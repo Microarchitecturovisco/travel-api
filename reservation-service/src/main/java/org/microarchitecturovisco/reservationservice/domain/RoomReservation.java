@@ -3,28 +3,25 @@ package org.microarchitecturovisco.reservationservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
-@Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
-
+@Builder
+public class RoomReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String email;
+    @ManyToOne
+    @JoinColumn(name="reservation_id")
+    private Reservation reservation;
 
-    private String password;
+    @OneToOne
+    @JoinColumn(name="room_type_id")
+    private RoomType roomType;
 
-    private String name;
+    private int numberOfGuests;
 
-    private String surname;
-
-    @OneToMany(mappedBy = "user")
-    private List<Reservation> reservations;
 }

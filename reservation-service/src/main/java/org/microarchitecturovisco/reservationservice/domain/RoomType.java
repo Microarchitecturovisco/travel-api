@@ -1,21 +1,19 @@
 package org.microarchitecturovisco.reservationservice.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RoomType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private int guestCapacity;
 
@@ -25,7 +23,6 @@ public class RoomType {
 
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name="reservation_id")
-    private Reservation reservation;
+    @OneToOne(mappedBy = "roomType")
+    private RoomReservation roomReservation;
 }
