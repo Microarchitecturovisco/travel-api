@@ -1,28 +1,25 @@
 package org.microarchitecturovisco.transport.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@Entity
 @Getter
 @Setter
-@Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransportCourse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @OneToOne
+    @JoinColumn(name = "location_from_id")
     private Location departureFrom;
 
     @OneToOne
+    @JoinColumn(name = "location_to_id")
     private Location arrivalAt;
 
-    public TransportCourse() {
-    }
-
-    public TransportCourse(Location departureFrom, Location arrivalAt) {
-        this.departureFrom = departureFrom;
-        this.arrivalAt = arrivalAt;
-    }
 }

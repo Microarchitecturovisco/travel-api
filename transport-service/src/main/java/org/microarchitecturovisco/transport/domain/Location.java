@@ -1,27 +1,27 @@
 package org.microarchitecturovisco.transport.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
 @Getter
 @Setter
-@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
+
+    @Column(nullable = false)
     private String country;
+
     private String region;
 
-    public Location() {
-    }
+    @OneToOne(mappedBy = "departureFrom")
+    private TransportCourse transportCourseFrom;
 
-    public Location(String country, String region) {
-        this.country = country;
-        this.region = region;
-    }
+    @OneToOne(mappedBy = "arrivalAt")
+    private TransportCourse transportCourseAt;
 }
