@@ -12,7 +12,7 @@ import lombok.*;
 public class CateringOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Enumerated(EnumType.STRING)
     private CateringType type;

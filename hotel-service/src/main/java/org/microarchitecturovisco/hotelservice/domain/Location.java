@@ -12,14 +12,12 @@ import lombok.*;
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private String country;
 
     private String region;
 
-
     @OneToOne(mappedBy = "location")
     private Hotel hotel;
-
 }
