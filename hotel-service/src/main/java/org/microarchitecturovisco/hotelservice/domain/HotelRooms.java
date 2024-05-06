@@ -15,7 +15,7 @@ public class HotelRooms {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int numberAvailable;
+    private int availableQuantity;
 
     @ManyToOne
     @JoinColumn(name="hotel_id")

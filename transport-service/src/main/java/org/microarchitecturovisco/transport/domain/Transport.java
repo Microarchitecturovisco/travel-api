@@ -3,7 +3,7 @@ package org.microarchitecturovisco.transport.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,9 +19,9 @@ public class Transport {
     @OneToOne
     private TransportCourse course;
 
-    private Date departureDate;
+    private LocalDateTime departureDate;
 
-    private Date returnDate;
+    private LocalDateTime returnDate;
 
     @Enumerated(EnumType.STRING)
     private TransportType type;

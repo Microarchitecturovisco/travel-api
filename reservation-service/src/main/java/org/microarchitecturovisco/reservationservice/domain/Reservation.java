@@ -3,7 +3,7 @@ package org.microarchitecturovisco.reservationservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -22,9 +22,9 @@ public class Reservation {
     @JoinColumn(name = "reservation_transport_id")
     private ReservationTransport reservationTransport;
 
-    private Date hotelTimeFrom;
+    private LocalDateTime hotelTimeFrom;
 
-    private Date hotelTimeTo;
+    private LocalDateTime hotelTimeTo;
 
     private int infantsQuantity;
 
