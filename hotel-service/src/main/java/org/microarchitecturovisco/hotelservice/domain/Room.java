@@ -10,17 +10,20 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class HotelRooms {
+public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    private int availableQuantity;
 
     @ManyToOne
     @JoinColumn(name="hotel_id")
     private Hotel hotel;
 
-    @OneToOne(mappedBy = "hotelRooms")
-    private RoomType roomType;
+    private String name;
+
+    private int guestCapacity;
+
+    private float pricePerAdult;
+
+    private String description;
 }

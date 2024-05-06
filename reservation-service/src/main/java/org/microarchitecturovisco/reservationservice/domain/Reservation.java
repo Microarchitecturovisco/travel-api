@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
 
 @Entity
 @Getter
@@ -18,10 +18,6 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
-    @JoinColumn(name = "reservation_transport_id")
-    private ReservationTransport reservationTransport;
-
     private LocalDateTime hotelTimeFrom;
 
     private LocalDateTime hotelTimeTo;
@@ -34,12 +30,14 @@ public class Reservation {
 
     private int adultsQuantity;
 
-    @OneToMany(mappedBy = "reservation")
-    private List<RoomReservation> rooms;
-
     private float price;
 
-    @ManyToOne
-    @JoinColumn(name="user_id")
-    private User user;
+    private boolean paid;
+
+    private int hotelId;
+
+    @ElementCollection
+    private Collection<Integer> roomReservationsIds;
+
+    private int userId;
 }

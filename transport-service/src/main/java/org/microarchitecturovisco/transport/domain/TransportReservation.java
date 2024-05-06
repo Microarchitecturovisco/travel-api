@@ -9,18 +9,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Location {
+public class TransportReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String country;
+    @OneToOne
+    private Transport transportId;
 
-    private String region;
-
-    @OneToOne(mappedBy = "departureFrom")
-    private TransportCourse transportCourseFrom;
-
-    @OneToOne(mappedBy = "arrivalAt")
-    private TransportCourse transportCourseAt;
+    private int numberOfSeats;
 }

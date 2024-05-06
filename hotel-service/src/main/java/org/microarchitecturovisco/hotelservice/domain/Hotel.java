@@ -30,7 +30,7 @@ public class Hotel {
     private Location location;
 
     @OneToMany(mappedBy = "hotel")
-    private List<HotelRooms> availableRooms;
+    private List<Room> rooms;
 
     @ElementCollection
     private List<String> photos;

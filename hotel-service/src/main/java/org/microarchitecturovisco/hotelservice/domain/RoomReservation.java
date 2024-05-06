@@ -1,7 +1,9 @@
-package org.microarchitecturovisco.reservationservice.domain;
+package org.microarchitecturovisco.hotelservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -14,14 +16,10 @@ public class RoomReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name="reservation_id")
-    private Reservation reservation;
-
     @OneToOne
-    @JoinColumn(name="room_type_id")
-    private RoomType roomType;
+    private Room roomId;
 
-    private int numberOfGuests;
+    private LocalDateTime dateFrom;
 
+    private LocalDateTime dateTo;
 }
