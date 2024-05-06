@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.transport.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,14 +20,18 @@ public class Transport {
     @OneToOne
     private TransportCourse course;
 
+    @NotNull
     private LocalDateTime departureDate;
 
+    @NotNull
     private LocalDateTime returnDate;
 
     @Enumerated(EnumType.STRING)
     private TransportType type;
 
+    @NotNull
     private int capacity;
 
+    @NotNull
     private float pricePerAdult;
 }

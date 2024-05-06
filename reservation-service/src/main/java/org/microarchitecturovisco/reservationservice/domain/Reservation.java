@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.reservationservice.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,8 +19,10 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotNull
     private LocalDateTime hotelTimeFrom;
 
+    @NotNull
     private LocalDateTime hotelTimeTo;
 
     private int infantsQuantity;
@@ -28,16 +31,22 @@ public class Reservation {
 
     private int teensQuantity;
 
+    @NotNull
     private int adultsQuantity;
 
+    @NotNull
     private float price;
 
+    @NotNull
     private boolean paid;
 
+    @NotNull
     private int hotelId;
 
+    @NotNull
     @ElementCollection
     private Collection<Integer> roomReservationsIds;
 
+    @NotNull
     private int userId;
 }

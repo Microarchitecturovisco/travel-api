@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.hotelservice.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,9 @@ public class RoomReservation {
     @OneToOne
     private Room roomId;
 
+    @NotNull
     private LocalDateTime dateFrom;
 
+    @NotNull
     private LocalDateTime dateTo;
 }

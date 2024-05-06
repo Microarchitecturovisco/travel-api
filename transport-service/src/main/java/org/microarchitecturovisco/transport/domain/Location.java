@@ -2,6 +2,7 @@ package org.microarchitecturovisco.transport.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Getter
@@ -14,6 +15,7 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotNull
     private String country;
 
     private String region;

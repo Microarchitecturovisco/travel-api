@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.transport.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -17,5 +18,6 @@ public class TransportReservation {
     @OneToOne
     private Transport transportId;
 
+    @NotNull
     private int numberOfSeats;
 }

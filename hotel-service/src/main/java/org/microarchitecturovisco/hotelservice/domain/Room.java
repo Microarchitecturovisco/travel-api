@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.hotelservice.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 
@@ -19,10 +20,13 @@ public class Room {
     @JoinColumn(name="hotel_id")
     private Hotel hotel;
 
+    @NotNull
     private String name;
 
+    @NotNull
     private int guestCapacity;
 
+    @NotNull
     private float pricePerAdult;
 
     private String description;
