@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.transport.domain;
+package org.microarchitecturovisco.transport.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
+@Table(name = "locations")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +16,7 @@ import java.util.List;
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @NotNull
     private String country;
@@ -27,4 +28,10 @@ public class Location {
 
     @OneToMany(mappedBy = "arrivalAt")
     private List<TransportCourse> transportCourseAt;
+
+    public Location(String country, String region) {
+        this.id = null;
+        this.country = country;
+        this.region = region;
+    }
 }

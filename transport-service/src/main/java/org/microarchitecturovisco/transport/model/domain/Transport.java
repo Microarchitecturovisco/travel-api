@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.transport.domain;
+package org.microarchitecturovisco.transport.model.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Table(name = "transports")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,17 +19,12 @@ public class Transport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @ManyToOne
     private TransportCourse course;
 
+    // the day the transport takes place
     @NotNull
     private LocalDateTime departureDate;
-
-    @NotNull
-    private LocalDateTime returnDate;
-
-    @Enumerated(EnumType.STRING)
-    private TransportType type;
 
     @NotNull
     private int capacity;

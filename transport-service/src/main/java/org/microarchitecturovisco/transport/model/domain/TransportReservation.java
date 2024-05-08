@@ -1,10 +1,11 @@
-package org.microarchitecturovisco.transport.domain;
+package org.microarchitecturovisco.transport.model.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
+@Table(name = "transports_reservations")
 @Getter
 @Setter
 @NoArgsConstructor
