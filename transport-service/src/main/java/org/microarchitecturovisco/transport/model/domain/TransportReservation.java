@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
+@Table(name = "transports_reservations")
 @Getter
 @Setter
 @NoArgsConstructor
