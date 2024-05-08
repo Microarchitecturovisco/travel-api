@@ -15,8 +15,9 @@ public class TransportReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
-    private Transport transportId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="transport_id", nullable=false)
+    private Transport transport;
 
     @NotNull
     private int numberOfSeats;

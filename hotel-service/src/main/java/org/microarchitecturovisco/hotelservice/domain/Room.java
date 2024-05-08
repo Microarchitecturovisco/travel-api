@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -16,7 +18,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="hotel_id")
     private Hotel hotel;
 
@@ -30,4 +32,7 @@ public class Room {
     private float pricePerAdult;
 
     private String description;
+
+    @OneToMany(mappedBy="room", cascade = CascadeType.ALL)
+    private List<RoomReservation> roomReservations;
 }

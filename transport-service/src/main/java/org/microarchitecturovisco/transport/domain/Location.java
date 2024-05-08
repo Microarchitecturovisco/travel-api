@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -20,9 +22,9 @@ public class Location {
 
     private String region;
 
-    @OneToOne(mappedBy = "departureFrom")
-    private TransportCourse transportCourseFrom;
+    @OneToMany(mappedBy = "departureFrom")
+    private List<TransportCourse> transportCourseFrom;
 
-    @OneToOne(mappedBy = "arrivalAt")
-    private TransportCourse transportCourseAt;
+    @OneToMany(mappedBy = "arrivalAt")
+    private List<TransportCourse> transportCourseAt;
 }

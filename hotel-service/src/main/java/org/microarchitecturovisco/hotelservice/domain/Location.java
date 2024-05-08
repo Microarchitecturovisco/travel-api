@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -20,6 +22,6 @@ public class Location {
 
     private String region;
 
-    @OneToOne(mappedBy = "location")
-    private Hotel hotel;
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
+    private List<Hotel> hotel;
 }

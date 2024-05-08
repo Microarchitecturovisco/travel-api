@@ -14,12 +14,12 @@ public class TransportCourse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
-    @JoinColumn(name = "location_from_id")
+    @ManyToOne
+    @JoinColumn(name = "transport_course_from_id", nullable = false)
     private Location departureFrom;
 
-    @OneToOne
-    @JoinColumn(name = "location_to_id")
+    @ManyToOne
+    @JoinColumn(name = "transport_course_at_id", nullable = false)
     private Location arrivalAt;
 
 }

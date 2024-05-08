@@ -17,12 +17,13 @@ public class RoomReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
-    private Room roomId;
-
     @NotNull
     private LocalDateTime dateFrom;
 
     @NotNull
     private LocalDateTime dateTo;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="room_id", nullable=false)
+    private Room room;
 }

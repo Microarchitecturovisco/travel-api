@@ -24,7 +24,7 @@ public class CateringOption {
     @NotNull
     private float price;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 

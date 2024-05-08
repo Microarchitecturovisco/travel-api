@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,4 +35,7 @@ public class Transport {
 
     @NotNull
     private float pricePerAdult;
+
+    @OneToMany(mappedBy="transport", cascade = CascadeType.ALL)
+    private List<TransportReservation> transportReservations;
 }
