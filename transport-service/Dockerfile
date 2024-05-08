@@ -1,12 +1,13 @@
 # syntax=docker/dockerfile:1
 
-FROM openjdk:21 AS build
+FROM jelastic/maven:3.9.5-openjdk-21 AS build
 
 ENV HOME=/usr/app
 RUN mkdir -p $HOME
 WORKDIR $HOME
 ADD . $HOME
-RUN --mount=type=cache,target=/root/.m2 ./mvnw -f $HOME/pom.xml clean package
+
+RUN --mount=type=cache,target=/root/.m2 mvn clean package
 
 
 FROM openjdk:21
