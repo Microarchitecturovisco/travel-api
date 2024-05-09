@@ -12,6 +12,7 @@ import org.microarchitecturovisco.transport.model.dto.response.AvailableTranspor
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
+import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.springframework.stereotype.Service;
@@ -69,23 +70,12 @@ public class TransportsService {
 
         List<Transport> transports = transportRepository.findAll();
 
-        Transport testTransport = transports.getFirst();
-        TransportCourseDto transportCourseDto = TransportCourseDto.builder()
-                .type(testTransport.getCourse().getType())
-                .departureFromLocation(LocationMapper.map(testTransport.getCourse().getDepartureFrom()))
-                .arrivalAtLocation(LocationMapper.map(testTransport.getCourse().getArrivalAt()))
-                .build();
+        Transport transportA = transports.getFirst();
+        Transport transportB = transports.get(1);
 
         return GetTransportsBySearchQueryResponseDto.builder()
                 .transportDtoList(
-                        List.of(TransportDto.builder()
-                                .idTransport(testTransport.getId())
-                                .transportCourse(transportCourseDto)
-                                .departureDate(testTransport.getDepartureDate())
-                                .capacity(testTransport.getCapacity())
-                                .pricePerAdult(testTransport.getPricePerAdult())
-                                .build())
-
+                        TransportMapper.mapList(List.of(transportA, transportB))
                 ).build();
     }
 }
