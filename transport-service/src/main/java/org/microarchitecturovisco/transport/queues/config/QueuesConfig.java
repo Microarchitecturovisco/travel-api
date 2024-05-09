@@ -14,6 +14,6 @@ public class QueuesConfig {
 
     @Bean
     public Queue getTransportsResponse() {
-        return new Queue("transports.response.getTransportsBySearchQuery", false);
+        return new Queue("transports.responses.getTransportsBySearchQuery", false);
     }
 }

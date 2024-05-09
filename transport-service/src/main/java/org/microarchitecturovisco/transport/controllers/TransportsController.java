@@ -33,6 +33,8 @@ public class TransportsController {
     public void consumeGetTransportsRequest(GetTransportsBySearchQueryRequestDto requestDto) {
         GetTransportsBySearchQueryResponseDto responseDto = transportsService.getTransportsBySearchQuery(requestDto);
 
+        System.out.println("Send transports response size " + responseDto.getTransportDtoList().size());
+
         rabbitTemplate.convertAndSend("transports.responses.getTransportsBySearchQuery", responseDto);
     }
 }
