@@ -74,6 +74,7 @@ public class TransportsService {
         Transport transportB = transports.get(1);
 
         return GetTransportsBySearchQueryResponseDto.builder()
+                .uuid(requestDto.getUuid())
                 .transportDtoList(
                         TransportMapper.mapList(List.of(transportA, transportB))
                 ).build();
