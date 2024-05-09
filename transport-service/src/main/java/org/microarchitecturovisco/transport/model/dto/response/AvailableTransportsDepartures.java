@@ -1,9 +1,9 @@
-package org.microarchitecturovisco.transport.model.dto.transports.response;
+package org.microarchitecturovisco.transport.model.dto.response;
 
 
 import lombok.Builder;
 import lombok.Data;
-import org.microarchitecturovisco.transport.model.dto.transports.LocationDto;
+import org.microarchitecturovisco.transport.model.dto.LocationDto;
 
 import java.util.List;
 
