@@ -3,8 +3,12 @@ name: Travel API CI
 on:
   push:
     branches: [ "dev" ]
+    paths:
+      - 'hotel-service/**'
   pull_request:
     branches: [ "dev" ]
+    paths:
+      - 'hotel-service/**'
 
 permissions: write-all
 
@@ -22,12 +26,12 @@ jobs:
           distribution: 'zulu'
           cache: maven
       - name: Build transport-service
-        run: mvn -B package --file transport-service/pom.xml
+        run: mvn -B package --file hotel-service/pom.xml
 
       - name: transport-service test reports
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: |
-            transport-service/target/surefire-reports/TEST-*.xml
+            hotel-service/target/surefire-reports/TEST-*.xml
 
