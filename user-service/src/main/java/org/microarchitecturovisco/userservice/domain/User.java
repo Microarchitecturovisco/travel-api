@@ -23,20 +23,23 @@ public class User {
     @NotNull
     @Email(regexp = ".+[@].+[\\.].+")
     @Size(max = 100)
-    @Column(name = "email")
     private String email;
 
     @NotNull
-    @Column(name = "password")
     private String password;
 
     @NotNull
     @Size(max = 50)
-    @Column(name = "name")
     private String name;
 
     @NotNull
     @Size(max = 50)
-    @Column(name = "surname")
     private String surname;
+
+    public User(String email, String password, String name, String surname){
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.surname = surname;
+    }
 }
