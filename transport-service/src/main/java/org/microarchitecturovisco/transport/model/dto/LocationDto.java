@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.transport.model.dto.transports;
+package org.microarchitecturovisco.transport.model.dto;
 
 import lombok.Builder;
 import lombok.Data;

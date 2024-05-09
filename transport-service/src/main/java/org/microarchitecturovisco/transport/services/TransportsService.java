@@ -2,12 +2,18 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.Location;
+import org.microarchitecturovisco.transport.model.domain.Transport;
 import org.microarchitecturovisco.transport.model.domain.TransportCourse;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
-import org.microarchitecturovisco.transport.model.dto.transports.response.AvailableTransportsDepartures;
-import org.microarchitecturovisco.transport.model.dto.transports.response.AvailableTransportsDto;
+import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
+import org.microarchitecturovisco.transport.model.dto.TransportDto;
+import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
+import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDepartures;
+import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
+import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
+import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +24,7 @@ import java.util.List;
 public class TransportsService {
 
     private final TransportCourseRepository transportCourseRepository;
+    private final TransportRepository transportRepository;
 
     public AvailableTransportsDto getAvailableTransports() {
 
@@ -56,5 +63,29 @@ public class TransportsService {
                         .bus(LocationMapper.mapList(departuresBus))
                         .build())
                 .build();
+    }
+
+    public GetTransportsBySearchQueryResponseDto getTransportsBySearchQuery(GetTransportsBySearchQueryRequestDto requestDto) {
+
+        List<Transport> transports = transportRepository.findAll();
+
+        Transport testTransport = transports.getFirst();
+        TransportCourseDto transportCourseDto = TransportCourseDto.builder()
+                .type(testTransport.getCourse().getType())
+                .departureFromLocation(LocationMapper.map(testTransport.getCourse().getDepartureFrom()))
+                .arrivalAtLocation(LocationMapper.map(testTransport.getCourse().getArrivalAt()))
+                .build();
+
+        return GetTransportsBySearchQueryResponseDto.builder()
+                .transportDtoList(
+                        List.of(TransportDto.builder()
+                                .idTransport(testTransport.getId())
+                                .transportCourse(transportCourseDto)
+                                .departureDate(testTransport.getDepartureDate())
+                                .capacity(testTransport.getCapacity())
+                                .pricePerAdult(testTransport.getPricePerAdult())
+                                .build())
+
+                ).build();
     }
 }
