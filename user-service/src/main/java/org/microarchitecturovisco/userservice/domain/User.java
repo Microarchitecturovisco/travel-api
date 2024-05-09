@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.userservice.model;
+package org.microarchitecturovisco.userservice.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

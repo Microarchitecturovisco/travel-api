@@ -1,6 +1,6 @@
 package org.microarchitecturovisco.userservice.controllers;
 
-import org.microarchitecturovisco.userservice.model.User;
+import org.microarchitecturovisco.userservice.domain.User;
 import org.microarchitecturovisco.userservice.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,6 @@
 package org.microarchitecturovisco.userservice;
 
-import org.microarchitecturovisco.userservice.model.User;
+import org.microarchitecturovisco.userservice.domain.User;
 import org.microarchitecturovisco.userservice.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
