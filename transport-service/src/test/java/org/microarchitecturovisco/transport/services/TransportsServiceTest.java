@@ -29,7 +29,7 @@ public class TransportsServiceTest {
     private TransportCourseRepository transportCourseRepository;
 
     @Test
-    public void testGetAvailableTransports() {
+    public void testGetAvailableTransports_returnsCorrectDto() {
         // Arrange
         TransportCourse transportCourse = new TransportCourse();
         Location location = new Location("Polska", "Warsaw");
@@ -45,5 +45,20 @@ public class TransportsServiceTest {
         assertEquals(1, result.getDepartures().getPlane().size());
         assertEquals("Warsaw", result.getDepartures().getPlane().getFirst().getRegion());
         assertEquals("Polska", result.getDepartures().getPlane().getFirst().getCountry());
+        assertEquals(0, result.getDepartures().getBus().size());
+        assertEquals(1, result.getArrivals().size());
+    }
+
+    @Test
+    public void testGetAvailableTransports_returnsEmptyList () {
+        // Arrange
+        when(transportCourseRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // Act
+        AvailableTransportsDto result = transportsService.getAvailableTransports();
+
+        // Assert
+        assertEquals(0, result.getDepartures().getPlane().size());
+        assertEquals(0, result.getDepartures().getBus().size());
     }
 }
