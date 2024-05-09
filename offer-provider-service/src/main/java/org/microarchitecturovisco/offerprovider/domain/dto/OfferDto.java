@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.offerprovider.controllers.domain.dto;
+package org.microarchitecturovisco.offerprovider.domain.dto;
 
 import lombok.Builder;
 import lombok.Data;
