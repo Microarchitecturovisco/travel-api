@@ -1,19 +1,15 @@
 package org.microarchitecturovisco.transport.services;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 import org.microarchitecturovisco.transport.model.domain.Location;
 import org.microarchitecturovisco.transport.model.domain.TransportCourse;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
-import org.microarchitecturovisco.transport.model.dto.transports.response.AvailableTransportsDto;
+import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -5,11 +5,14 @@ import org.microarchitecturovisco.transport.model.domain.Location;
 import org.microarchitecturovisco.transport.model.domain.Transport;
 import org.microarchitecturovisco.transport.model.domain.TransportCourse;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
-import org.microarchitecturovisco.transport.model.dto.transports.LocationDto;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -27,6 +30,7 @@ public class Bootstrap implements CommandLineRunner {
     private final LocationRepository locationRepository;
     private final TransportRepository transportRepository;
     private final TransportCourseRepository transportCourseRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public void run(String... args) throws Exception {
