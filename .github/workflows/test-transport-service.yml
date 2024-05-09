@@ -1,4 +1,4 @@
-name: Travel API CI
+name: Travel API CI - Transport service
 
 on:
   push:
@@ -14,6 +14,7 @@ permissions: write-all
 
 jobs:
   test:
+    name: Package and execute tests
     runs-on: ubuntu-latest
     if: always()
 
