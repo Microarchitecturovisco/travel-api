@@ -9,5 +9,6 @@ import java.util.List;
 @Data
 @Builder
 public class GetTransportsBySearchQueryResponseDto {
+    private String uuid;
     private List<TransportDto> transportDtoList;
 }

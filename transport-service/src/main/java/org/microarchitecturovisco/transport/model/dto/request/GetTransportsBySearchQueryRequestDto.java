@@ -9,6 +9,8 @@ import java.util.List;
 @Data
 @Builder
 public class GetTransportsBySearchQueryRequestDto {
+    private String uuid;
+
     private List<Integer> departureLocationIdsByPlane;
     private List<Integer> departureLocationIdsByBus;
     private List<Integer> arrivalLocationIds;
