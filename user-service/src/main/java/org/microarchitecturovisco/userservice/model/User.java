@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.userservice.domain;
+package org.microarchitecturovisco.userservice.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,26 +13,30 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="users")
+@Table(name = "users")
 public class User {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @NotNull
     @Email(regexp = ".+[@].+[\\.].+")
     @Size(max = 100)
+    @Column(name = "email")
     private String email;
 
     @NotNull
+    @Column(name = "password")
     private String password;
 
     @NotNull
     @Size(max = 50)
+    @Column(name = "name")
     private String name;
 
     @NotNull
     @Size(max = 50)
+    @Column(name = "surname")
     private String surname;
 }

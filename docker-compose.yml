@@ -1,92 +1,43 @@
-name: mcarchvsc
-version: "3"
+#name: mcarchvsc
+version: "3.8"
 
 services:
-  rabbitmq:
-    image: rabbitmq:3.13-management
-    hostname: rabbitmq
-    ports:
-      - 5672:5672
-      - 15672:15672
-    networks:
-      - backend
 
   discovery:
     hostname: discovery
     build: ./discovery-service
     ports:
-      - 8010:8010
-    depends_on:
-      - rabbitmq
-    networks:
-      - backend
-
-  gateway:
-    build: ./api-gateway
-    ports:
-      - 8082:8082
-    depends_on:
-      - rabbitmq
-      - discovery
-    networks:
-      - backend
-
-
-  # custom services
-  hotel:
-    build: ./hotel-service
-    depends_on:
-      - rabbitmq
-      - discovery
-      - gateway
-    networks:
-      - backend
-
-  offer-provider:
-    build: ./offer-provider-service
-    depends_on:
-      - rabbitmq
-      - discovery
-      - gateway
-    networks:
-      - backend
-
-  payment:
-    build: ./payment-service
-    depends_on:
-      - rabbitmq
-      - discovery
-      - gateway
-    networks:
-      - backend
-
-  reservation:
-    build: ./reservation-service
-    depends_on:
-      - rabbitmq
-      - discovery
-      - gateway
-    networks:
-      - backend
-
-  transport:
-    build: ./transport-service
-    depends_on:
-      - rabbitmq
-      - discovery
-      - gateway
+      - 8020:8020
     networks:
       - backend
 
   user:
     build: ./user-service
     depends_on:
-      - rabbitmq
       - discovery
-      - gateway
+#      - gateway
+      - psdb
+    networks:
+      - backend
+    ports:
+      - 8082:8082
+
+  psdb:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=users
+    ports:
+      - 5433:5432
+    restart: always
+    volumes:
+      - ./db:/var/lib/postgres
     networks:
       - backend
 
+volumes:
+  db:
 
 networks:
   backend:
