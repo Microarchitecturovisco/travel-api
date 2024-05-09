@@ -5,10 +5,15 @@ import org.microarchitecturovisco.transport.model.domain.Location;
 import org.microarchitecturovisco.transport.model.domain.Transport;
 import org.microarchitecturovisco.transport.model.domain.TransportCourse;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
+import org.microarchitecturovisco.transport.model.dto.TransportDto;
+import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
+import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -119,6 +124,37 @@ public class Bootstrap implements CommandLineRunner {
 
 
 
+    }
+
+    @Scheduled(fixedDelay = 10000)
+    public void testGetTransportsBySearchQuery() {
+        GetTransportsBySearchQueryRequestDto testRequestDto = GetTransportsBySearchQueryRequestDto.builder()
+                .uuid(java.util.UUID.randomUUID().toString())
+                .dateFrom(LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0))
+                .dateTo(LocalDateTime.of(2024, Month.MAY, 14, 12, 0, 0))
+                .departureLocationIdsByPlane(List.of(1, 2))
+                .departureLocationIdsByBus(List.of())
+                .arrivalLocationIds(List.of(7))
+                .adults(2)
+                .childrenUnderThree(1)
+                .childrenUnderTen(1)
+                .childrenUnderEighteen(1)
+                .build();
+
+        rabbitTemplate.convertAndSend("transports.requests.getTransportsBySearchQuery", testRequestDto);
+    }
+
+    @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
+    @RabbitHandler
+    public void consumeGetTransportsResponse(GetTransportsBySearchQueryResponseDto responseDto) {
+
+        System.out.println("Received transports:");
+        for (TransportDto transportDto : responseDto.getTransportDtoList()) {
+            System.out.println("  - " + transportDto.getTransportCourse().getDepartureFromLocation().getRegion() + " <-> " + transportDto.getTransportCourse().getArrivalAtLocation().getRegion());
+            System.out.println("    " + transportDto.getDepartureDate());
+        }
+
+        System.out.println("Received transports of size " + responseDto.getTransportDtoList().size());
     }
 
 }
