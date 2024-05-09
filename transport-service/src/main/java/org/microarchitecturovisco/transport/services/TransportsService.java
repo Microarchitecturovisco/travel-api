@@ -1,7 +1,6 @@
 package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.mapping.List;
 import org.microarchitecturovisco.transport.model.domain.Location;
 import org.microarchitecturovisco.transport.model.domain.TransportCourse;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
@@ -12,6 +11,7 @@ import org.microarchitecturovisco.transport.repositories.TransportCourseReposito
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

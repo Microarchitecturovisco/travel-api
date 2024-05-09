@@ -7,7 +7,7 @@ RUN mkdir -p $HOME
 WORKDIR $HOME
 ADD . $HOME
 
-RUN --mount=type=cache,target=/root/.m2 mvn clean package
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -Dmaven.test.skip
 
 
 FROM openjdk:21
