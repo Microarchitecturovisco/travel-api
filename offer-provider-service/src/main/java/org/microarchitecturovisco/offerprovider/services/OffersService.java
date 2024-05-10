@@ -25,7 +25,7 @@ public class OffersService {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public List<TransportDto> getOffersBasedOnSearchQuery(
+    public List<TransportDto> getAvailableTransportsBasedOnSearchQuery(
             List<Integer> departureBuses,
             List<Integer> departurePlane,
             List<Integer> arrivals,
