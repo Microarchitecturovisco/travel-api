@@ -1,0 +1,52 @@
+version: '3.9'
+name: mcarchvsc
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: database
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports: 
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  userdb:
+    image: postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=users
+      - PGDATA=/data/postgres
+    expose:
+      - "5432"
+    restart: unless-stopped
+    volumes:
+      - ./userdb:/data/postgres
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  postgres:
+  userdb:
+
+networks:
+  backend:
+    name: mcarchvsc_backend
+    external: true
