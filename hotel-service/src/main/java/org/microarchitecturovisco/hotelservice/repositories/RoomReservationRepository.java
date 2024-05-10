@@ -1,9 +1,9 @@
 package org.microarchitecturovisco.hotelservice.repositories;
 
-import org.microarchitecturovisco.hotelservice.domain.Hotel;
+import org.microarchitecturovisco.hotelservice.domain.RoomReservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HotelRepository extends JpaRepository<Hotel, Integer> {
+public interface RoomReservationRepository extends JpaRepository<RoomReservation, Integer> {
 }

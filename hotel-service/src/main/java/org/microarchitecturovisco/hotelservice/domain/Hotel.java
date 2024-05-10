@@ -14,7 +14,6 @@ import java.util.List;
 @Table(name="hotels")
 public class Hotel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
@@ -23,10 +22,10 @@ public class Hotel {
 
     private String description;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "hotel")
     private List<CateringOption> cateringOptions;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "location_id")
     private Location location;
 
@@ -35,4 +34,17 @@ public class Hotel {
 
     @ElementCollection
     private List<String> photos;
+
+    // Constructor with all fields except id
+    public Hotel(int id,
+                 String name,
+                 float rating,
+                 String description,
+                 Location location) {
+        this.id = id;
+        this.name = name;
+        this.rating = rating;
+        this.description = description;
+        this.location = location;
+    }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name="locations")
 public class Location {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @NotNull
@@ -23,6 +23,11 @@ public class Location {
 
     private String region;
 
-    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "location")
     private List<Hotel> hotel;
+
+    public Location(String country, String region) {
+        this.country = country;
+        this.region = region;
+    }
 }
