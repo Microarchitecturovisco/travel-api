@@ -1,5 +1,6 @@
 package org.microarchitecturovisco.offerprovider.utils.handlers;
 
+import org.microarchitecturovisco.offerprovider.domain.exceptions.ServiceTimeoutException;
 import org.microarchitecturovisco.offerprovider.domain.exceptions.WrongDateFormatException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,5 +18,12 @@ public class OfferProviderExceptionHandler extends ResponseEntityExceptionHandle
     )
     protected ResponseEntity handleBadRequest(RuntimeException ex, WebRequest request) {
         return handleExceptionInternal(ex, ResponseEntity.badRequest().body(ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(
+            ServiceTimeoutException.class
+    )
+    protected ResponseEntity handleInternalServerError(RuntimeException ex, WebRequest request) {
+        return handleExceptionInternal(ex, ResponseEntity.internalServerError().body(ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 }

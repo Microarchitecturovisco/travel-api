@@ -1,13 +1,18 @@
 package org.microarchitecturovisco.offerprovider.domain.dto.responses;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class TransportDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TransportDto implements Serializable {
     private Integer idTransport;
 
     private LocalDateTime departureDate;

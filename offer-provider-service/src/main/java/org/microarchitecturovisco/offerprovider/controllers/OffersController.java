@@ -1,8 +1,6 @@
 package org.microarchitecturovisco.offerprovider.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.offerprovider.domain.dto.OfferDto;
-import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetTransportsMessage;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDto;
 import org.microarchitecturovisco.offerprovider.services.OffersService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,7 +19,7 @@ public class OffersController {
     private final RabbitTemplate rabbitTemplate;
 
     @GetMapping("/offers")
-    public List<OfferDto> getOffersBasedOnSearchQuery(
+    public List<TransportDto> getOffersBasedOnSearchQuery(
             @RequestParam(name = "departureBus") List<Integer> departureBuses,
             @RequestParam(name = "departurePlane") List<Integer> departurePlane,
             @RequestParam(name = "arrivals") List<Integer> arrivals,
@@ -36,11 +34,5 @@ public class OffersController {
 
         return offersService.getOffersBasedOnSearchQuery(departureBuses, departurePlane,
                 arrivals, dateFrom, dateTo, adults, infants, kids, teens);
-    }
-
-    @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
-    public void consumeGetTransportsRequest(TransportDto transportDto) {
-
-
     }
 }
