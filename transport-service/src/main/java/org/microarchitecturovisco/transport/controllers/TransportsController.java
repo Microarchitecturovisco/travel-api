@@ -34,10 +34,15 @@ public class TransportsController {
 
     @RabbitListener(queues = "transports.requests.getTransportsBySearchQuery")
     public void consumeGetTransportsRequest(String requestDtoJson) {
+        long startTime = System.currentTimeMillis();
+
         GetTransportsBySearchQueryRequestDto requestDto = JsonReader.readGetTransportsBySearchQueryRequestFromJson(requestDtoJson);
+
         GetTransportsBySearchQueryResponseDto responseDto = transportsService.getTransportsBySearchQuery(requestDto);
 
+        long endTime = System.currentTimeMillis();
         System.out.println("Send transports response size " + responseDto.getTransportDtoList().size());
+        System.out.println("Service call took " + (endTime - startTime) + " ms");
 
         rabbitTemplate.convertAndSend("transports.responses.getTransportsBySearchQuery", JsonConverter.convertGetTransportsBySearchQueryResponseDto(responseDto));
     }
