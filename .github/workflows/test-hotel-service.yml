@@ -1,0 +1,38 @@
+name: Travel API CI - Hotel service
+
+on:
+  push:
+    branches: [ "dev" ]
+    paths:
+      - 'hotel-service/**'
+  pull_request:
+    branches: [ "dev" ]
+    paths:
+      - 'hotel-service/**'
+
+permissions: write-all
+
+jobs:
+  test:
+    name: Package and execute tests
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+          cache: maven
+      - name: Build transport-service
+        run: mvn -B package --file hotel-service/pom.xml
+
+      - name: transport-service test reports
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            hotel-service/target/surefire-reports/TEST-*.xml
+

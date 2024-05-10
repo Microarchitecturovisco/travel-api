@@ -1,7 +1,7 @@
 package org.microarchitecturovisco.transport.model.mappers;
 
 import org.microarchitecturovisco.transport.model.domain.Location;
-import org.microarchitecturovisco.transport.model.dto.transports.LocationDto;
+import org.microarchitecturovisco.transport.model.dto.LocationDto;
 
 import java.util.List;
 

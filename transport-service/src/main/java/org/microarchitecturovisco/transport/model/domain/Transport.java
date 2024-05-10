@@ -1,8 +1,10 @@
 package org.microarchitecturovisco.transport.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.repository.cdi.Eager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +34,6 @@ public class Transport {
     @NotNull
     private float pricePerAdult;
 
-    @OneToMany(mappedBy="transport", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="transport", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<TransportReservation> transportReservations;
 }
