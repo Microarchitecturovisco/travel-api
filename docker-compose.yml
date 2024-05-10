@@ -84,21 +84,6 @@ services:
       - rabbitmq
       - discovery
       - gateway
-      - userdb
-    networks:
-      - backend
-
-  userdb:
-    image: postgres
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=users
-    expose:
-      - "5432"
-    restart: always
-    volumes:
-      - ./db:/var/lib/postgres
     networks:
       - backend
 
