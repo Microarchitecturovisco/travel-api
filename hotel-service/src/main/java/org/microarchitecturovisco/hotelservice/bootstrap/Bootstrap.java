@@ -2,6 +2,7 @@ package org.microarchitecturovisco.hotelservice.bootstrap;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.CsvParser;
+import org.microarchitecturovisco.hotelservice.domain.Hotel;
 import org.microarchitecturovisco.hotelservice.domain.Location;
 import org.microarchitecturovisco.hotelservice.repositories.HotelRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -15,18 +16,20 @@ import java.util.logging.Logger;
 public class Bootstrap implements CommandLineRunner {
 
     private final CsvParser csvParser;
-    private final HotelRepository hotelRepository;
+    private final String dataDirectory = "hotel-service\\src\\main\\java\\org\\microarchitecturovisco\\hotelservice\\bootstrap\\data\\";
 
     @Override
     public void run(String... args) throws Exception {
         Logger logger = Logger.getLogger("Bootstrap");
 
         // Path to the CSV file
-        String csvFilePath = "hotel-service\\src\\main\\java\\org\\microarchitecturovisco\\hotelservice\\bootstrap\\data\\hotels.csv";
+        String hotelCsvFile = dataDirectory + "hotels.csv";
 
-        // Parse hotels from CSV
-        List<Location> locations = csvParser.createLocations(csvFilePath);
-        
+        List<Location> locations = csvParser.importLocations(hotelCsvFile);
         logger.info("Saved locations: " + locations);
+
+        List<Hotel> hotels = csvParser.importHotels(hotelCsvFile);
+        logger.info("Saved hotels: " + hotels);
+
     }
 }

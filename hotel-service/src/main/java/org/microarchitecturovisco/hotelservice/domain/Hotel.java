@@ -20,6 +20,7 @@ public class Hotel {
 
     private float rating;
 
+    @Column(length = 1000)
     private String description;
 
     @OneToMany(mappedBy = "hotel")
@@ -35,11 +36,10 @@ public class Hotel {
     @ElementCollection
     private List<String> photos;
 
-    // Constructor with all fields except id
     public Hotel(int id,
                  String name,
-                 float rating,
                  String description,
+                 float rating,
                  Location location) {
         this.id = id;
         this.name = name;
