@@ -144,7 +144,7 @@ public class Bootstrap implements CommandLineRunner {
 
     }
 
-    @Scheduled(fixedDelay = 10000)
+    //@Scheduled(fixedDelay = 10000)
     public void testGetTransportsBySearchQuery() {
         GetTransportsBySearchQueryRequestDto testRequestDto = GetTransportsBySearchQueryRequestDto.builder()
                 .uuid(java.util.UUID.randomUUID().toString())
@@ -162,17 +162,17 @@ public class Bootstrap implements CommandLineRunner {
         rabbitTemplate.convertAndSend("transports.requests.getTransportsBySearchQuery", testRequestDto);
     }
 
-    @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
-    @RabbitHandler
-    public void consumeGetTransportsResponse(GetTransportsBySearchQueryResponseDto responseDto) {
-
-        System.out.println("Received transports:");
-        for (TransportDto transportDto : responseDto.getTransportDtoList()) {
-            System.out.println("  - " + transportDto.getTransportCourse().getDepartureFromLocation().getRegion() + " <-> " + transportDto.getTransportCourse().getArrivalAtLocation().getRegion());
-            System.out.println("    " + transportDto.getDepartureDate());
-        }
-
-        System.out.println("Received transports of size " + responseDto.getTransportDtoList().size());
-    }
+//    @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
+//    @RabbitHandler
+//    public void consumeGetTransportsResponse(GetTransportsBySearchQueryResponseDto responseDto) {
+//
+//        System.out.println("Received transports:");
+//        for (TransportDto transportDto : responseDto.getTransportDtoList()) {
+//            System.out.println("  - " + transportDto.getTransportCourse().getDepartureFromLocation().getRegion() + " <-> " + transportDto.getTransportCourse().getArrivalAtLocation().getRegion());
+//            System.out.println("    " + transportDto.getDepartureDate());
+//        }
+//
+//        System.out.println("Received transports of size " + responseDto.getTransportDtoList().size());
+//    }
 
 }
