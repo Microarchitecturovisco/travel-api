@@ -16,10 +16,10 @@ import java.util.List;
 @Table(name="rooms")
 public class Room {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Hotel.class)
     @JoinColumn(name="hotel_id")
     private Hotel hotel;
 
@@ -32,8 +32,9 @@ public class Room {
     @NotNull
     private float pricePerAdult;
 
+    @Column(length = 1000)
     private String description;
 
-    @OneToMany(mappedBy="room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="room")
     private List<RoomReservation> roomReservations;
 }

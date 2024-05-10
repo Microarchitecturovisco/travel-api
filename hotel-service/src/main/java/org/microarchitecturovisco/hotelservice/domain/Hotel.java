@@ -30,7 +30,7 @@ public class Hotel {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "hotel")
     private List<Room> rooms;
 
     @ElementCollection

@@ -25,16 +25,20 @@ public class Bootstrap implements CommandLineRunner {
         // Path to the CSV file
         String hotelCsvFile = dataDirectory + "hotels.csv";
         String hotelPhotosCsvFile = dataDirectory + "hotel_photos.csv";
+        String hotelRoomsCsvFile = dataDirectory + "hotel_rooms.csv";
+
 
         csvParser.importPhotosForHotels(hotelPhotosCsvFile);
-        logger.info("Saved hotel photos");
+        logger.info("Saved photos");
 
-        List<Location> locations = csvParser.importLocations(hotelCsvFile);
-        logger.info("Saved locations: " + locations);
+        csvParser.importLocations(hotelCsvFile);
+        logger.info("Saved locations");
 
         List<Hotel> hotels = csvParser.importHotels(dataDirectory);
         logger.info("Saved hotels: " + hotels);
 
+        csvParser.importRoomsForHotels(hotelRoomsCsvFile);
+        logger.info("Saved rooms");
 
     }
 }
