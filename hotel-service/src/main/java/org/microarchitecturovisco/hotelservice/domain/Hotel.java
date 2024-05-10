@@ -40,11 +40,13 @@ public class Hotel {
                  String name,
                  String description,
                  float rating,
-                 Location location) {
+                 Location location,
+                 List<String> photos) {
         this.id = id;
         this.name = name;
         this.rating = rating;
         this.description = description;
         this.location = location;
+        this.photos = photos;
     }
 }
