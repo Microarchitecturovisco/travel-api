@@ -70,8 +70,12 @@ public class TransportsService {
         List<Transport> filteredTransports = new ArrayList<>();
 
         List<Integer> mergedDepartureLocationIds = new ArrayList<>();
-        mergedDepartureLocationIds.addAll(requestDto.getDepartureLocationIdsByBus());
-        mergedDepartureLocationIds.addAll(requestDto.getDepartureLocationIdsByPlane());
+        if (requestDto.getDepartureLocationIdsByPlane() != null) {
+            mergedDepartureLocationIds.addAll(requestDto.getDepartureLocationIdsByPlane());
+        }
+        if (requestDto.getDepartureLocationIdsByBus() != null) {
+            mergedDepartureLocationIds.addAll(requestDto.getDepartureLocationIdsByBus());
+        }
 
         for (Transport transport : transports) {
             if ((requestDto.getDateFrom() != null || requestDto.getDateTo() != null) &&
@@ -88,7 +92,9 @@ public class TransportsService {
                 continue;
             }
 
-            if (!requestDto.getArrivalLocationIds().isEmpty() && !requestDto.getArrivalLocationIds().contains(transport.getCourse().getArrivalAt().getId())) {
+            if (requestDto.getArrivalLocationIds() != null &&
+                    !requestDto.getArrivalLocationIds().isEmpty() &&
+                    !requestDto.getArrivalLocationIds().contains(transport.getCourse().getArrivalAt().getId())) {
                 continue;
             }
 
@@ -107,7 +113,7 @@ public class TransportsService {
             Integer adults,
             Integer childrenUnderTen,
             Integer childrenUnderEighteen) {
-        return getTransportOccupiedSeats(transport) - adults - childrenUnderTen - childrenUnderEighteen >= 0;
+        return transport.getCapacity() - getTransportOccupiedSeats(transport) - adults - childrenUnderTen - childrenUnderEighteen >= 0;
     }
 
     public Integer getTransportOccupiedSeats(Transport transport) {
