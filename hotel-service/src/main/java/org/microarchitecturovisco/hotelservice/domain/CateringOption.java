@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name="cateringoptions")
 public class CateringOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
