@@ -211,4 +211,95 @@ public class TransportsServiceTest {
         // Assert
         assertEquals(1, responseDto.getTransportDtoList().getFirst().getIdTransport());
     }
+
+    @Test
+    public void testGetTransportsBySearchQuery_People() {
+        // Arrange
+        GetTransportsBySearchQueryRequestDto requestDto = GetTransportsBySearchQueryRequestDto.builder()
+                .uuid(java.util.UUID.randomUUID().toString())
+                .adults(2)
+                .childrenUnderThree(1)
+                .childrenUnderTen(1)
+                .childrenUnderEighteen(2)
+                .build();
+
+        // 5 seats left (just what the user needs)
+        Transport transportA = Transport.builder()
+                .id(1)
+                .departureDate(LocalDateTime.of(2024, Month.MAY, 5, 12, 0, 0))
+                .course(TransportCourse.builder()
+                        .type(TransportType.PLANE)
+                        .departureFrom(Location.builder().id(1).country("Poland").region("Gdańsk").build())
+                        .arrivalAt(Location.builder().id(2).country("Tunezja").region("Tunis").build())
+                        .build())
+                .capacity(15)
+                .pricePerAdult(200.0f)
+                .transportReservations(List.of(
+                        TransportReservation.builder().id(1).numberOfSeats(5).build(),
+                        TransportReservation.builder().id(2).numberOfSeats(2).build(),
+                        TransportReservation.builder().id(3).numberOfSeats(3).build()))
+                .build();
+
+        // full capacity
+        Transport transportB = Transport.builder()
+                .id(2)
+                .departureDate(LocalDateTime.of(2024, Month.MAY, 10, 12, 0, 0))
+                .course(TransportCourse.builder()
+                        .type(TransportType.PLANE)
+                        .departureFrom(Location.builder().id(5).country("Poland").region("Wrocław").build())
+                        .arrivalAt(Location.builder().id(2).country("Tunezja").region("Tunis").build())
+                        .build())
+                .capacity(10)
+                .pricePerAdult(200.0f)
+                .transportReservations(List.of(
+                        TransportReservation.builder().id(1).numberOfSeats(5).build(),
+                        TransportReservation.builder().id(2).numberOfSeats(2).build(),
+                        TransportReservation.builder().id(3).numberOfSeats(3).build()))
+                .build();
+
+        // 3 seats left (not enough for the user)
+        Transport transportC = Transport.builder()
+                .id(3)
+                .departureDate(LocalDateTime.of(2024, Month.MAY, 10, 12, 0, 0))
+                .course(TransportCourse.builder()
+                        .type(TransportType.PLANE)
+                        .departureFrom(Location.builder().id(5).country("Poland").region("Wrocław").build())
+                        .arrivalAt(Location.builder().id(2).country("Tunezja").region("Tunis").build())
+                        .build())
+                .capacity(13)
+                .pricePerAdult(200.0f)
+                .transportReservations(List.of(
+                        TransportReservation.builder().id(1).numberOfSeats(5).build(),
+                        TransportReservation.builder().id(2).numberOfSeats(2).build(),
+                        TransportReservation.builder().id(3).numberOfSeats(3).build()))
+                .build();
+
+        // 30 seats left (more than the user needs)
+        Transport transportD = Transport.builder()
+                .id(4)
+                .departureDate(LocalDateTime.of(2024, Month.MAY, 10, 12, 0, 0))
+                .course(TransportCourse.builder()
+                        .type(TransportType.PLANE)
+                        .departureFrom(Location.builder().id(1).country("Poland").region("Gdańsk").build())
+                        .arrivalAt(Location.builder().id(10).country("Egipt").region("Kair").build())
+                        .build())
+                .capacity(40)
+                .pricePerAdult(200.0f)
+                .transportReservations(List.of(
+                        TransportReservation.builder().id(1).numberOfSeats(5).build(),
+                        TransportReservation.builder().id(2).numberOfSeats(2).build(),
+                        TransportReservation.builder().id(3).numberOfSeats(3).build()))
+                .build();
+
+        when(transportRepository.findAll()).thenReturn(List.of(transportA, transportB, transportC, transportD));
+
+        // Act
+        GetTransportsBySearchQueryResponseDto responseDto = transportsService.getTransportsBySearchQuery(requestDto);
+
+        // Assert
+        assertEquals(2, responseDto.getTransportDtoList().size());
+        assertEquals(1, responseDto.getTransportDtoList().getFirst().getIdTransport());
+        assertEquals(4, responseDto.getTransportDtoList().getLast().getIdTransport());
+
+    }
 }
