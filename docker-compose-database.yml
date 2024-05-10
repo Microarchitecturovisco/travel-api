@@ -33,7 +33,7 @@ services:
       - "5432"
     restart: unless-stopped
     volumes:
-      - ./userdb:/data/postgres
+      - userdb:/data/postgres
     networks:
       - backend
     healthcheck:
