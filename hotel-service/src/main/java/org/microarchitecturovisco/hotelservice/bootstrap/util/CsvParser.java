@@ -62,7 +62,7 @@ public class CsvParser {
                 int hotelId = Integer.parseInt(data[0]);
                 String roomName = data[1];
                 String description = data[2];
-                int guestCapacity = calculateGuestCapacity(description);
+                int guestCapacity = calculateGuestCapacity(roomName);
                 float pricePerAdult = Float.parseFloat(data[3]);
 
                 Room room = Room.builder()
@@ -86,20 +86,34 @@ public class CsvParser {
         }
     }
 
+    public int calculateGuestCapacity(String roomName) {
+        int basicCapacity = extractBasicCapacity(roomName);
 
-    private int calculateGuestCapacity(String description){
-        int guestCapacity = 0;
-
-        String regex = "\\d+";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(description);
-
-        if (matcher.find()) {
-            guestCapacity = Integer.parseInt(matcher.group());
+        if (roomName.contains("dostawka")) {
+            basicCapacity++;
         }
 
-        return guestCapacity;
+        if (roomName.contains("dostawki")) {
+            basicCapacity += 2;
+        }
+
+        return basicCapacity;
     }
+
+    private int extractBasicCapacity(String roomName) {
+        int basicCapacity = 0;
+
+        String regex = "\\d+(?= os\\.)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(roomName);
+
+        if (matcher.find()) {
+            basicCapacity = Integer.parseInt(matcher.group());
+        }
+
+        return basicCapacity;
+    }
+
 
     public void importLocations(String csvFilePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
