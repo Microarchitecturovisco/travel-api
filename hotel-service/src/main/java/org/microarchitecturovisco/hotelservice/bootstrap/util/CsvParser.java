@@ -12,10 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class CsvParser {
@@ -31,7 +28,7 @@ public class CsvParser {
 
     private Map<Integer, List<String>> hotelPhotosMap;
 
-    public void importPhotosForHotels(String csvFilePath) {
+    public void importPhotos(String csvFilePath) {
         Map<Integer, List<String>> hotelPhotosMap = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
@@ -51,33 +48,15 @@ public class CsvParser {
         this.hotelPhotosMap = hotelPhotosMap;
     }
 
-    public void importRoomsForHotels(String csvFilePath) {
+    public void importRooms(String csvFilePath) {
         Logger logger = Logger.getLogger("Bootstrap | Rooms");
-
+        RoomCapacityCalculator capacityCalculator = new RoomCapacityCalculator();
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String line;
             br.readLine(); // Skip header line
             while ((line = br.readLine()) != null) {
                 String[] data = line.split("\t");
-                int hotelId = Integer.parseInt(data[0]);
-                String roomName = data[1];
-                String description = data[2];
-                int guestCapacity = calculateGuestCapacity(roomName);
-                float pricePerAdult = Float.parseFloat(data[3]);
-
-                Room room = Room.builder()
-                        .name(roomName)
-                        .description(description)
-                        .guestCapacity(guestCapacity)
-                        .pricePerAdult(pricePerAdult)
-                        .build();
-
-                Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
-                if (hotel != null) {
-                    room.setHotel(hotel);
-                } else {
-                    logger.info("Hotel not found for room with ID: " + hotelId);
-                }
+                Room room = createNewRoom(logger, capacityCalculator, data);
 
                 roomRepository.save(room);
             }
@@ -86,34 +65,28 @@ public class CsvParser {
         }
     }
 
-    public int calculateGuestCapacity(String roomName) {
-        int basicCapacity = extractBasicCapacity(roomName);
+    private Room createNewRoom(Logger logger, RoomCapacityCalculator capacityCalculator, String[] data) {
+        int hotelId = Integer.parseInt(data[0]);
+        String roomName = data[1];
+        String description = data[2];
+        int guestCapacity = capacityCalculator.calculateGuestCapacity(roomName);
+        float pricePerAdult = Float.parseFloat(data[3]);
 
-        if (roomName.contains("dostawka")) {
-            basicCapacity++;
+        Room room = Room.builder()
+                .name(roomName)
+                .description(description)
+                .guestCapacity(guestCapacity)
+                .pricePerAdult(pricePerAdult)
+                .build();
+
+        Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
+        if (hotel != null) {
+            room.setHotel(hotel);
+        } else {
+            logger.info("Hotel not found for room with ID: " + hotelId);
         }
-
-        if (roomName.contains("dostawki")) {
-            basicCapacity += 2;
-        }
-
-        return basicCapacity;
+        return room;
     }
-
-    private int extractBasicCapacity(String roomName) {
-        int basicCapacity = 0;
-
-        String regex = "\\d+(?= os\\.)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(roomName);
-
-        if (matcher.find()) {
-            basicCapacity = Integer.parseInt(matcher.group());
-        }
-
-        return basicCapacity;
-    }
-
 
     public void importLocations(String csvFilePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
@@ -135,7 +108,6 @@ public class CsvParser {
 
         Location location = locationRepository.findByCountryAndRegion(country, region);
         if (location == null) {
-            // If location doesn't exist, create a new one
             location = new Location(country, region);
             locationRepository.save(location);
         }
@@ -173,64 +145,48 @@ public class CsvParser {
         return new Hotel(hotelId, name, description, rating, location, photos);
     }
 
-    public void importCateringOptionsForHotels(String csvFilePath) {
+    public void importCateringOptions(String csvFilePath) {
         Logger logger = Logger.getLogger("Bootstrap | CateringOptions");
+        CateringPriceCalculator cateringPriceCalculator = new CateringPriceCalculator();
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String line;
             br.readLine(); // Skip header line
 
             while ((line = br.readLine()) != null) {
                 String[] data = line.split("\t");
-                int hotelId = Integer.parseInt(data[0]);
-                String foodOption = data[1];
-                float rating = Float.parseFloat(data[2]);
-
-                CateringType cateringType = mapToCateringType(foodOption);
-                if (cateringType != null) {
-                    float price = calculateCateringPrice(cateringType);
-                    CateringOption cateringOption = CateringOption.builder()
-                            .type(cateringType)
-                            .price(price)
-                            .rating(rating)
-                            .build();
-
-                    Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
-                    if (hotel != null) {
-                        cateringOption.setHotel(hotel);
-                    } else {
-                        logger.info("Hotel not found for catering option with ID: " + hotelId);
-                    }
-
-                    cateringOptionRepository.save(cateringOption);
-                } else {
-                    logger.info("Failed to map food option: " + foodOption);
-                }
+                CateringOption cateringOption = createNewCateringOption(logger, cateringPriceCalculator, data);
+                cateringOptionRepository.save(cateringOption);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private CateringType mapToCateringType(String foodOption) {
-        return switch (foodOption) {
-            case "All inclusive", "All inclusive ultra", "All inclusive 24h", "All inclusive soft" -> CateringType.ALL_INCLUSIVE;
-            case "Full board plus", "Half board plus" -> CateringType.THREE_COURSES;
-            case "2 posiłki" -> CateringType.TWO_COURSES;
-            case "Śniadania" -> CateringType.BREAKFAST;
-            case "Bez wyżywienia" -> CateringType.NO_CATERING;
-            default -> null;
-        };
-    }
+    private CateringOption createNewCateringOption(Logger logger, CateringPriceCalculator cateringPriceCalculator, String[] data) {
+        CateringTypeMapper cateringTypeMapper = new CateringTypeMapper();
+        int hotelId = Integer.parseInt(data[0]);
+        String foodOption = data[1];
+        float rating = Float.parseFloat(data[2]);
 
-    private float calculateCateringPrice(CateringType cateringType) {
-        return switch (cateringType) {
-            case ALL_INCLUSIVE -> 100.0f;
-            case THREE_COURSES -> 80.0f;
-            case TWO_COURSES -> 60.0f;
-            case BREAKFAST -> 30.0f;
-            case NO_CATERING -> 0.0f;
-            default -> 0.0f;
-        };
-    }
+        CateringType cateringType = cateringTypeMapper.mapToCateringType(foodOption);
+        if (cateringType != null) {
+            float price = cateringPriceCalculator.calculateCateringPrice(cateringType);
+            CateringOption cateringOption = CateringOption.builder()
+                    .type(cateringType)
+                    .price(price)
+                    .rating(rating)
+                    .build();
 
+            Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
+            if (hotel != null) {
+                cateringOption.setHotel(hotel);
+            } else {
+                logger.info("Hotel not found for catering option with ID: " + hotelId);
+            }
+            return cateringOption;
+        } else {
+            logger.info("Failed to map food option: " + foodOption);
+        }
+        return new CateringOption();
+    }
 }
