@@ -1,16 +1,15 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util;
 
 import org.microarchitecturovisco.hotelservice.domain.*;
-import org.microarchitecturovisco.hotelservice.repositories.CateringOptionRepository;
-import org.microarchitecturovisco.hotelservice.repositories.HotelRepository;
-import org.microarchitecturovisco.hotelservice.repositories.LocationRepository;
-import org.microarchitecturovisco.hotelservice.repositories.RoomRepository;
+import org.microarchitecturovisco.hotelservice.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -27,6 +26,8 @@ public class CsvParser {
     private CateringOptionRepository cateringOptionRepository;
 
     private Map<Integer, List<String>> hotelPhotosMap;
+    @Autowired
+    private RoomReservationRepository roomReservationRepository;
 
     public void importPhotos(String csvFilePath) {
         Map<Integer, List<String>> hotelPhotosMap = new HashMap<>();
@@ -188,5 +189,32 @@ public class CsvParser {
             logger.info("Failed to map food option: " + foodOption);
         }
         return new CateringOption();
+    }
+
+    public void importRoomReservations(String filename) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            br.readLine();  // Skip header line
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split("\t");
+                RoomReservation roomReservation = createNewRoomReservation(data);
+                roomReservationRepository.save(roomReservation);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private RoomReservation createNewRoomReservation(String[] data) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        int roomId = Integer.parseInt(data[0]);
+        LocalDateTime dateFrom = LocalDateTime.parse(data[1], formatter);
+        LocalDateTime dateTo = LocalDateTime.parse(data[2], formatter);
+
+        Optional<Room> optionalRoom = roomRepository.findById(roomId);
+        Room room = optionalRoom.orElseThrow(() -> new RuntimeException("Room not found with ID: " + roomId));
+
+        return new RoomReservation(dateFrom, dateTo, room);
     }
 }

@@ -20,22 +20,22 @@ public class Bootstrap implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Logger logger = Logger.getLogger("Bootstrap");
 
-        importDataFromCsvFiles(logger);
+        importScrappedDataFromCsvFiles(logger);
 
-        createSampleRoomReservations();
-
+        createSampleRoomReservations(logger);
     }
 
-    private void createSampleRoomReservations() {
+    private void createSampleRoomReservations(Logger logger) {
+        String roomReservationCsvFile = dataDirectory + "room_reservations.csv";
+        csvParser.importRoomReservations(roomReservationCsvFile);
+        logger.info("Saved room reservations");
     }
 
-    private void importDataFromCsvFiles(Logger logger) {
-        // Path to the CSV file
+    private void importScrappedDataFromCsvFiles(Logger logger) {
         String hotelCsvFile = dataDirectory + "hotels.csv";
         String hotelPhotosCsvFile = dataDirectory + "hotel_photos.csv";
         String hotelRoomsCsvFile = dataDirectory + "hotel_rooms.csv";
         String hotelCateringOptionsCsvFile = dataDirectory + "hotel_food_options.csv";
-
 
         csvParser.importPhotos(hotelPhotosCsvFile);
         logger.info("Saved photos");
@@ -44,7 +44,7 @@ public class Bootstrap implements CommandLineRunner {
         logger.info("Saved locations");
 
         List<Hotel> hotels = csvParser.importHotels(dataDirectory);
-        logger.info("Saved hotels: " + hotels);
+        logger.info("Saved hotels: ");
 
         csvParser.importRooms(hotelRoomsCsvFile);
         logger.info("Saved rooms");
