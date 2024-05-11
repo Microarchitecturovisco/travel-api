@@ -1,8 +1,7 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util;
 
-import org.microarchitecturovisco.hotelservice.domain.Hotel;
-import org.microarchitecturovisco.hotelservice.domain.Location;
-import org.microarchitecturovisco.hotelservice.domain.Room;
+import org.microarchitecturovisco.hotelservice.domain.*;
+import org.microarchitecturovisco.hotelservice.repositories.CateringOptionRepository;
 import org.microarchitecturovisco.hotelservice.repositories.HotelRepository;
 import org.microarchitecturovisco.hotelservice.repositories.LocationRepository;
 import org.microarchitecturovisco.hotelservice.repositories.RoomRepository;
@@ -25,11 +24,12 @@ public class CsvParser {
     private LocationRepository locationRepository;
     @Autowired
     private HotelRepository hotelRepository;
-
-    private Map<Integer, List<String>> hotelPhotosMap;
-    private Map<Integer, List<Room>> hotelRoomsMap;
     @Autowired
     private RoomRepository roomRepository;
+    @Autowired
+    private CateringOptionRepository cateringOptionRepository;
+
+    private Map<Integer, List<String>> hotelPhotosMap;
 
     public void importPhotosForHotels(String csvFilePath) {
         Map<Integer, List<String>> hotelPhotosMap = new HashMap<>();
@@ -52,7 +52,8 @@ public class CsvParser {
     }
 
     public void importRoomsForHotels(String csvFilePath) {
-        Map<Integer, List<Room>> hotelRoomsMap = new HashMap<>();
+        Logger logger = Logger.getLogger("Bootstrap | Rooms");
+
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String line;
             br.readLine(); // Skip header line
@@ -75,7 +76,7 @@ public class CsvParser {
                 if (hotel != null) {
                     room.setHotel(hotel);
                 } else {
-                    System.err.println("Hotel not found for room with ID: " + hotelId);
+                    logger.info("Hotel not found for room with ID: " + hotelId);
                 }
 
                 roomRepository.save(room);
@@ -83,7 +84,6 @@ public class CsvParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.hotelRoomsMap = hotelRoomsMap;
     }
 
 
@@ -128,7 +128,6 @@ public class CsvParser {
     }
 
     public List<Hotel> importHotels(String dataDirectory) {
-        Logger logger = Logger.getLogger("Bootstrap | Hotels");
         List<Hotel> hotels = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(dataDirectory + "hotels.csv"))) {
             String line;
@@ -159,4 +158,65 @@ public class CsvParser {
 
         return new Hotel(hotelId, name, description, rating, location, photos);
     }
+
+    public void importCateringOptionsForHotels(String csvFilePath) {
+        Logger logger = Logger.getLogger("Bootstrap | CateringOptions");
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+            String line;
+            br.readLine(); // Skip header line
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split("\t");
+                int hotelId = Integer.parseInt(data[0]);
+                String foodOption = data[1];
+                float rating = Float.parseFloat(data[2]);
+
+                CateringType cateringType = mapToCateringType(foodOption);
+                if (cateringType != null) {
+                    float price = calculateCateringPrice(cateringType);
+                    CateringOption cateringOption = CateringOption.builder()
+                            .type(cateringType)
+                            .price(price)
+                            .rating(rating)
+                            .build();
+
+                    Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
+                    if (hotel != null) {
+                        cateringOption.setHotel(hotel);
+                    } else {
+                        logger.info("Hotel not found for catering option with ID: " + hotelId);
+                    }
+
+                    cateringOptionRepository.save(cateringOption);
+                } else {
+                    logger.info("Failed to map food option: " + foodOption);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private CateringType mapToCateringType(String foodOption) {
+        return switch (foodOption) {
+            case "All inclusive", "All inclusive ultra", "All inclusive 24h", "All inclusive soft" -> CateringType.ALL_INCLUSIVE;
+            case "Full board plus", "Half board plus" -> CateringType.THREE_COURSES;
+            case "2 posiłki" -> CateringType.TWO_COURSES;
+            case "Śniadania" -> CateringType.BREAKFAST;
+            case "Bez wyżywienia" -> CateringType.NO_CATERING;
+            default -> null;
+        };
+    }
+
+    private float calculateCateringPrice(CateringType cateringType) {
+        return switch (cateringType) {
+            case ALL_INCLUSIVE -> 100.0f;
+            case THREE_COURSES -> 80.0f;
+            case TWO_COURSES -> 60.0f;
+            case BREAKFAST -> 30.0f;
+            case NO_CATERING -> 0.0f;
+            default -> 0.0f;
+        };
+    }
+
 }

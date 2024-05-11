@@ -1,66 +1,66 @@
-idHotel	foodOption
-0	All inclusive
-1	All inclusive
-2	All inclusive
-3	All inclusive
-4	All inclusive
-5	All inclusive 24h
-6	All inclusive
-6	2 posiłki
-7	2 posiłki
-7	All inclusive
-8	All inclusive
-9	All inclusive
-10	2 posiłki
-10	All inclusive
-11	All inclusive
-12	All inclusive
-13	All inclusive
-14	Full board plus
-15	All inclusive soft
-16	All inclusive
-17	All inclusive
-18	All inclusive
-19	Full board plus
-20	All inclusive
-21	Full board plus
-22	2 posiłki
-22	All inclusive soft
-23	Bez wyżywienia
-23	Śniadania
-23	Half board plus
-23	Full board plus
-24	All inclusive 24h
-25	All inclusive
-26	All inclusive
-27	Śniadania
-27	2 posiłki
-27	All inclusive
-28	All inclusive
-29	All inclusive
-30	All inclusive
-31	Full board plus
-32	All inclusive
-33	All inclusive
-34	All inclusive
-35	Śniadania
-35	Half board plus
-35	Full board plus
-35	All inclusive
-36	All inclusive
-37	All inclusive
-38	All inclusive 24h
-39	All inclusive
-40	2 posiłki
-40	Full board plus
-41	All inclusive
-42	All inclusive
-43	All inclusive
-44	All inclusive
-45	All inclusive ultra
-46	All inclusive
-46	Śniadania
-46	2 posiłki
-47	All inclusive
-48	All inclusive
-49	All inclusive
+idHotel	foodOption	rating
+0	All inclusive	4.2
+1	All inclusive	3.8
+2	All inclusive	4.5
+3	All inclusive	3.5
+4	All inclusive	3.9
+5	All inclusive 24h	4.1
+6	All inclusive	4.3
+6	2 posiłki	3.7
+7	2 posiłki	4.0
+7	All inclusive	4.4
+8	All inclusive	3.8
+9	All inclusive	4.2
+10	2 posiłki	3.6
+10	All inclusive	4.0
+11	All inclusive	4.3
+12	All inclusive	3.9
+13	All inclusive	4.1
+14	Full board plus	3.5
+15	All inclusive soft	4.4
+16	All inclusive	4.2
+17	All inclusive	4.0
+18	All inclusive	4.1
+19	Full board plus	3.8
+20	All inclusive	4.3
+21	Full board plus	4.5
+22	Bez wyżywienia	4.0
+22	All inclusive soft	3.7
+23	Bez wyżywienia	3.9
+23	Śniadania	4.1
+23	Half board plus	4.3
+23	Full board plus	3.6
+24	All inclusive 24h	4.2
+25	All inclusive	3.8
+26	All inclusive	4.0
+27	Śniadania	3.7
+27	2 posiłki	3.9
+27	All inclusive	4.2
+28	All inclusive	3.6
+29	All inclusive	4.3
+30	All inclusive	4.1
+31	Full board plus	4.5
+32	All inclusive	4.0
+33	All inclusive	3.8
+34	All inclusive	4.1
+35	Śniadania	3.9
+35	Half board plus	4.2
+35	Full board plus	4.4
+35	All inclusive	4.3
+36	All inclusive	3.7
+37	All inclusive	4.2
+38	All inclusive 24h	4.0
+39	All inclusive	4.1
+40	2 posiłki	4.3
+40	Full board plus	3.8
+41	All inclusive	4.5
+42	All inclusive	4.2
+43	All inclusive	4.0
+44	All inclusive	3.9
+45	All inclusive ultra	4.1
+46	All inclusive	3.8
+46	Śniadania	4.0
+46	2 posiłki	3.6
+47	All inclusive	4.2
+48	All inclusive	3.7
+49	All inclusive	4.0

@@ -5,6 +5,5 @@ public enum CateringType {
     THREE_COURSES,
     TWO_COURSES,
     BREAKFAST,
-    NO_CATERING,
-    ACCORDING_TO_PROGRAMME;
+    NO_CATERING;
 }
