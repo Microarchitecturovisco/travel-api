@@ -1,19 +1,18 @@
 package org.microarchitecturovisco.transport.bootstrap;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.transport.bootstrap.util.CsvParser;
-import org.microarchitecturovisco.transport.model.domain.*;
+import org.microarchitecturovisco.transport.bootstrap.util.parsers.TransportReservationParser;
+import org.microarchitecturovisco.transport.bootstrap.util.parsers.LocationParser;
+import org.microarchitecturovisco.transport.bootstrap.util.parsers.TransportCoursesParser;
+import org.microarchitecturovisco.transport.bootstrap.util.parsers.TransportParser;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
+import org.microarchitecturovisco.transport.repositories.TransportReservationRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
 import java.util.logging.Logger;
 
 @Component
