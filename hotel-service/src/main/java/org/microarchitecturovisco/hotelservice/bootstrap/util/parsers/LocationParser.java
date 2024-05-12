@@ -40,5 +40,4 @@ public class LocationParser {
             locationRepository.save(location);
         }
     }
-
 }

@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.hotelservice.bootstrap.util;
+package org.microarchitecturovisco.hotelservice.bootstrap.util.parsers.room;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,5 +32,4 @@ public class RoomCapacityCalculator {
 
         return basicCapacity;
     }
-
 }

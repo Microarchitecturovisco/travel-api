@@ -1,6 +1,6 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util.parsers;
 
-import org.microarchitecturovisco.hotelservice.bootstrap.util.RoomCapacityCalculator;
+import org.microarchitecturovisco.hotelservice.bootstrap.util.parsers.room.RoomCapacityCalculator;
 import org.microarchitecturovisco.hotelservice.domain.*;
 import org.microarchitecturovisco.hotelservice.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;

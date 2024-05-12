@@ -36,7 +36,7 @@ public class Bootstrap implements CommandLineRunner {
         logger.info("Saved locations");
 
         hotelParser.importHotels(dataDirectory, photosParser);
-        logger.info("Saved hotels: ");
+        logger.info("Saved hotels");
 
         roomParser.importRooms(hotelRoomsCsvFile);
         logger.info("Saved rooms");

@@ -32,6 +32,4 @@ public class PhotosParser {
         }
         this.hotelPhotosMap = hotelPhotosMap;
     }
-
-
 }
