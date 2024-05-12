@@ -5,15 +5,10 @@ import org.microarchitecturovisco.transport.bootstrap.util.parsers.TransportRese
 import org.microarchitecturovisco.transport.bootstrap.util.parsers.LocationParser;
 import org.microarchitecturovisco.transport.bootstrap.util.parsers.TransportCoursesParser;
 import org.microarchitecturovisco.transport.bootstrap.util.parsers.TransportParser;
-import org.microarchitecturovisco.transport.repositories.LocationRepository;
-import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
-import org.microarchitecturovisco.transport.repositories.TransportRepository;
-import org.microarchitecturovisco.transport.repositories.TransportReservationRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.logging.Logger;
 
 @Component
 @RequiredArgsConstructor
@@ -21,13 +16,11 @@ public class Bootstrap implements CommandLineRunner {
 
     private final RabbitTemplate rabbitTemplate;
 
+    private final TransportReservationParser transportReservationParser;
     private final String dataDirectory = "transport-service\\src\\main\\java\\org\\microarchitecturovisco\\transport\\bootstrap\\data\\";
-    private final TransportRepository transportRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        Logger logger = Logger.getLogger("Bootstrap | Transport");
-
         String hotelCsvFile = dataDirectory + "hotels.csv";
         String hotelDepartureOptionsCsvFile = dataDirectory + "hotel_departure_options.csv";
         String transportsSampleCsvFile = dataDirectory + "transports_sample.csv";
@@ -77,9 +70,7 @@ public class Bootstrap implements CommandLineRunner {
                             .departureFrom(departureLocation)
                             .arrivalAt(planeArrivalLocation)
                             .type(TransportType.PLANE).build()));
-
                     planeCourses.add(transportCourseRepository.save(TransportCourse.builder()
-                            .departureFrom(planeArrivalLocation)
                             .arrivalAt(departureLocation)
                             .type(TransportType.PLANE).build()));
 

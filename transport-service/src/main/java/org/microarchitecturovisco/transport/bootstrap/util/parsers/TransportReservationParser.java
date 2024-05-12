@@ -2,7 +2,6 @@ package org.microarchitecturovisco.transport.bootstrap.util.parsers;
 
 import org.microarchitecturovisco.transport.model.domain.Transport;
 import org.microarchitecturovisco.transport.model.domain.TransportReservation;
-import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.microarchitecturovisco.transport.repositories.TransportReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
