@@ -18,13 +18,12 @@ import java.util.List;
 @Builder
 public class Transport {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @ManyToOne
     private TransportCourse course;
 
-    // the day the transport takes place
     @NotNull
     private LocalDateTime departureDate;
 
@@ -34,6 +33,14 @@ public class Transport {
     @NotNull
     private float pricePerAdult;
 
-    @OneToMany(mappedBy="transport", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="transport")
     private List<TransportReservation> transportReservations;
+
+
+    public Transport(TransportCourse course, LocalDateTime departureDate, int capacity, float pricePerAdult) {
+        this.course = course;
+        this.departureDate = departureDate;
+        this.capacity = capacity;
+        this.pricePerAdult = pricePerAdult;
+    }
 }

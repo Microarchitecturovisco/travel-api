@@ -30,7 +30,6 @@ public class Location {
     private List<TransportCourse> transportCourseAt;
 
     public Location(String country, String region) {
-        this.id = null;
         this.country = country;
         this.region = region;
     }

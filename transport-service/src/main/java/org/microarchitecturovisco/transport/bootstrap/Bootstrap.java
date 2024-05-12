@@ -13,10 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 @Component
@@ -25,27 +22,28 @@ public class Bootstrap implements CommandLineRunner {
 
 
     private final LocationRepository locationRepository;
-    private final TransportRepository transportRepository;
     private final TransportCourseRepository transportCourseRepository;
     private final RabbitTemplate rabbitTemplate;
 
     private final CsvParser csvParser;
     private final String dataDirectory = "transport-service\\src\\main\\java\\org\\microarchitecturovisco\\transport\\bootstrap\\data\\";
+    private final TransportRepository transportRepository;
+
     @Override
     public void run(String... args) throws Exception {
         Logger logger = Logger.getLogger("Bootstrap | Transport");
 
         String hotelCsvFile = dataDirectory + "hotels.csv";
         String hotelDepartureOptionsCsvFile = dataDirectory + "hotel_departure_options.csv";
+        String transportsSampleCsvFile = dataDirectory + "transports_sample.csv";
 
         List<Location> allAbroadLocations = csvParser.importLocationsAbroad(hotelCsvFile);
-        logger.info("Saved locations from abroad");
-
         List<Location> allPolishLocations = csvParser.importLocationsPoland(hotelDepartureOptionsCsvFile);
-        logger.info("Saved locations in Poland");
+        logger.info("Saved locations: " + locationRepository.count());
 
         createTransportCourses(logger, allAbroadLocations, allPolishLocations);
 
+        createTransports(logger, transportsSampleCsvFile);
 
         ///////////////////////////////////
 //
@@ -120,6 +118,12 @@ public class Bootstrap implements CommandLineRunner {
 //            }
 //        }
     }
+
+    private void createTransports(Logger logger, String csvfilename) {
+        csvParser.importTransports(csvfilename);
+        logger.info("Saved transports: " + transportRepository.count());
+    }
+
     public static Map<Integer, List<String>> readDepartureCities(String filename) {
         Map<Integer, List<String>> departureCitiesMap = new HashMap<>();
 
@@ -184,7 +188,7 @@ public class Bootstrap implements CommandLineRunner {
 
         createPlaneConnections(logger, planeCourses, departureCitiesMap, hotelLocationMap);
         createBusConnections(logger, busCourses, departureCitiesMap, hotelLocationMap);
-        logger.info("Transport Courses created");
+        logger.info("Saved transport courses: " + transportCourseRepository.count());
     }
 
     @Scheduled(fixedDelay = 10000)
