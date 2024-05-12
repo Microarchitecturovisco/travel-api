@@ -22,4 +22,9 @@ public class TransportReservation {
 
     @NotNull
     private int numberOfSeats;
+
+    public TransportReservation(Transport transport, int numberOfSeats) {
+        this.transport = transport;
+        this.numberOfSeats = numberOfSeats;
+    }
 }
