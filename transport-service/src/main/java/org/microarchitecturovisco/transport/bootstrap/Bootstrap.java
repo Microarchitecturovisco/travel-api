@@ -17,6 +17,9 @@ public class Bootstrap implements CommandLineRunner {
     private final RabbitTemplate rabbitTemplate;
 
     private final TransportReservationParser transportReservationParser;
+    private final LocationParser locationParser;
+    private final TransportParser transportParser;
+    private final TransportCoursesParser transportCoursesParser;
     private final String dataDirectory = "transport-service\\src\\main\\java\\org\\microarchitecturovisco\\transport\\bootstrap\\data\\";
 
     @Override
@@ -24,7 +27,10 @@ public class Bootstrap implements CommandLineRunner {
         String hotelCsvFile = dataDirectory + "hotels.csv";
         String hotelDepartureOptionsCsvFile = dataDirectory + "hotel_departure_options.csv";
         String transportsSampleCsvFile = dataDirectory + "transports_sample.csv";
+        String transportReservationSampleCsvFile = dataDirectory + "transport_reservation_sample.csv";
 
+        locationParser.importLocationsAbroad(hotelCsvFile);
+        locationParser.importLocationsPoland(hotelDepartureOptionsCsvFile);
 
     @Scheduled(fixedDelay = 10000)
     public void testGetTransportsBySearchQuery() {
@@ -40,8 +46,10 @@ public class Bootstrap implements CommandLineRunner {
                 .childrenUnderTen(1)
                 .childrenUnderEighteen(1)
                 .build();
+        transportCoursesParser.createTransportCourses(hotelCsvFile, hotelDepartureOptionsCsvFile);
 
         rabbitTemplate.convertAndSend("transports.requests.getTransportsBySearchQuery", testRequestDto);
+        transportParser.importTransports(transportsSampleCsvFile);
 
     @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
     @RabbitHandler
