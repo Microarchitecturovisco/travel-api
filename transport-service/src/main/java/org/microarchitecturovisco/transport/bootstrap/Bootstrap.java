@@ -20,12 +20,8 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class Bootstrap implements CommandLineRunner {
 
-
-    private final LocationRepository locationRepository;
-    private final TransportCourseRepository transportCourseRepository;
     private final RabbitTemplate rabbitTemplate;
 
-    private final CsvParser csvParser;
     private final String dataDirectory = "transport-service\\src\\main\\java\\org\\microarchitecturovisco\\transport\\bootstrap\\data\\";
     private final TransportRepository transportRepository;
 
@@ -54,53 +50,6 @@ public class Bootstrap implements CommandLineRunner {
                 .build();
 
         rabbitTemplate.convertAndSend("transports.requests.getTransportsBySearchQuery", testRequestDto);
-    private void createBusConnections(Logger logger, List<TransportCourse> busCourses, Map<Integer, List<String>> departureCitiesMap, Map<Integer, Location> hotelLocationMap) {
-        List<Location> locationsAvailableByBus = new ArrayList<>();
-        locationsAvailableByBus.add(new Location("Albania", "Durres"));
-        locationsAvailableByBus.add(new Location("Turcja - narty", "Kayseri"));
-        locationsAvailableByBus.add(new Location("Włochy", "Apulia"));
-        locationsAvailableByBus.add(new Location("Włochy", "Sycylia"));
-        locationsAvailableByBus.add(new Location("Włochy", "Kalabria"));
-
-        for (Map.Entry<Integer, List<String>> entry : departureCitiesMap.entrySet()) {
-            int hotelId = entry.getKey();
-            List<String> departureCities = entry.getValue();
-
-            // Check if hotelId exists in hotel location map
-            if (hotelLocationMap.containsKey(hotelId)) {
-                Location hotelLocation = hotelLocationMap.get(hotelId);
-                String arrivalCountry = hotelLocation.getCountry();
-                String arrivalRegion = hotelLocation.getRegion();
-                Location busArrivalLocation = locationRepository.findByCountryAndRegion(arrivalCountry, arrivalRegion);
-
-                // Iterate through each departure city for the current hotel
-                for (String departureCity : departureCities) {
-                    // Check if the departure city is available by bus
-                    for (Location busLocation : locationsAvailableByBus) {
-                        // Create transport courses if the departure city matches
-                        if (busLocation.getRegion().equals(arrivalRegion)) {
-                            Location depLocation = locationRepository.findByCountryAndRegion("Polska", departureCity);
-                            // Add bus connection
-                            busCourses.add(transportCourseRepository.save(TransportCourse.builder()
-                                    .departureFrom(depLocation)
-                                    .arrivalAt(busArrivalLocation)
-                                    .type(TransportType.BUS).build()));
-
-                            // Add return bus connection
-                            busCourses.add(transportCourseRepository.save(TransportCourse.builder()
-                                    .departureFrom(busArrivalLocation)
-                                    .arrivalAt(depLocation)
-                                    .type(TransportType.BUS).build()));
-
-//                            logger.info("BUS Hotel: " + hotelId + " From:" + depLocation.getRegion() + " To:" + arrivalRegion);
-                        }
-                    }
-                }
-            } else {
-//                logger.info("  - Hotel location not found");
-            }
-        }
-    }
 
     @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
     @RabbitHandler
@@ -135,12 +84,6 @@ public class Bootstrap implements CommandLineRunner {
                             .arrivalAt(departureLocation)
                             .type(TransportType.PLANE).build()));
 
-//                    logger.info("PLANE Hotel: " + hotelId + " From:" + departureRegion + " To:" + arrivalRegion);
-                }
-            } else {
-//                logger.info("  - Hotel location not found");
-            }
-        }
 
         System.out.println("Received transports of size " + responseDto.getTransportDtoList().size());
     }
