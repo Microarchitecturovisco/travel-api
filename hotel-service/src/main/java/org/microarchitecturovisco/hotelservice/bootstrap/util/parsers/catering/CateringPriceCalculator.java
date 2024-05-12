@@ -1,10 +1,10 @@
-package org.microarchitecturovisco.hotelservice.bootstrap.util;
+package org.microarchitecturovisco.hotelservice.bootstrap.util.parsers.catering;
 
 import org.microarchitecturovisco.hotelservice.domain.CateringType;
 
 public class CateringPriceCalculator {
 
-    float calculateCateringPrice(CateringType cateringType) {
+    public float calculateCateringPrice(CateringType cateringType) {
         return switch (cateringType) {
             case ALL_INCLUSIVE -> 100.0f;
             case THREE_COURSES -> 80.0f;

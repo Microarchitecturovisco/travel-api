@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.hotelservice.bootstrap.util;
+package org.microarchitecturovisco.hotelservice.bootstrap.util.parsers.catering;
 
 import org.microarchitecturovisco.hotelservice.domain.CateringType;
 
