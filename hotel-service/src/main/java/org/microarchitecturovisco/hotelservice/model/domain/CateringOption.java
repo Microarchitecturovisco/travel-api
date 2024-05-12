@@ -1,29 +1,32 @@
-package org.microarchitecturovisco.hotelservice.domain;
+package org.microarchitecturovisco.hotelservice.model.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class RoomReservation {
+public class CateringOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotNull
-    private LocalDateTime dateFrom;
+    @Enumerated(EnumType.STRING)
+    private CateringType type;
+
+    private float rating;
 
     @NotNull
-    private LocalDateTime dateTo;
+    private float price;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="room_id", nullable=false)
-    private Room room;
+    @JoinColumn(name = "hotel_id")
+    private Hotel hotel;
+
 }
+
