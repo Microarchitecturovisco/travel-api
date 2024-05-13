@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.offerprovider.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.offerprovider.domain.dto.OfferDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDto;
 import org.microarchitecturovisco.offerprovider.services.OffersService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ public class OffersController {
     private final OffersService offersService;
 
     @GetMapping("/transports")
-    public List<TransportDto> getAvailableTransportsQuery(
+    public List<OfferDto> getOffersBasedOnSearchQuery(
             @RequestParam(name = "departureBus") List<Integer> departureBuses,
             @RequestParam(name = "departurePlane") List<Integer> departurePlane,
             @RequestParam(name = "arrivals") List<Integer> arrivals,
@@ -31,7 +32,6 @@ public class OffersController {
 
     ) {
 
-        return offersService.getAvailableTransportsBasedOnSearchQuery(departureBuses, departurePlane,
-                arrivals, dateFrom, dateTo, adults, infants, kids, teens);
+        return List.of();
     }
 }
