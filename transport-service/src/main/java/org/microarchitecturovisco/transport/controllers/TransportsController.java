@@ -33,7 +33,6 @@ public class TransportsController {
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBySearchQuery")
-    @RabbitHandler
     public void consumeGetTransportsRequest(String requestDtoJson) {
         GetTransportsBySearchQueryRequestDto requestDto = JsonReader.readGetTransportsBySearchQueryRequestFromJson(requestDtoJson);
         GetTransportsBySearchQueryResponseDto responseDto = transportsService.getTransportsBySearchQuery(requestDto);

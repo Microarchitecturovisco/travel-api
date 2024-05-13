@@ -90,7 +90,6 @@ public class OffersService {
             String responseMessage = (String) rabbitTemplate.receiveAndConvert("transports.responses.getTransportsBySearchQuery", 5000);
 
             if(responseMessage != null) {
-                System.out.println("g");
                 TransportsBasedOnSearchQueryResponse transportDtoResponse = JsonReader.readTransportsBasedOnSearchQueryResponseFromJson(responseMessage);
                 return transportDtoResponse.getTransportDtoList();
             }
