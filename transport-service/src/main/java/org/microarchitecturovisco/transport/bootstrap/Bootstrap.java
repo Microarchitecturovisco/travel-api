@@ -144,35 +144,4 @@ public class Bootstrap implements CommandLineRunner {
 
     }
 
-    @Scheduled(fixedDelay = 10000)
-    public void testGetTransportsBySearchQuery() {
-        GetTransportsBySearchQueryRequestDto testRequestDto = GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(java.util.UUID.randomUUID().toString())
-                .dateFrom(LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0))
-                .dateTo(LocalDateTime.of(2024, Month.MAY, 14, 12, 0, 0))
-                .departureLocationIdsByPlane(List.of(1))
-                .departureLocationIdsByBus(List.of())
-                .arrivalLocationIds(List.of(6))
-                .adults(2)
-                .childrenUnderThree(1)
-                .childrenUnderTen(1)
-                .childrenUnderEighteen(1)
-                .build();
-
-        rabbitTemplate.convertAndSend("transports.requests.getTransportsBySearchQuery", testRequestDto);
-    }
-
-    @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
-    @RabbitHandler
-    public void consumeGetTransportsResponse(GetTransportsBySearchQueryResponseDto responseDto) {
-
-        System.out.println("Received transports:");
-        for (TransportDto transportDto : responseDto.getTransportDtoList()) {
-            System.out.println("  - " + transportDto.getTransportCourse().getDepartureFromLocation().getRegion() + " <-> " + transportDto.getTransportCourse().getArrivalAtLocation().getRegion());
-            System.out.println("    " + transportDto.getDepartureDate());
-        }
-
-        System.out.println("Received transports of size " + responseDto.getTransportDtoList().size());
-    }
-
 }

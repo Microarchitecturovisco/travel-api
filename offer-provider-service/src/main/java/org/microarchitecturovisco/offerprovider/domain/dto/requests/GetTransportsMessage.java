@@ -1,9 +1,7 @@
-package org.microarchitecturovisco.transport.model.dto.request;
+package org.microarchitecturovisco.offerprovider.domain.dto.requests;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -11,9 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class GetTransportsBySearchQueryRequestDto implements Serializable {
+public class GetTransportsMessage implements Serializable {
     private String uuid;
 
     private LocalDateTime dateFrom;
@@ -27,4 +23,5 @@ public class GetTransportsBySearchQueryRequestDto implements Serializable {
     private Integer childrenUnderThree;
     private Integer childrenUnderTen;
     private Integer childrenUnderEighteen;
+
 }
