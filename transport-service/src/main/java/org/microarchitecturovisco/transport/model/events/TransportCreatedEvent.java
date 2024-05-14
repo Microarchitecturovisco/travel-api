@@ -2,6 +2,7 @@ package org.microarchitecturovisco.transport.model.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Table(name = "transport_created_events")
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 public class TransportCreatedEvent extends TransportEvent {

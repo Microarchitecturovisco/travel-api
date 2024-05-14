@@ -2,6 +2,7 @@ package org.microarchitecturovisco.transport.model.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class TransportReservationCreatedEvent extends TransportEvent {
 
     private UUID idTransportReservation;
