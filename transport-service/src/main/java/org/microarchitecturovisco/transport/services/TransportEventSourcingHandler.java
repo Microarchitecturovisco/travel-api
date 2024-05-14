@@ -8,43 +8,35 @@ import org.microarchitecturovisco.transport.model.domain.TransportReservation;
 import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
 import org.microarchitecturovisco.transport.model.events.TransportEvent;
 import org.microarchitecturovisco.transport.model.events.TransportReservationCreatedEvent;
-import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TransportEventSourcingHandler {
-
-    private final TransportEventStore eventStore;
 
     private final TransportRepository transportRepository;
     private final TransportReservationRepository transportReservationRepository;
     private final TransportCourseRepository transportCourseRepository;
     private final LocationRepository locationRepository;
 
-    public void project(UUID idTransport) {
-        List<TransportEvent> transportEvents = eventStore.findTransportEventsByIdTransport(idTransport);
-
-        Transport transport = new Transport();
-
+    public void project(List<TransportEvent> transportEvents) {
         for (TransportEvent transportEvent : transportEvents) {
             if (transportEvent instanceof TransportCreatedEvent) {
-                apply((TransportCreatedEvent) transportEvent, transport);
+                apply((TransportCreatedEvent) transportEvent);
             }
             if (transportEvent instanceof TransportReservationCreatedEvent) {
-                apply((TransportReservationCreatedEvent) transportEvent, transport);
+                apply((TransportReservationCreatedEvent) transportEvent);
             }
         }
-
-        transportRepository.save(transport);
     }
 
-    private void apply(TransportCreatedEvent event, Transport transport) {
+    private void apply(TransportCreatedEvent event) {
+        Transport transport = new Transport();
+
         Location departureFrom = Location.builder()
                 .id(event.getIdDepartureLocation())
                 .country(event.getDepartureLocationCountry())
@@ -72,9 +64,12 @@ public class TransportEventSourcingHandler {
         transport.setCapacity(event.getCapacity());
         transport.setPricePerAdult(event.getPricePerAdult());
         transport.setTransportReservations(new ArrayList<>());
+        transportRepository.save(transport);
     }
 
-    private void apply(TransportReservationCreatedEvent event, Transport transport) {
+    private void apply(TransportReservationCreatedEvent event) {
+        Transport transport = transportRepository.findById(event.getIdTransport()).orElseThrow(RuntimeException::new);
+
         TransportReservation transportReservation = TransportReservation.builder()
                 .id(event.getIdTransportReservation())
                 .numberOfSeats(event.getNumberOfSeats())
@@ -83,5 +78,6 @@ public class TransportEventSourcingHandler {
         transport.getTransportReservations().add(transportReservation);
 
         transportReservationRepository.save(transportReservation);
+        transportRepository.save(transport);
     }
 }
