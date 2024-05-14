@@ -2,6 +2,7 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
+import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDepartures;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
@@ -9,6 +10,7 @@ import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySe
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
+import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,21 @@ public class TransportsQueryService {
 
     private final TransportCourseRepository transportCourseRepository;
     private final TransportRepository transportRepository;
+    private final TransportEventStore transportEventStore;
+
+    private final TransportEventSourcingHandler eventSourcingHandler;
+
+    public List<TransportDto> getAllTransports() {
+        List<UUID> transportIds = transportEventStore.getAllTransportIds();
+
+        long startTime = System.currentTimeMillis();
+        transportIds.forEach(eventSourcingHandler::project);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Project call took " + (endTime - startTime) + " ms");
+
+        List<Transport> transports = transportRepository.findAll();
+        return TransportMapper.mapList(transports);
+    }
 
     public AvailableTransportsDto getAvailableTransports() {
 

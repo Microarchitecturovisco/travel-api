@@ -1,18 +1,22 @@
 package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
+import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
+import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TransportCommandService {
 
-    private final TransportEventSourcingHandler transportEventSourcingHandler;
+    private final TransportEventStore transportEventStore;
 
-    public void save(UUID idTransport) {
-        transportEventSourcingHandler.project(idTransport);
+    public void createTransport(CreateTransportCommand command) {
+        TransportCreatedEvent transportCreatedEvent = new TransportCreatedEvent(
+                command.getUuid(), command.getCommandTimeStamp(), command.getTransportDto()
+        );
+
+        transportEventStore.save(transportCreatedEvent);
     }
-
 }
