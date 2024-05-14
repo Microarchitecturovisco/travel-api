@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public class CreateTransportCommand {
     private String uuid;
-    private LocalDateTime commandCreatedTime;
+    private LocalDateTime commandTimeStamp;
 
     private TransportDto transportDto;
 }

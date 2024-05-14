@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UpdateTransportCommand {
     private String uuid;
-    private LocalDateTime commandCreatedTime;
+    private LocalDateTime commandTimeStamp;
 
     private TransportDto transportDto;
 }
