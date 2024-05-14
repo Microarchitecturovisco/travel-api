@@ -13,7 +13,7 @@ public class TransportsCommandController {
 
     private final TransportCommandService transportCommandService;
 
-    @RabbitListener(queues = "transports.requests.createReservation")
+    @RabbitListener(queues = "#{createTransportReservationRequestQueue.name}")
     public void consumeCreateTransportReservationCommand(String commandDtoJson) {
         CreateTransportReservationCommand command = JsonReader.readCreateTransportReservationCommand(commandDtoJson);
 

@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.transport.queues.config;
+package org.microarchitecturovisco.transport.rabbitmq.config;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
@@ -15,10 +15,5 @@ public class QueuesConfig {
     @Bean
     public Queue getTransportsResponse() {
         return new Queue("transports.responses.getTransportsBySearchQuery", false);
-    }
-
-    @Bean
-    public Queue createTransportReservationRequest() {
-        return new Queue("transports.requests.createReservation", false);
     }
 }
