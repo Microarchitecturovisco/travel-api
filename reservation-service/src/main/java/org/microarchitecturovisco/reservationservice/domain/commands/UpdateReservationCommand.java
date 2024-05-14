@@ -8,6 +8,6 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class UpdateReservationCommand {
-    Integer reservationId;
+    String reservationId;
     boolean paid;
 }

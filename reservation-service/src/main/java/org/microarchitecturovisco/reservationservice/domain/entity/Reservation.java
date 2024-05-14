@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
@@ -44,11 +45,11 @@ public class Reservation {
 
     @NotNull
     @ElementCollection
-    private Collection<Integer> roomReservationsIds;
+    private List<String> roomReservationsIds;
 
     @NotNull
     @ElementCollection
-    private Collection<Integer> transportReservationsIds;
+    private List<String> transportReservationsIds;
 
     @NotNull
     private int userId;

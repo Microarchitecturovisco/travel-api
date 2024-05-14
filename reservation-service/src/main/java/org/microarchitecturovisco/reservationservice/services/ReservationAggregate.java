@@ -25,7 +25,7 @@ public class ReservationAggregate {
 
     public List<ReservationEvent> handleCreateReservationCommand(CreateReservationCommand command) {
         ReservationCreatedEvent event = ReservationCreatedEvent.builder()
-                .id(command.getId())
+                .idReservation(command.getId())
                 .hotelTimeFrom(command.getHotelTimeFrom())
                 .hotelTimeTo(command.getHotelTimeTo())
                 .infantsQuantity(command.getInfantsQuantity())
@@ -52,7 +52,7 @@ public class ReservationAggregate {
         }
 
         ReservationUpdateEvent event = ReservationUpdateEvent.builder()
-                .id(command.getReservationId())
+                .idReservation(command.getReservationId())
                 .paid(command.isPaid())
                 .build();
         reservationEventStore.save(event);
