@@ -29,13 +29,6 @@ public class TransportsQueryService {
     private final TransportEventSourcingHandler eventSourcingHandler;
 
     public List<TransportDto> getAllTransports() {
-        List<UUID> transportIds = transportEventStore.getAllTransportIds();
-
-        long startTime = System.currentTimeMillis();
-        transportIds.forEach(eventSourcingHandler::project);
-        long endTime = System.currentTimeMillis();
-        System.out.println("Project call took " + (endTime - startTime) + " ms");
-
         List<Transport> transports = transportRepository.findAll();
         return TransportMapper.mapList(transports);
     }

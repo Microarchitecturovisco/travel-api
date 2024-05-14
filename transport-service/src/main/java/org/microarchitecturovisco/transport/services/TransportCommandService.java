@@ -12,11 +12,15 @@ public class TransportCommandService {
 
     private final TransportEventStore transportEventStore;
 
+    private final TransportEventSourcingHandler eventSourcingHandler;
+
     public void createTransport(CreateTransportCommand command) {
         TransportCreatedEvent transportCreatedEvent = new TransportCreatedEvent(
                 command.getUuid(), command.getCommandTimeStamp(), command.getTransportDto()
         );
 
         transportEventStore.save(transportCreatedEvent);
+
+        eventSourcingHandler.project(command.getTransportDto().getIdTransport());
     }
 }
