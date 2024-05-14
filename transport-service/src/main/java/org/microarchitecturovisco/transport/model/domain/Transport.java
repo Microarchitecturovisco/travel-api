@@ -8,6 +8,7 @@ import org.springframework.data.repository.cdi.Eager;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "transports")
@@ -18,8 +19,7 @@ import java.util.List;
 @Builder
 public class Transport {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @ManyToOne
     private TransportCourse course;

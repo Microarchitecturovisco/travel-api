@@ -5,11 +5,12 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
 public class TransportDto implements Serializable {
-    private Integer idTransport;
+    private UUID idTransport;
 
     private LocalDateTime departureDate;
     private Integer capacity;

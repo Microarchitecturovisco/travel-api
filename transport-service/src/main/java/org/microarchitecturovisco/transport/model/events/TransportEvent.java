@@ -19,8 +19,8 @@ import java.util.UUID;
 @Entity
 public abstract class TransportEvent {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private LocalDateTime eventTimeStamp;
 

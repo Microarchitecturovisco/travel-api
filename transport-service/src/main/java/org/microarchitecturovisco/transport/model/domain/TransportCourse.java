@@ -3,6 +3,8 @@ package org.microarchitecturovisco.transport.model.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "transport_courses")
 @Getter
@@ -12,8 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 public class TransportCourse {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @Enumerated(EnumType.STRING)
     private TransportType type;

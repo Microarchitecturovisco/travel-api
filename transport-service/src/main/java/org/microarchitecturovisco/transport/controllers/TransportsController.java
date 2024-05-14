@@ -4,10 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
-import org.microarchitecturovisco.transport.services.TransportsService;
+import org.microarchitecturovisco.transport.services.TransportsQueryService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
 import org.microarchitecturovisco.transport.utils.json.JsonReader;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TransportsController {
 
-    private final TransportsService transportsService;
+    private final TransportsQueryService transportsQueryService;
     private final RabbitTemplate rabbitTemplate;
 
     @GetMapping("/available")
     public AvailableTransportsDto getAvailableTransports() {
-        return transportsService.getAvailableTransports();
+        return transportsQueryService.getAvailableTransports();
     }
 
     @GetMapping("/")
@@ -38,7 +37,7 @@ public class TransportsController {
 
         GetTransportsBySearchQueryRequestDto requestDto = JsonReader.readGetTransportsBySearchQueryRequestFromJson(requestDtoJson);
 
-        GetTransportsBySearchQueryResponseDto responseDto = transportsService.getTransportsBySearchQuery(requestDto);
+        GetTransportsBySearchQueryResponseDto responseDto = transportsQueryService.getTransportsBySearchQuery(requestDto);
 
         long endTime = System.currentTimeMillis();
         System.out.println("Send transports response size " + responseDto.getTransportDtoList().size());
