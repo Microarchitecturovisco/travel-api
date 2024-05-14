@@ -47,22 +47,18 @@ public class Bootstrap implements CommandLineRunner {
         Logger logger = Logger.getLogger("Bootstrap");
 
         List<LocationDto> departureLocations = new ArrayList<>(List.of(
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Gdańsk").build(),
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Warszawa").build(),
-                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Poznań").build()
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Gdańsk").build(),
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Warszawa").build()
         ));
 
         List<LocationDto> planeArrivalLocations = new ArrayList<>(List.of(
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("Egipt").region("Kair").build(),
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("RPA").region("Kapsztad").build(),
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Egipt").region("Kair").build(),
                 LocationDto.builder().idLocation(UUID.randomUUID()).country("Tunezja").region("Tunis").build())
         );
 
         List<LocationDto> busArrivalLocations = new ArrayList<>(List.of(
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("Włochy").region("Florencja").build(),
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("Włochy").region("Wenecja").build(),
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("Niemcy").region("Hanower").build(),
-//                LocationDto.builder().idLocation(UUID.randomUUID()).country("Niemcy").region("Berlin").build()
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Włochy").region("Florencja").build(),
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Niemcy").region("Berlin").build()
         ));
 
 
@@ -154,7 +150,7 @@ public class Bootstrap implements CommandLineRunner {
         LocalDateTime bootstrapBeginDay = LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0);
 
 //         generate transport for each course and every day of two months
-        for (int day = 0; day < 2; day++) {
+        for (int day = 0; day < 10; day++) {
             for (TransportCourseDto planeCourse : planeCourses) {
                 int capacity = ThreadLocalRandom.current().nextInt(80, 100);
 
@@ -174,8 +170,8 @@ public class Bootstrap implements CommandLineRunner {
                 );
 
                 // make reservations for transport
-//                int numberOfReservationsToMake = ThreadLocalRandom.current().nextInt(0, 10) > 6 ? capacity : (int) ( capacity * 0.8);
-                int numberOfReservationsToMake = 4;
+                int numberOfReservationsToMake = ThreadLocalRandom.current().nextInt(0, 10) > 6 ? capacity : (int) ( capacity * 0.8);
+//                int numberOfReservationsToMake = 4;
 
                 while (numberOfReservationsToMake > 0) {
                     int occupiedSeats = ThreadLocalRandom.current().nextInt(1, 8);
@@ -201,6 +197,7 @@ public class Bootstrap implements CommandLineRunner {
             }
             for (TransportCourseDto busCourse : busCourses) {
                 TransportDto transportDto = TransportDto.builder()
+                        .idTransport(UUID.randomUUID())
                         .transportCourse(busCourse)
                         .departureDate(bootstrapBeginDay.plusDays(day))
                         .capacity(ThreadLocalRandom.current().nextInt(20, 50))
