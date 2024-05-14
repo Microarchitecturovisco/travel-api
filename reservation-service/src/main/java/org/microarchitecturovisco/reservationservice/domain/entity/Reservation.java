@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.reservationservice.domain;
+package org.microarchitecturovisco.reservationservice.domain.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,8 +17,7 @@ import java.util.Collection;
 public class Reservation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private String id;
 
     @NotNull
     private LocalDateTime hotelTimeFrom;
@@ -45,7 +45,11 @@ public class Reservation {
 
     @NotNull
     @ElementCollection
-    private Collection<Integer> roomReservationsIds;
+    private List<String> roomReservationsIds;
+
+    @NotNull
+    @ElementCollection
+    private List<String> transportReservationsIds;
 
     @NotNull
     private int userId;
