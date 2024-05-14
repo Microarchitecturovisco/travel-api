@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "transports_reservations")
 @Getter
@@ -14,7 +16,7 @@ import lombok.*;
 public class TransportReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private UUID id;
 
     @ManyToOne()
     @JoinColumn(name="transport_id", nullable=false)

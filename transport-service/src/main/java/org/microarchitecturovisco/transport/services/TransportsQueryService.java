@@ -2,7 +2,6 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
-import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDepartures;
@@ -11,18 +10,28 @@ import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySe
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
+import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TransportsService {
+public class TransportsQueryService {
 
     private final TransportCourseRepository transportCourseRepository;
     private final TransportRepository transportRepository;
+    private final TransportEventStore transportEventStore;
+
+    private final TransportEventSourcingHandler eventSourcingHandler;
+
+    public List<TransportDto> getAllTransports() {
+        List<Transport> transports = transportRepository.findAll();
+        return TransportMapper.mapList(transports);
+    }
 
     public AvailableTransportsDto getAvailableTransports() {
 
@@ -69,7 +78,7 @@ public class TransportsService {
 
         List<Transport> filteredTransports = new ArrayList<>();
 
-        List<Integer> mergedDepartureLocationIds = new ArrayList<>();
+        List<UUID> mergedDepartureLocationIds = new ArrayList<>();
         if (requestDto.getDepartureLocationIdsByPlane() != null) {
             mergedDepartureLocationIds.addAll(requestDto.getDepartureLocationIdsByPlane());
         }

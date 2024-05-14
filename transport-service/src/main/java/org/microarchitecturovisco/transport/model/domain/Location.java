@@ -5,6 +5,7 @@ import lombok.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "locations")
@@ -15,8 +16,7 @@ import java.util.List;
 @Builder
 public class Location {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private UUID id;
 
     @NotNull
     private String country;
