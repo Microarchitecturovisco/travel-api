@@ -23,7 +23,7 @@ public class HotelsController {
     public void consumeGetTransportsRequest(GetHotelsBySearchQueryRequestDto requestDto) {
         GetHotelsBySearchQueryResponseDto responseDto = hotelsService.GetHotelsBySearchQuery(requestDto);
 
-        System.out.println("Send hotels response size " + responseDto.getHotelsDtoList().size());
+        System.out.println("Send hotels response size " + responseDto.getHotels().size());
 
         rabbitTemplate.convertAndSend("hotels.responses.getHotelsBySearchQuery", responseDto);
     }
