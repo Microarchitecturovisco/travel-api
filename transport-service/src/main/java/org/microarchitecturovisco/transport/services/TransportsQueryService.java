@@ -2,8 +2,6 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
-import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
-import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDepartures;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
@@ -16,10 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TransportsService {
+public class TransportsQueryService {
 
     private final TransportCourseRepository transportCourseRepository;
     private final TransportRepository transportRepository;
@@ -69,7 +68,7 @@ public class TransportsService {
 
         List<Transport> filteredTransports = new ArrayList<>();
 
-        List<Integer> mergedDepartureLocationIds = new ArrayList<>();
+        List<UUID> mergedDepartureLocationIds = new ArrayList<>();
         if (requestDto.getDepartureLocationIdsByPlane() != null) {
             mergedDepartureLocationIds.addAll(requestDto.getDepartureLocationIdsByPlane());
         }
