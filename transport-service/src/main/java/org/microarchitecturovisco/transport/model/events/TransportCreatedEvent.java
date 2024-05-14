@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transport_created_events")
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
