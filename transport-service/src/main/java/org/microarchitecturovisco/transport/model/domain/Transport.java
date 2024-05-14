@@ -19,6 +19,7 @@ import java.util.UUID;
 @Builder
 public class Transport {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne

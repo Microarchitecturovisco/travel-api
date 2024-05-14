@@ -14,6 +14,14 @@ public class LocationMapper {
                 .build();
     }
 
+    public static Location map(LocationDto dto) {
+        return Location.builder()
+                .id(dto.getIdLocation())
+                .country(dto.getCountry())
+                .region(dto.getRegion())
+                .build();
+    }
+
     public static List<LocationDto> mapList(List<Location> locations) {
         return locations.stream().map(LocationMapper::map).toList();
     }

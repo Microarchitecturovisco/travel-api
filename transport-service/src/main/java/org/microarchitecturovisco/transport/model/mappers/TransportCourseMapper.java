@@ -12,4 +12,13 @@ public class TransportCourseMapper {
                 .departureFromLocation(LocationMapper.map(transportCourse.getDepartureFrom()))
                 .build();
     }
+
+    public static TransportCourse map(TransportCourseDto dto) {
+        return TransportCourse.builder()
+                .id(dto.getIdTransportCourse())
+                .type(dto.getType())
+                .arrivalAt(LocationMapper.map(dto.getArrivalAtLocation()))
+                .departureFrom(LocationMapper.map(dto.getDepartureFromLocation()))
+                .build();
+    }
 }

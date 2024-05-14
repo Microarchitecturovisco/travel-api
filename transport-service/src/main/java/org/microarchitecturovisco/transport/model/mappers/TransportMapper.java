@@ -19,4 +19,14 @@ public class TransportMapper {
     public static List<TransportDto> mapList(List<Transport> transports) {
         return transports.stream().map(TransportMapper::map).toList();
     }
+
+    public static Transport map(TransportDto dto) {
+        return Transport.builder()
+                .id(dto.getIdTransport())
+                .course(TransportCourseMapper.map(dto.getTransportCourse()))
+                .departureDate(dto.getDepartureDate())
+                .capacity(dto.getCapacity())
+                .pricePerAdult(dto.getPricePerAdult())
+                .build();
+    }
 }
