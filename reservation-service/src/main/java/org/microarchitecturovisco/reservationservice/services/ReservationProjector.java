@@ -16,19 +16,15 @@ import java.util.Optional;
 public class ReservationProjector {
     private final ReservationRepository reservationRepository;
 
-    public void project(String reservationId, List<ReservationEvent> events) {
+    public void project(List<ReservationEvent> events) {
         for(ReservationEvent event : events) {
             if(event instanceof ReservationCreatedEvent) {
                 apply((ReservationCreatedEvent) event);
             }
             if(event instanceof ReservationUpdateEvent) {
-                apply(reservationId, (ReservationUpdateEvent) event);
+                apply((ReservationUpdateEvent) event);
             }
         }
-    }
-
-    public void project(List<ReservationEvent> events) {
-        project(null, events);
     }
 
     public void apply(ReservationCreatedEvent event) {
@@ -50,8 +46,8 @@ public class ReservationProjector {
         reservationRepository.save(reservation);
     }
 
-    public void apply(String reservationId, ReservationUpdateEvent event) {
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
+    public void apply(ReservationUpdateEvent event) {
+        Reservation reservation = reservationRepository.findById(event.getIdReservation()).orElseThrow(RuntimeException::new);
         reservation.setPaid(event.getPaid());
 
         reservationRepository.save(reservation);

@@ -56,7 +56,7 @@ public class ReservationAggregate {
                 .paid(command.isPaid())
                 .build();
         reservationEventStore.save(event);
-        reservationProjector.project(command.getReservationId(), List.of(event));
+        reservationProjector.project(List.of(event));
 
         return List.of(event);
     }
