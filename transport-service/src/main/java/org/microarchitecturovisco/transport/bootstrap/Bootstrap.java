@@ -1,26 +1,22 @@
 package org.microarchitecturovisco.transport.bootstrap;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
+import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.domain.*;
+import org.microarchitecturovisco.transport.model.dto.LocationDto;
+import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
-import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
-import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
-import org.microarchitecturovisco.transport.repositories.LocationRepository;
-import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
-import org.microarchitecturovisco.transport.repositories.TransportRepository;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
+import org.microarchitecturovisco.transport.services.TransportCommandService;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
@@ -28,151 +24,126 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class Bootstrap implements CommandLineRunner {
 
-
-    private final LocationRepository locationRepository;
-    private final TransportRepository transportRepository;
-    private final TransportCourseRepository transportCourseRepository;
-    private final RabbitTemplate rabbitTemplate;
+    private final TransportCommandService transportCommandService;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         Logger logger = Logger.getLogger("Bootstrap");
 
-        List<Location> departureLocations = new ArrayList<>();
+        List<LocationDto> departureLocations = new ArrayList<>(List.of(
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Gdańsk").build(),
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Warszawa").build()
+        ));
 
-        List<Location> planeArrivalLocations = new ArrayList<>();
+        List<LocationDto> planeArrivalLocations = new ArrayList<>(List.of(
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Egipt").region("Kair").build(),
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Tunezja").region("Tunis").build())
+        );
 
-        List<Location> busArrivalLocations = new ArrayList<>();
-
-        for (Location departureLocation : List.of(
-                Location.builder().country("Polska").region("Gdańsk").build(),
-                Location.builder().country("Polska").region("Warszawa").build(),
-                Location.builder().country("Polska").region("Poznań").build()
-        )) {
-            departureLocations.add(locationRepository.save(departureLocation));
-        }
-
-        for (Location planeArrivalLocation : List.of(
-                Location.builder().country("Egipt").region("Kair").build(),
-                Location.builder().country("RPA").region("Kapsztad").build(),
-                Location.builder().country("Tunezja").region("Tunis").build())) {
-            planeArrivalLocations.add(locationRepository.save(planeArrivalLocation));
-        }
-
-        for (Location busArrivalLocation : List.of(
-                Location.builder().country("Włochy").region("Florencja").build(),
-                Location.builder().country("Włochy").region("Wenecja").build(),
-                Location.builder().country("Niemcy").region("Hanower").build(),
-                Location.builder().country("Niemcy").region("Berlin").build()
-        )) {
-            busArrivalLocations.add(locationRepository.save(busArrivalLocation));
-        }
+        List<LocationDto> busArrivalLocations = new ArrayList<>(List.of(
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Włochy").region("Florencja").build(),
+                LocationDto.builder().idLocation(UUID.randomUUID()).country("Niemcy").region("Berlin").build()
+        ));
 
 
-        List<TransportCourse> planeCourses = new ArrayList<>();
-        for (Location departureLocation : departureLocations) {
-            for (Location planeArrivalLocation : planeArrivalLocations) {
-                planeCourses.add(transportCourseRepository.save(TransportCourse.builder().departureFrom(departureLocation).arrivalAt(planeArrivalLocation).type(TransportType.PLANE).build()));
-            }
-        }
-        for (Location departureLocation : departureLocations) {
-            for (Location planeArrivalLocation : planeArrivalLocations) {
-                planeCourses.add(transportCourseRepository.save(TransportCourse.builder().departureFrom(planeArrivalLocation).arrivalAt(departureLocation).type(TransportType.PLANE).build()));
+        List<TransportCourseDto> planeCourses = new ArrayList<>();
+        for (LocationDto departureLocation : departureLocations) {
+            for (LocationDto planeArrivalLocation : planeArrivalLocations) {
+                planeCourses.add(TransportCourseDto.builder()
+                        .idTransportCourse(UUID.randomUUID())
+                        .departureFromLocation(departureLocation)
+                        .arrivalAtLocation(planeArrivalLocation)
+                        .type(TransportType.PLANE)
+                        .build());
+                planeCourses.add(TransportCourseDto.builder()
+                        .idTransportCourse(UUID.randomUUID())
+                        .departureFromLocation(planeArrivalLocation)
+                        .arrivalAtLocation(departureLocation)
+                        .type(TransportType.PLANE)
+                        .build());
             }
         }
 
-        List<TransportCourse> busCourses = new ArrayList<>();
-        for (Location departureLocation : departureLocations) {
-            for (Location busArrivalLocation : busArrivalLocations) {
-                busCourses.add(transportCourseRepository.save(TransportCourse.builder().departureFrom(departureLocation).arrivalAt(busArrivalLocation).type(TransportType.BUS).build()));
+        List<TransportCourseDto> busCourses = new ArrayList<>();
+        for (LocationDto departureLocation : departureLocations) {
+            for (LocationDto busArrivalLocation : busArrivalLocations) {
+                busCourses.add(TransportCourseDto.builder()
+                        .idTransportCourse(UUID.randomUUID())
+                        .departureFromLocation(departureLocation)
+                        .arrivalAtLocation(busArrivalLocation)
+                        .type(TransportType.BUS)
+                        .build());
+                busCourses.add(TransportCourseDto.builder()
+                        .idTransportCourse(UUID.randomUUID())
+                        .departureFromLocation(busArrivalLocation)
+                        .arrivalAtLocation(departureLocation)
+                        .type(TransportType.BUS)
+                        .build());
             }
         }
-        for (Location departureLocation : departureLocations) {
-            for (Location busArrivalLocation : busArrivalLocations) {
-                busCourses.add(transportCourseRepository.save(TransportCourse.builder().departureFrom(busArrivalLocation).arrivalAt(departureLocation).type(TransportType.BUS).build()));
-            }
-        }
-
-        List<Transport> transports = new ArrayList<>();
 
         LocalDateTime bootstrapBeginDay = LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0);
 
-        // generate transport for each course and every day of two months
-        for (int day = 0; day < 60; day++) {
-            for (TransportCourse planeCourse : planeCourses) {
+//        generate transport for each course and every day of two months
+        for (int day = 0; day < 10; day++) {
+            for (TransportCourseDto planeCourse : planeCourses) {
                 int capacity = ThreadLocalRandom.current().nextInt(80, 100);
 
-                Transport transport = Transport.builder()
-                        .course(planeCourse)
+                TransportDto transportDto = TransportDto.builder()
+                        .idTransport(UUID.randomUUID())
                         .departureDate(bootstrapBeginDay.plusDays(day))
+                        .transportCourse(planeCourse)
                         .capacity(capacity)
                         .pricePerAdult(ThreadLocalRandom.current().nextFloat(100, 500))
                         .build();
-                transport = transportRepository.save(transport);
 
+                transportCommandService.createTransport(CreateTransportCommand.builder()
+                        .uuid(UUID.randomUUID())
+                        .commandTimeStamp(LocalDateTime.now())
+                        .transportDto(transportDto)
+                        .build()
+                );
+
+                // make reservations for transport
                 int numberOfReservationsToMake = ThreadLocalRandom.current().nextInt(0, 10) > 6 ? capacity : (int) ( capacity * 0.8);
-
-                List<TransportReservation> reservations = new ArrayList<>();
 
                 while (numberOfReservationsToMake > 0) {
                     int occupiedSeats = ThreadLocalRandom.current().nextInt(1, 8);
 
                     if (numberOfReservationsToMake - occupiedSeats < 0) continue;
 
-                    TransportReservation reservation = TransportReservation.builder()
+                    TransportReservationDto reservationDto = TransportReservationDto.builder()
                             .numberOfSeats(occupiedSeats)
-                            .transport(transport)
+                            .idTransport(transportDto.getIdTransport())
+                            .idTransportReservation(UUID.randomUUID())
                             .build();
-                    reservations.add(reservation);
                     numberOfReservationsToMake -= occupiedSeats;
+
+                    transportCommandService.createReservation(CreateTransportReservationCommand.builder()
+                            .uuid(UUID.randomUUID())
+                            .commandTimeStamp(LocalDateTime.now())
+                            .transportReservationDto(reservationDto)
+                            .build()
+                    );
                 }
-                transport.setTransportReservations(reservations);
-                transports.add(transportRepository.save(transport));
+
             }
-            for (TransportCourse busCourse : busCourses) {
-                Transport transport = Transport.builder()
-                        .course(busCourse)
+            for (TransportCourseDto busCourse : busCourses) {
+                TransportDto transportDto = TransportDto.builder()
+                        .idTransport(UUID.randomUUID())
+                        .transportCourse(busCourse)
                         .departureDate(bootstrapBeginDay.plusDays(day))
                         .capacity(ThreadLocalRandom.current().nextInt(20, 50))
                         .pricePerAdult(ThreadLocalRandom.current().nextFloat(50, 200))
                         .build();
-                transports.add(transportRepository.save(transport));
+
+                transportCommandService.createTransport(CreateTransportCommand.builder()
+                        .uuid(UUID.randomUUID())
+                        .commandTimeStamp(LocalDateTime.now())
+                        .transportDto(transportDto)
+                        .build()
+                );
             }
         }
-
-
-
     }
-
-    @Scheduled(fixedDelay = 10000)
-    public void testGetTransportsBySearchQuery() {
-        GetTransportsBySearchQueryRequestDto testRequestDto = GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(java.util.UUID.randomUUID().toString())
-                .dateFrom(LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0))
-                .dateTo(LocalDateTime.of(2024, Month.MAY, 14, 12, 0, 0))
-                .departureLocationIdsByPlane(List.of(1))
-                .departureLocationIdsByBus(List.of())
-                .arrivalLocationIds(List.of(6))
-                .adults(2)
-                .childrenUnderThree(1)
-                .childrenUnderTen(1)
-                .childrenUnderEighteen(1)
-                .build();
-
-        rabbitTemplate.convertAndSend("transports.requests.getTransportsBySearchQuery", testRequestDto);
-    }
-
-    @RabbitListener(queues = "transports.responses.getTransportsBySearchQuery")
-    @RabbitHandler
-    public void consumeGetTransportsResponse(GetTransportsBySearchQueryResponseDto responseDto) {
-
-        System.out.println("Received transports:");
-        for (TransportDto transportDto : responseDto.getTransportDtoList()) {
-            System.out.println("  - " + transportDto.getTransportCourse().getDepartureFromLocation().getRegion() + " <-> " + transportDto.getTransportCourse().getArrivalAtLocation().getRegion());
-            System.out.println("    " + transportDto.getDepartureDate());
-        }
-
-        System.out.println("Received transports of size " + responseDto.getTransportDtoList().size());
-    }
-
 }
