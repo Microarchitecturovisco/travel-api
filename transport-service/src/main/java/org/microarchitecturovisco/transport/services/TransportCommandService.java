@@ -2,7 +2,9 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
+import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
+import org.microarchitecturovisco.transport.model.events.TransportReservationCreatedEvent;
 import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +24,18 @@ public class TransportCommandService {
         transportEventStore.save(transportCreatedEvent);
 
         eventSourcingHandler.project(command.getTransportDto().getIdTransport());
+    }
+
+    public void createReservation(CreateTransportReservationCommand command) {
+        TransportReservationCreatedEvent transportReservationCreatedEvent = TransportReservationCreatedEvent.builder()
+                .id(command.getUuid())
+                .eventTimeStamp(command.getCommandTimeStamp())
+                .idTransportReservation(command.getTransportReservationDto().getIdTransportReservation())
+                .idTransport(command.getTransportReservationDto().getIdTransport())
+                .build();
+
+        transportEventStore.save(transportReservationCreatedEvent);
+
+        eventSourcingHandler.project(command.getTransportReservationDto().getIdTransport());
     }
 }

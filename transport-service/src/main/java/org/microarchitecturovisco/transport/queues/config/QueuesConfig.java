@@ -16,4 +16,9 @@ public class QueuesConfig {
     public Queue getTransportsResponse() {
         return new Queue("transports.responses.getTransportsBySearchQuery", false);
     }
+
+    @Bean
+    public Queue createTransportReservationRequest() {
+        return new Queue("transports.requests.createReservation", false);
+    }
 }
