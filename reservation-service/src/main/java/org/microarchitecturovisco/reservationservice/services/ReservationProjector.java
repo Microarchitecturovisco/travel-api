@@ -27,6 +27,10 @@ public class ReservationProjector {
         }
     }
 
+    public void project(List<ReservationEvent> events) {
+        project(null, events);
+    }
+
     public void apply(ReservationCreatedEvent event) {
         Reservation reservation = Reservation.builder()
                 .id(event.getIdReservation())

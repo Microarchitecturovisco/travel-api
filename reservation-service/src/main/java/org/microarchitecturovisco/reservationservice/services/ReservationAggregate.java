@@ -40,7 +40,7 @@ public class ReservationAggregate {
                 .userId(command.getUserId())
                 .build();
         reservationEventStore.save(event);
-        reservationProjector.project(null, List.of(event));
+        reservationProjector.project(List.of(event));
         return List.of(event);
     }
 
