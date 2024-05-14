@@ -6,12 +6,13 @@ import org.microarchitecturovisco.hotelservice.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.Month;
+import java.time.ZoneOffset;
 import java.util.Optional;
+import java.util.Random;
+import java.util.logging.Logger;
 
 @Component
 public class RoomReservationParser {
@@ -22,30 +23,40 @@ public class RoomReservationParser {
     @Autowired
     private RoomReservationRepository roomReservationRepository;
 
-    public void importRoomReservations(String filename) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-            br.readLine();  // Skip header line
+    public void importRoomReservations() {
+        Logger logger = Logger.getLogger("HOTELS");
+        LocalDateTime dateFrom = LocalDateTime.of(2024, Month.JUNE, 1, 0, 0);
+        LocalDateTime dateTo = LocalDateTime.of(2024, Month.OCTOBER, 30, 23, 59);
+        long randomSeed = 1234;
+        int numberOfRoomReservations = 30;
+        int[] durationOptions = {7, 10, 14}; // Duration options in days
 
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split("\t");
-                RoomReservation roomReservation = createNewRoomReservation(data);
-                roomReservationRepository.save(roomReservation);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        Random random = new Random(randomSeed);
+
+        for (int i = 0; i < numberOfRoomReservations; i++) {
+            LocalDateTime randomDateFrom = generateRandomDateTime(dateFrom, dateTo, random);
+            logger.info(String.valueOf(randomDateFrom));
+
+            int randomDurationIndex = random.nextInt(durationOptions.length);
+            int randomDuration = durationOptions[randomDurationIndex];
+            Duration duration = Duration.ofDays(randomDuration);
+
+            LocalDateTime randomDateTo = randomDateFrom.plus(duration);
+
+            int roomId = random.nextInt((int) roomRepository.count()) + 1;
+            Optional<Room> optionalRoom = roomRepository.findById(roomId);
+            Room room = optionalRoom.orElseThrow(() -> new RuntimeException("Room not found with ID: " + roomId));
+
+            RoomReservation roomReservation = new RoomReservation(randomDateFrom, randomDateTo, room);
+            roomReservationRepository.save(roomReservation);
         }
     }
 
-    private RoomReservation createNewRoomReservation(String[] data) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        int roomId = Integer.parseInt(data[0]);
-        LocalDateTime dateFrom = LocalDateTime.parse(data[1], formatter);
-        LocalDateTime dateTo = LocalDateTime.parse(data[2], formatter);
-
-        Optional<Room> optionalRoom = roomRepository.findById(roomId);
-        Room room = optionalRoom.orElseThrow(() -> new RuntimeException("Room not found with ID: " + roomId));
-
-        return new RoomReservation(dateFrom, dateTo, room);
+    private LocalDateTime generateRandomDateTime(LocalDateTime min, LocalDateTime max, Random random) {
+        long minSeconds = min.toEpochSecond(ZoneOffset.UTC);
+        long maxSeconds = max.toEpochSecond(ZoneOffset.UTC);
+        long randomSeconds = minSeconds + random.nextInt((int) (maxSeconds - minSeconds + 1));
+        return LocalDateTime.ofEpochSecond(randomSeconds, 0, ZoneOffset.UTC);
     }
+
 }

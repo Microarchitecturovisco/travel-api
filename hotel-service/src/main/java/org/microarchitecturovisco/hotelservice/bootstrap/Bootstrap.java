@@ -27,7 +27,6 @@ public class Bootstrap implements CommandLineRunner {
         String hotelPhotosCsvFile = dataDirectory + "hotel_photos.csv";
         String hotelRoomsCsvFile = dataDirectory + "hotel_rooms.csv";
         String hotelCateringOptionsCsvFile = dataDirectory + "hotel_food_options.csv";
-        String roomReservationCsvFile = dataDirectory + "room_reservations.csv";
 
         photosParser.importPhotos(hotelPhotosCsvFile);
         logger.info("Saved photos");
@@ -44,7 +43,7 @@ public class Bootstrap implements CommandLineRunner {
         cateringOptionParser.importCateringOptions(hotelCateringOptionsCsvFile);
         logger.info("Saved catering options");
 
-        roomReservationParser.importRoomReservations(roomReservationCsvFile);
+        roomReservationParser.importRoomReservations();
         logger.info("Saved room reservations");
     }
 }
