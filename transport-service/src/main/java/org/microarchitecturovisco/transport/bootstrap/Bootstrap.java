@@ -37,7 +37,6 @@ public class Bootstrap implements CommandLineRunner {
         String hotelCsvFile = dataDirectory + "hotels.csv";
         String hotelDepartureOptionsCsvFile = dataDirectory + "hotel_departure_options.csv";
         String transportsSampleCsvFile = dataDirectory + "transports_sample.csv";
-        String transportReservationSampleCsvFile = dataDirectory + "transport_reservation_sample.csv";
 
         locationParser.importLocationsAbroad(hotelCsvFile);
         locationParser.importLocationsPoland(hotelDepartureOptionsCsvFile);
@@ -46,7 +45,7 @@ public class Bootstrap implements CommandLineRunner {
 
         transportParser.importTransports(transportsSampleCsvFile);
 
-        transportReservationParser.importTransportReservations(transportReservationSampleCsvFile);
+        transportReservationParser.importTransportReservations();
     }
 
     @Scheduled(fixedDelay = 10000)
