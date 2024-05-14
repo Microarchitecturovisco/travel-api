@@ -29,7 +29,7 @@ public class ReservationProjector {
 
     public void apply(ReservationCreatedEvent event) {
         Reservation reservation = Reservation.builder()
-                .id(event.getId())
+                .id(event.getIdReservation())
                 .hotelTimeFrom(event.getHotelTimeFrom())
                 .hotelTimeTo(event.getHotelTimeTo())
                 .infantsQuantity(event.getInfantsQuantity())
