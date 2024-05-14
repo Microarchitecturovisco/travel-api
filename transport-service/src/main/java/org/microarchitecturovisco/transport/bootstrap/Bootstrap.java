@@ -27,7 +27,7 @@ public class Bootstrap implements CommandLineRunner {
     private final TransportCommandService transportCommandService;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         Logger logger = Logger.getLogger("Bootstrap");
 
         List<LocationDto> departureLocations = new ArrayList<>(List.of(
@@ -118,7 +118,6 @@ public class Bootstrap implements CommandLineRunner {
                             .idTransportReservation(UUID.randomUUID())
                             .build();
                     numberOfReservationsToMake -= occupiedSeats;
-                    logger.info("Add reservation for transport id " + transportDto.getIdTransport());
 
                     transportCommandService.createReservation(CreateTransportReservationCommand.builder()
                             .uuid(UUID.randomUUID())
