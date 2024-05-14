@@ -7,7 +7,6 @@ import lombok.experimental.SuperBuilder;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transports_reservation_created_events")
 @Getter
 @Setter
 @AllArgsConstructor

@@ -8,7 +8,6 @@ import java.util.UUID;
 
 @Data
 @Builder
-@SuperBuilder
 public class TransportReservationDto {
     private UUID idTransportReservation;
     private UUID idTransport;

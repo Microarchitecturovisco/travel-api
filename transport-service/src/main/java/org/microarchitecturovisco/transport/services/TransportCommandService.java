@@ -8,6 +8,8 @@ import org.microarchitecturovisco.transport.model.events.TransportReservationCre
 import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.springframework.stereotype.Service;
 
+import java.util.logging.Logger;
+
 @Service
 @RequiredArgsConstructor
 public class TransportCommandService {
@@ -37,5 +39,7 @@ public class TransportCommandService {
         transportEventStore.save(transportReservationCreatedEvent);
 
         eventSourcingHandler.project(command.getTransportReservationDto().getIdTransport());
+        Logger logger = Logger.getLogger("TransportCommandService");
+        logger.info("Projecting transport reservation for id " + command.getTransportReservationDto().getIdTransport());
     }
 }
