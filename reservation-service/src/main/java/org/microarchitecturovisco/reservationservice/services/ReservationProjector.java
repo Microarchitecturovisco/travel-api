@@ -16,7 +16,7 @@ import java.util.Optional;
 public class ReservationProjector {
     private final ReservationRepository reservationRepository;
 
-    public void project(Integer reservationId, List<ReservationEvent> events) {
+    public void project(String reservationId, List<ReservationEvent> events) {
         for(ReservationEvent event : events) {
             if(event instanceof ReservationCreatedEvent) {
                 apply((ReservationCreatedEvent) event);
@@ -46,7 +46,7 @@ public class ReservationProjector {
         reservationRepository.save(reservation);
     }
 
-    public void apply(Integer reservationId, ReservationUpdateEvent event) {
+    public void apply(String reservationId, ReservationUpdateEvent event) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
         reservation.setPaid(event.getPaid());
 
