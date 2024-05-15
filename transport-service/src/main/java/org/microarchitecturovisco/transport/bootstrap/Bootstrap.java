@@ -5,7 +5,6 @@ import org.microarchitecturovisco.transport.bootstrap.util.LocationParser;
 import org.microarchitecturovisco.transport.bootstrap.util.TransportCoursesParser;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
-import org.microarchitecturovisco.transport.model.domain.*;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
