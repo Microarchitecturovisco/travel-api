@@ -11,17 +11,17 @@ import org.springframework.context.annotation.Configuration;
 public class QueuesConfig {
 
     @Bean
-    public Queue handlePaymentRequest() {
+    public Queue handlePaymentQueue() {
         return new Queue("payments.requests.handle", false);
     }
 
     @Bean
-    public DirectExchange handlePaymentResponseExchange() {
-        return new DirectExchange("payments.responses.handle");
+    public DirectExchange handlePaymentExchange() {
+        return new DirectExchange("payments.requests.handle");
     }
 
     @Bean
-    public Binding handlePaymentRequestBinding(DirectExchange handlePaymentResponseExchange, Queue handlePaymentRequest) {
-        return BindingBuilder.bind(handlePaymentRequest).to(handlePaymentResponseExchange).with("payments.handlePayment");
+    public Binding handlePaymentRequestBinding(DirectExchange handlePaymentExchange, Queue handlePaymentQueue) {
+        return BindingBuilder.bind(handlePaymentQueue).to(handlePaymentExchange).with("payments.handlePayment");
     }
 }
