@@ -42,10 +42,9 @@ public class RoomReservationParser {
 
             LocalDateTime randomDateTo = randomDateFrom.plus(duration);
 
-            HotelDto hotel = hotels.get(random.nextInt(hotels.size()));
+            HotelDto hotel = selectRandomHotel(hotels);
             List<RoomDto> rooms = hotel.getRooms();
-
-            RoomDto room = rooms.get(random.nextInt(rooms.size()));
+            RoomDto room = selectRandomRoom(rooms);
 
             RoomReservationDto roomReservation = new RoomReservationDto();
             roomReservation.setReservationId(UUID.randomUUID());
@@ -57,6 +56,18 @@ public class RoomReservationParser {
         }
 
         return roomReservations;
+    }
+
+    private HotelDto selectRandomHotel(List<HotelDto> hotels) {
+        Random random = new Random();
+        int randomIndex = random.nextInt(hotels.size());
+        return hotels.get(randomIndex);
+    }
+
+    private RoomDto selectRandomRoom(List<RoomDto> rooms) {
+        Random random = new Random();
+        int randomIndex = random.nextInt(rooms.size());
+        return rooms.get(randomIndex);
     }
 
     private LocalDateTime generateRandomDateTime(LocalDateTime min, LocalDateTime max, Random random) {
