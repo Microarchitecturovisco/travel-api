@@ -10,7 +10,6 @@ import java.util.UUID;
 @Builder
 public class RoomDto {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID roomId;
 
     private UUID hotelId;
@@ -24,8 +23,4 @@ public class RoomDto {
     private String description;
 
     private List<RoomReservationDto> roomReservations;
-
-    public UUID getHotelId() {
-        return this.roomId;
-    }
 }

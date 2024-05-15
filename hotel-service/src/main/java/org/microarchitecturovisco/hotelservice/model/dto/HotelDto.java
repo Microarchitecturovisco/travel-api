@@ -1,5 +1,6 @@
 package org.microarchitecturovisco.hotelservice.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class HotelDto implements Serializable {
     private UUID hotelId;
 
@@ -24,21 +26,4 @@ public class HotelDto implements Serializable {
     private List<String> photos;
     
     private List<RoomDto> rooms;
-
-    public HotelDto(UUID hotelId,
-                    String name,
-                    String description,
-                    float rating,
-                    LocationDto location,
-                    List<CateringOptionDto> cateringOptions,
-                    List<String> photos,
-                    List<RoomDto> rooms) {
-        this.hotelId = hotelId;
-        this.name = name;
-        this.description = description;
-        this.rating = rating;
-        this.location = location;
-        this.photos = photos;
-    }
-
 }
