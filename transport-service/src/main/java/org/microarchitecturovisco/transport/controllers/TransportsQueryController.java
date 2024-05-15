@@ -2,8 +2,10 @@ package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
+import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
+import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.services.TransportsQueryService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
@@ -54,5 +56,14 @@ public class TransportsQueryController {
         System.out.println("Service call took " + (endTime - startTime) + " ms");
 
         rabbitTemplate.convertAndSend("transports.responses.getTransportsBySearchQuery", JsonConverter.convertGetTransportsBySearchQueryResponseDto(responseDto));
+    }
+
+    @RabbitListener(queues = "transports.requests.getTransportsBetweenLocations")
+    public String  getTransportsBetweenLocations(String requestDtoJson) {
+        GetTransportsBetweenLocationsRequestDto requestDto = JsonReader.readGetTransportsBetweenLocationsRequestDtoFromJson(requestDtoJson);
+
+        GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenLocations(requestDto);
+
+        return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 }

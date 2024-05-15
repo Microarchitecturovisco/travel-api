@@ -22,4 +22,23 @@ public class ExchangesConfig {
     public Binding createTransportReservationRequestBinding(FanoutExchange createTransportReservationRequestExchange, Queue createTransportReservationRequestQueue) {
         return BindingBuilder.bind(createTransportReservationRequestQueue).to(createTransportReservationRequestExchange);
     }
+
+    // get transports between locations
+    @Bean
+    public Queue getTransportsBetweenLocationsQueue() {
+        return new Queue("transports.requests.getTransportsBetweenLocations");
+    }
+
+    @Bean
+    public DirectExchange getTransportsBetweenLocationsExchange() {
+        return new DirectExchange("transports.requests.getTransportsBetweenLocations");
+    }
+
+    @Bean
+    public Binding binding(DirectExchange getTransportsBetweenLocationsExchange,
+                           Queue getTransportsBetweenLocationsQueue) {
+        return BindingBuilder.bind(getTransportsBetweenLocationsQueue)
+                .to(getTransportsBetweenLocationsExchange)
+                .with("transports.getTransportsBetweenLocations");
+    }
 }
