@@ -1,6 +1,8 @@
 package org.microarchitecturovisco.transport.bootstrap;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.transport.bootstrap.util.LocationParser;
+import org.microarchitecturovisco.transport.bootstrap.util.TransportCoursesParser;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.domain.*;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
@@ -23,64 +26,52 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class Bootstrap implements CommandLineRunner {
-
+    private final LocationParser locationParser;
+    private final TransportCoursesParser transportCoursesParser;
     private final TransportCommandService transportCommandService;
+
+    private void logLocations(String locationType, List<LocationDto> locations) {
+        Logger logger = Logger.getLogger("Bootstrap | Transport");
+
+        logger.info(locationType + ":");
+        for (LocationDto location : locations) {
+            logger.info("ID: " + location.getIdLocation() + ", Country: " + location.getCountry() + ", Region: " + location.getRegion());
+        }
+    }
+
+    private void logTransportCourses(String type, List<TransportCourseDto> transportCourses) {
+        Logger logger = Logger.getLogger("Bootstrap | Transport");
+
+        logger.info(type + ":");
+        for (TransportCourseDto course : transportCourses) {
+            logger.info("ID: " + course.getIdTransportCourse() +
+                    ", Departure: " + course.getDepartureFromLocation().getRegion() +
+                    ", Arrival: " + course.getArrivalAtLocation().getRegion() +
+                    ", Type: " + course.getType());
+        }
+    }
 
     @Override
     public void run(String... args) {
         Logger logger = Logger.getLogger("Bootstrap");
 
-        List<LocationDto> departureLocations = new ArrayList<>(List.of(
-                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Gdańsk").build(),
-                LocationDto.builder().idLocation(UUID.randomUUID()).country("Polska").region("Warszawa").build()
-        ));
+        String dataDirectory = "transport-service\\src\\main\\java\\org\\microarchitecturovisco\\transport\\bootstrap\\data\\";
+        String hotelCsvFile = dataDirectory + "hotels.csv";
+        String hotelDepartureOptionsCsvFile = dataDirectory + "hotel_departure_options.csv";
+        String transportsSampleCsvFile = dataDirectory + "transports_sample.csv";
 
-        List<LocationDto> planeArrivalLocations = new ArrayList<>(List.of(
-                LocationDto.builder().idLocation(UUID.randomUUID()).country("Egipt").region("Kair").build(),
-                LocationDto.builder().idLocation(UUID.randomUUID()).country("Tunezja").region("Tunis").build())
-        );
+        List<LocationDto> planeArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile, "PLANE");
+        List<LocationDto> busArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile, "BUS");
+        List<LocationDto> departureLocations = locationParser.importLocationsPoland(hotelDepartureOptionsCsvFile);
 
-        List<LocationDto> busArrivalLocations = new ArrayList<>(List.of(
-                LocationDto.builder().idLocation(UUID.randomUUID()).country("Włochy").region("Florencja").build(),
-                LocationDto.builder().idLocation(UUID.randomUUID()).country("Niemcy").region("Berlin").build()
-        ));
+        Map<String, List<TransportCourseDto>> transportCoursesMap = transportCoursesParser.createTransportCourses(hotelCsvFile, hotelDepartureOptionsCsvFile, busArrivalLocations, planeArrivalLocations, departureLocations);
 
+        List<TransportCourseDto> planeCourses = transportCoursesMap.get("PLANE");
+        List<TransportCourseDto> busCourses = transportCoursesMap.get("BUS");
 
-        List<TransportCourseDto> planeCourses = new ArrayList<>();
-        for (LocationDto departureLocation : departureLocations) {
-            for (LocationDto planeArrivalLocation : planeArrivalLocations) {
-                planeCourses.add(TransportCourseDto.builder()
-                        .idTransportCourse(UUID.randomUUID())
-                        .departureFromLocation(departureLocation)
-                        .arrivalAtLocation(planeArrivalLocation)
-                        .type(TransportType.PLANE)
-                        .build());
-                planeCourses.add(TransportCourseDto.builder()
-                        .idTransportCourse(UUID.randomUUID())
-                        .departureFromLocation(planeArrivalLocation)
-                        .arrivalAtLocation(departureLocation)
-                        .type(TransportType.PLANE)
-                        .build());
-            }
-        }
+        logTransportCourses("Plane Courses", planeCourses);
+        logTransportCourses("Bus Courses", busCourses);
 
-        List<TransportCourseDto> busCourses = new ArrayList<>();
-        for (LocationDto departureLocation : departureLocations) {
-            for (LocationDto busArrivalLocation : busArrivalLocations) {
-                busCourses.add(TransportCourseDto.builder()
-                        .idTransportCourse(UUID.randomUUID())
-                        .departureFromLocation(departureLocation)
-                        .arrivalAtLocation(busArrivalLocation)
-                        .type(TransportType.BUS)
-                        .build());
-                busCourses.add(TransportCourseDto.builder()
-                        .idTransportCourse(UUID.randomUUID())
-                        .departureFromLocation(busArrivalLocation)
-                        .arrivalAtLocation(departureLocation)
-                        .type(TransportType.BUS)
-                        .build());
-            }
-        }
 
         LocalDateTime bootstrapBeginDay = LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0);
 
