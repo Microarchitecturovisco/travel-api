@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.paymentservice.queues.config;
+package org.microarchitecturovisco.paymentservice.rabbitmq.config;
 
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.context.annotation.Bean;
