@@ -1,14 +1,9 @@
 package org.microarchitecturovisco.hotelservice.model.dto;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.microarchitecturovisco.hotelservice.model.domain.CateringOption;
-import org.microarchitecturovisco.hotelservice.model.domain.Location;
-import org.microarchitecturovisco.hotelservice.model.domain.Room;
-
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import java.util.List;
@@ -32,5 +27,18 @@ public class HotelDto implements Serializable {
     
     private List<RoomDto> rooms;
 
+    public HotelDto(UUID hotelId,
+                    String name,
+                    String description,
+                    float rating,
+                    LocationDto location,
+                    List<String> photos){
+        this.hotelId = hotelId;
+        this.name = name;
+        this.description = description;
+        this.rating = rating;
+        this.location = location;
+        this.photos = photos;
+    }
 
 }
