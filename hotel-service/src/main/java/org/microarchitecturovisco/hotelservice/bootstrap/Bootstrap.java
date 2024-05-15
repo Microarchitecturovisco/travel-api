@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.CateringOptionParser;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.HotelParser;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.LocationParser;
+import org.microarchitecturovisco.hotelservice.bootstrap.util.RoomReservationParser;
 import org.microarchitecturovisco.hotelservice.model.dto.CateringOptionDto;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.LocationDto;
+import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
@@ -14,12 +16,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 @Component
@@ -28,6 +25,7 @@ public class Bootstrap implements CommandLineRunner {
     private final LocationParser locationParser;
     private final HotelParser hotelParser;
     private final CateringOptionParser cateringOptionParser;
+    private final RoomReservationParser roomReservationParser;
 
     public File loadCSVInitFiles(String filepathInResources)
             throws FileNotFoundException {
@@ -51,5 +49,8 @@ public class Bootstrap implements CommandLineRunner {
         List<HotelDto> hotels = hotelParser.importHotels(hotelCsvFile.getPath(), hotelPhotosCsvFile.getPath(), hotelLocations);
 
         List<CateringOptionDto> cateringOptions = cateringOptionParser.importCateringOptions(hotelCateringOptionsCsvFile.getPath(), hotels);
+
+        List<RoomReservationDto> roomReservations = roomReservationParser.importRoomReservations(hotels);
+
     }
 }
