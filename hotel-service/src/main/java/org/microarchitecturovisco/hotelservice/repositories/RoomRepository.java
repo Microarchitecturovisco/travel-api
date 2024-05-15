@@ -7,8 +7,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
-public interface RoomRepository extends JpaRepository<Room, Integer> {
+public interface RoomRepository extends JpaRepository<Room, UUID> {
     @Query("SELECT DISTINCT r FROM Room r " +
             "JOIN r.hotel h " +
             "JOIN h.location l " +
