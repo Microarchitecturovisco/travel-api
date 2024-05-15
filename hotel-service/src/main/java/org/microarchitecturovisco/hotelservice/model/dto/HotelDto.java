@@ -1,16 +1,9 @@
 package org.microarchitecturovisco.hotelservice.model.dto;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
-import org.microarchitecturovisco.hotelservice.model.domain.CateringOption;
-import org.microarchitecturovisco.hotelservice.model.domain.Location;
-import org.microarchitecturovisco.hotelservice.model.domain.Room;
-
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.UUID;
-
 import java.util.List;
 
 @Data

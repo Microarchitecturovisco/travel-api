@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomDto;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 

@@ -3,7 +3,6 @@ package org.microarchitecturovisco.hotelservice.model.events;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 

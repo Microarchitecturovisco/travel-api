@@ -8,7 +8,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class CateringOptionDto {
-    private UUID catteringId;
+    private UUID cateringId;
 
     private CateringType type;
 

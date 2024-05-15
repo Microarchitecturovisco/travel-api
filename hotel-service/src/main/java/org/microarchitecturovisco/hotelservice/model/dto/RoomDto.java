@@ -1,12 +1,8 @@
 package org.microarchitecturovisco.hotelservice.model.dto;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
-import org.microarchitecturovisco.hotelservice.model.domain.Hotel;
-import org.microarchitecturovisco.hotelservice.model.domain.RoomReservation;
-
 import java.util.List;
 import java.util.UUID;
 

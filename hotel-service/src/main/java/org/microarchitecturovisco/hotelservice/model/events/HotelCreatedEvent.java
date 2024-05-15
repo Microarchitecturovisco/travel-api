@@ -6,12 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.microarchitecturovisco.hotelservice.model.domain.CateringOption;
-import org.microarchitecturovisco.hotelservice.model.domain.Hotel;
-import org.microarchitecturovisco.hotelservice.model.domain.Location;
-import org.microarchitecturovisco.hotelservice.model.domain.Room;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
