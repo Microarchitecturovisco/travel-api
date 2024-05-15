@@ -20,7 +20,7 @@ public interface RoomRepository extends JpaRepository<Room, UUID> {
             "                              AND (:dateFrom BETWEEN r.dateFrom AND r.dateTo " +
             "                                   OR :dateTo BETWEEN r.dateFrom AND r.dateTo)))")
     List<Room> findAvailableRoomsByLocationAndDate(
-            @Param("arrivalLocationIds") List<Integer> arrivalLocationIds,
+            @Param("arrivalLocationIds") List<UUID> arrivalLocationIds,
             @Param("dateFrom") LocalDateTime dateFrom,
             @Param("dateTo") LocalDateTime dateTo);
 }
