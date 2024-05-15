@@ -14,16 +14,11 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class Bootstrap implements CommandLineRunner {
-
-    private final RabbitTemplate rabbitTemplate;
-
     @Override
-    public void run(String... args) {
-
-    }
+    public void run(String... args) {}
 
     private final DirectExchange exchange;
-
+    private final RabbitTemplate rabbitTemplate;
 
     @Scheduled(fixedRate = 5000, initialDelay = 5000)
     public void testPayment() {
