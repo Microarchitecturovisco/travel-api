@@ -38,7 +38,7 @@ public class HotelsCommandService {
         for (CateringOptionDto cateringOptionDto : command.getHotelDto().getCateringOptions()){
             CateringOptionCreatedEvent cateringOptionCreatedEvent = CateringOptionCreatedEvent.builder()
                     .eventTimeStamp(command.getCommandTimeStamp())
-                    .idCatering(cateringOptionDto.getCatteringId())
+                    .idCatering(cateringOptionDto.getCateringId())
                     .type(cateringOptionDto.getType())
                     .rating(cateringOptionDto.getRating())
                     .price(cateringOptionDto.getPrice())

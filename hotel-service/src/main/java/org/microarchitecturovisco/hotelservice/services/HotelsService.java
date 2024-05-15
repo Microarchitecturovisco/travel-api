@@ -10,10 +10,7 @@ import org.microarchitecturovisco.hotelservice.repositories.RoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +27,7 @@ public class HotelsService {
         List<Hotel> availableHotels = new ArrayList<>();
         List<Float> pricesPerAdult = new ArrayList<>();
 
-        List<Integer> arrivalLocationIds = requestDto.getArrivalLocationIds();
+        List<UUID> arrivalLocationIds = requestDto.getArrivalLocationIds();
 
         List<Room> availableRooms = roomRepository.findAvailableRoomsByLocationAndDate(arrivalLocationIds, dateFrom, dateTo);
         int numberOfGuests = requestDto.getAdults() + requestDto.getChildrenUnderEighteen() + requestDto.getChildrenUnderTen() + requestDto.getChildrenUnderThree();
