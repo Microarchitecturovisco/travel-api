@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Component
 public class TransportCoursesParser {
@@ -78,11 +77,6 @@ public class TransportCoursesParser {
                 // Find the matching location in the planeArrivalLocations list
                 LocationDto hotelLocation = findMatchingLocation(country, region, planeArrivalLocations);
                 hotelLocationMap.put(hotelId, hotelLocation);
-
-                Logger logger = Logger.getLogger("Bootstrap | Transport");
-                logger.info("hotelLocation\tID: " + hotelLocation.getIdLocation() + ", Country: " + hotelLocation.getCountry() + ", Region: " + hotelLocation.getRegion());
-
-
             }
         } catch (IOException e) {
             e.printStackTrace();
