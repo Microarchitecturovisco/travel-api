@@ -16,6 +16,10 @@ public class RoomReservationDto {
 
     private UUID reservationId;
 
+    private UUID roomId;
+
+    private UUID hotelId;
+
     private LocalDateTime dateFrom;
 
     private LocalDateTime dateTo;

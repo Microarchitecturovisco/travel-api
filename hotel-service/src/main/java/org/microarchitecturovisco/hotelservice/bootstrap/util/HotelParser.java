@@ -59,9 +59,9 @@ public class HotelParser {
                 .description(description)
                 .rating(rating)
                 .location(location)
-                .cateringOptions(List.of())
+                .cateringOptions(new ArrayList<>())
                 .photos(photos)
-                .rooms(List.of())
+                .rooms(new ArrayList<>())
                 .build();
     }
 

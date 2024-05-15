@@ -40,12 +40,18 @@ public class RoomReservationParser {
             Duration duration = Duration.ofDays(randomDuration);
 
             LocalDateTime randomDateTo = randomDateFrom.plus(duration);
-
+            HotelDto hotel= selectRandomHotel(hotels);
+            while (hotel.getRooms().isEmpty()) {
+                hotel= selectRandomHotel(hotels);
+            }
+            UUID hotelId = hotel.getHotelId();
+            UUID roomId = selectRandomRoom(hotel.getRooms()).getRoomId();
             RoomReservationDto roomReservation = new RoomReservationDto();
             roomReservation.setReservationId(UUID.randomUUID());
             roomReservation.setDateFrom(randomDateFrom);
             roomReservation.setDateTo(randomDateTo);
-
+            roomReservation.setHotelId(hotelId);
+            roomReservation.setRoomId(roomId);
             roomReservations.add(roomReservation);
         }
 

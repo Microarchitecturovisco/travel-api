@@ -1,5 +1,6 @@
 package org.microarchitecturovisco.hotelservice.model.dto;
 
+import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ public class HotelDto implements Serializable {
     private String name;
 
     private float rating;
-
+    @Lob
     private String description;
 
     private LocationDto location;

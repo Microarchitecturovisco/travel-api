@@ -26,7 +26,6 @@ public class RoomParser {
             while ((line = br.readLine()) != null) {
                 String[] data = line.split("\t");
                 RoomDto roomDto = createNewRoom(logger, capacityCalculator, data, hotelDtos);
-
                 // Add room to the corresponding hotel
                 if (roomDto != null) {
                     Optional<HotelDto> hotelOpt = hotelDtos.stream()

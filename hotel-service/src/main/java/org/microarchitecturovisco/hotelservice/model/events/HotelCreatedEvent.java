@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,8 +22,10 @@ public class HotelCreatedEvent extends HotelEvent {
     private UUID idHotel;
     private String name;
     private float rating;
+    @Lob
     private String description;
-    private List<String> photos;
+    @ElementCollection
+    private List<String> photos = new ArrayList<>();
 
     private UUID idLocation;
     private String country;

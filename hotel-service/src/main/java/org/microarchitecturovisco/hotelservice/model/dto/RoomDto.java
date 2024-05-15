@@ -19,7 +19,7 @@ public class RoomDto {
     private int guestCapacity;
 
     private float pricePerAdult;
-
+    @Lob
     private String description;
 
     private List<RoomReservationDto> roomReservations;
