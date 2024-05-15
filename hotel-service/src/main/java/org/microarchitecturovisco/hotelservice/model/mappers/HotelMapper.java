@@ -1,7 +1,6 @@
 package org.microarchitecturovisco.hotelservice.model.mappers;
 
 import org.microarchitecturovisco.hotelservice.model.domain.Hotel;
-import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelResponseDto;
 
 import java.util.ArrayList;
