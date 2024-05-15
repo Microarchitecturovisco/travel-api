@@ -20,7 +20,7 @@ public class LocationParser {
 
     public LocationParser() {
         locationsAvailableByBus.add(new Location("Albania", "Durres"));
-        locationsAvailableByBus.add(new Location("Turcja - narty", "Kayseri"));
+        locationsAvailableByBus.add(new Location("Turcja", "Kayseri"));
         locationsAvailableByBus.add(new Location("Włochy", "Apulia"));
         locationsAvailableByBus.add(new Location("Włochy", "Sycylia"));
         locationsAvailableByBus.add(new Location("Włochy", "Kalabria"));
