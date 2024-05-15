@@ -34,7 +34,6 @@ public class RoomParser {
                             .filter(hotel -> hotel.getHotelId() == roomDto.getHotelId())
                             .findFirst();
                     hotelOpt.ifPresent(hotel -> hotel.getRooms().add(roomDto));
-                    System.out.println("dupcia");
                 }
             }
         } catch (IOException e) {
