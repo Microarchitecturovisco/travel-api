@@ -20,27 +20,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HotelsService {
 
-    private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
 
 
     public GetHotelsBySearchQueryResponseDto GetHotelsBySearchQuery(GetHotelsBySearchQueryRequestDto requestDto) {
         LocalDateTime dateFrom = requestDto.getDateFrom();
         LocalDateTime dateTo = requestDto.getDateTo();
-        List<Hotel> hotels = hotelRepository.findAll();
 
         List<Hotel> availableHotels = new ArrayList<>();
         List<Float> pricesPerAdult = new ArrayList<>();
 
         List<Integer> arrivalLocationIds = requestDto.getArrivalLocationIds();
 
-        List<Hotel> hotelsInChosenLocation = hotelRepository.findHotelsByArrivalLocationIds(arrivalLocationIds);
         List<Room> availableRooms = roomRepository.findAvailableRoomsByLocationAndDate(arrivalLocationIds, dateFrom, dateTo);
         int numberOfGuests = requestDto.getAdults() + requestDto.getChildrenUnderEighteen() + requestDto.getChildrenUnderTen() + requestDto.getChildrenUnderThree();
         Map<Hotel, List<Room>> roomsByHotel = availableRooms.stream()
                 .collect(Collectors.groupingBy(Room::getHotel));
-
         for (Map.Entry<Hotel, List<Room>> entry : roomsByHotel.entrySet()) {
+            int tempGuests = numberOfGuests;
             Hotel hotel = entry.getKey();
             List<Room> rooms = entry.getValue();
             List<Room> sortedRooms = new ArrayList<>(rooms.stream()
@@ -48,12 +45,13 @@ public class HotelsService {
                     .toList());
             float currentPrice = 0;
             int currentPeople = 0;
-            while (numberOfGuests > 0) {
+            while (tempGuests > 0) {
                 for (int i = 0; i < sortedRooms.size(); i++) {
-                    if (sortedRooms.get(i).getGuestCapacity() >= numberOfGuests || i == sortedRooms.size() - 1) {
-                        numberOfGuests-= sortedRooms.get(i).getGuestCapacity();
+                    if (sortedRooms.get(i).getGuestCapacity() >= tempGuests || i == sortedRooms.size() - 1) {
+                        tempGuests-= sortedRooms.get(i).getGuestCapacity();
                         currentPrice = ((currentPrice * currentPeople) + (sortedRooms.get(i).getPricePerAdult() * sortedRooms.get(i).getGuestCapacity()))
                                 / (currentPeople + sortedRooms.get(i).getGuestCapacity());
+                        currentPeople += sortedRooms.get(i).getGuestCapacity();
                         sortedRooms.remove(i);
 
                         break;
@@ -61,7 +59,7 @@ public class HotelsService {
                 }
                 if (sortedRooms.isEmpty()) {break;}
             }
-            if (numberOfGuests <= 0) {
+            if (tempGuests <= 0) {
                 availableHotels.add(hotel);
                 pricesPerAdult.add(currentPrice);
             }

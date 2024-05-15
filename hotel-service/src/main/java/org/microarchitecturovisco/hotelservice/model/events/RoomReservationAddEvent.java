@@ -18,5 +18,5 @@ import java.time.LocalDateTime;
 public class RoomReservationAddEvent extends RoomEvent {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
-    private Room room;
+    private int roomId;
 }
