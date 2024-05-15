@@ -1,8 +1,10 @@
-package org.microarchitecturovisco.hotelservice.domain;
+package org.microarchitecturovisco.hotelservice.model.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -12,8 +14,7 @@ import lombok.*;
 @Builder
 public class CateringOption {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @NotNull
     @Enumerated(EnumType.STRING)
