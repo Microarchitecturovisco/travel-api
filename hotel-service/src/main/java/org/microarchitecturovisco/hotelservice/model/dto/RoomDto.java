@@ -23,8 +23,4 @@ public class RoomDto {
     private String description;
 
     private List<RoomReservationDto> roomReservations;
-
-    public UUID getHotelId() {
-        return this.roomId;
-    }
 }

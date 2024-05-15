@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @Component
@@ -33,6 +34,7 @@ public class RoomParser {
                             .filter(hotel -> hotel.getHotelId() == roomDto.getHotelId())
                             .findFirst();
                     hotelOpt.ifPresent(hotel -> hotel.getRooms().add(roomDto));
+                    System.out.println("dupcia");
                 }
             }
         } catch (IOException e) {
@@ -51,6 +53,7 @@ public class RoomParser {
 
         if (hotelOpt.isPresent()) {
             return RoomDto.builder()
+                    .roomId(UUID.randomUUID())
                     .hotelId(hotelOpt.get().getHotelId())
                     .name(roomName)
                     .description(description)

@@ -47,17 +47,17 @@ public class Bootstrap implements CommandLineRunner {
         File hotelPhotosCsvFile = loadCSVInitFiles("classpath:initData/hotel_photos.csv");
         File hotelRoomsCsvFile = loadCSVInitFiles("classpath:initData/hotel_rooms.csv");
         File hotelCateringOptionsCsvFile = loadCSVInitFiles("classpath:initData/hotel_food_options.csv");
-
+        System.out.println("dupa");
         List<LocationDto> hotelLocations = locationParser.importLocations(hotelCsvFile.getPath());
-
+        System.out.println("dup2a");
         List<HotelDto> hotels = hotelParser.importHotels(hotelCsvFile.getPath(), hotelPhotosCsvFile.getPath(), hotelLocations);
-
+        System.out.println("dup2");
         List<CateringOptionDto> cateringOptions = cateringOptionParser.importCateringOptions(hotelCateringOptionsCsvFile.getPath(), hotels);
-
+        System.out.println("dup3");
         roomParser.importRooms(hotelRoomsCsvFile.getPath(), hotels);
-
+        System.out.println(hotels.size());
         List<RoomReservationDto> roomReservations = roomReservationParser.importRoomReservations(hotels);
-
+        System.out.println("dup1a");
         for (HotelDto hotelDto : hotels){
             hotelsCommandService.createHotel(CreateHotelCommand.builder()
                     .uuid(UUID.randomUUID())
