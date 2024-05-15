@@ -4,7 +4,6 @@ import org.microarchitecturovisco.hotelservice.model.domain.CateringType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
 import java.util.UUID;
 
 @Entity
