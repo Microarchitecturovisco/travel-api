@@ -7,6 +7,8 @@ import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomRes
 import org.microarchitecturovisco.hotelservice.repositories.RoomEventStore;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class HotelsCommandService {
@@ -15,7 +17,6 @@ public class HotelsCommandService {
 
     public void createReservation(CreateRoomReservationCommand command)
     {
-        RoomCreated
 
 
     }
