@@ -55,8 +55,9 @@ public class HotelParser {
 
         UUID uuid = UUID.randomUUID(); // Generate random UUID
 
-        return new HotelDto(uuid, name, description, rating, location, photos);
+        return new HotelDto(uuid, name, description, rating, location, null, photos, null);
     }
+
 
     private LocationDto findLocation(List<LocationDto> locationDtos, String country, String region) {
         return locationDtos.stream()

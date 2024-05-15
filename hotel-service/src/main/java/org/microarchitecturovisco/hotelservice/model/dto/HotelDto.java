@@ -31,7 +31,9 @@ public class HotelDto implements Serializable {
                     String description,
                     float rating,
                     LocationDto location,
-                    List<String> photos){
+                    List<CateringOptionDto> cateringOptions,
+                    List<String> photos,
+                    List<RoomDto> rooms) {
         this.hotelId = hotelId;
         this.name = name;
         this.description = description;
