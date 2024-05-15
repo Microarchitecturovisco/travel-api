@@ -1,7 +1,11 @@
 package org.microarchitecturovisco.offerprovider.services;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.offerprovider.domain.dto.HotelDto;
+import org.microarchitecturovisco.offerprovider.domain.dto.LocationDto;
+import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetTransportsMessage;
+import org.microarchitecturovisco.offerprovider.domain.dto.responses.GetHotelsBySearchQueryResponseDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportsBasedOnSearchQueryResponse;
 import org.microarchitecturovisco.offerprovider.domain.exceptions.ServiceTimeoutException;
@@ -42,6 +46,20 @@ public class OffersService {
         return getFilteredTransportsFromTransportModule(departureBuses, departurePlane, arrivals, tripDates.getFirst(), tripDates.getSecond(), adults, infants, kids, teens);
     }
 
+    private List<HotelDto> getAvailableHotelsBasedOnSearchQuery(
+            String dateFromString,
+            String dateToString,
+            List<Integer> arrivalLocationIds,
+            Integer adults,
+            Integer infants,
+            Integer kids,
+            Integer teens
+    ) {
+        Pair<LocalDateTime, LocalDateTime> tripDates = parseDates(dateFromString, dateToString);
+
+        return getFilteredHotelsFromTransportModule(tripDates.getFirst(), tripDates.getSecond(), arrivalLocationIds, adults, infants, kids, teens);
+    }
+
 
     private Pair<LocalDateTime, LocalDateTime> parseDates(String dateFromString, String dateToString) {
         LocalDateTime dateFrom;
@@ -53,6 +71,45 @@ public class OffersService {
             throw new WrongDateFormatException();
         }
         return Pair.of(dateFrom, dateTo);
+    }
+
+    private List<HotelDto> getFilteredHotelsFromTransportModule(
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            List<Integer> arrivalLocationIds,
+            Integer adults,
+            Integer infants,
+            Integer kids,
+            Integer teens
+    ) {
+        GetHotelsBySearchQueryRequestDto message = GetHotelsBySearchQueryRequestDto.builder()
+                .dateFrom(dateFrom)
+                .dateTo(dateTo)
+                .arrivalLocationIds(arrivalLocationIds)
+                .adults(adults)
+                .childrenUnderThree(infants)
+                .childrenUnderTen(kids)
+                .childrenUnderEighteen(teens)
+                .build();
+
+        String messageJson = JsonConverter.convert(message);
+        rabbitTemplate.convertAndSend("hotels.requests.getHotelsBySearchQuery", messageJson);
+
+        try {
+            String responseMessage = (String) rabbitTemplate.receiveAndConvert("hotels.responses.getHotelsBySearchQuery", 5000);
+
+            if(responseMessage != null) {
+                GetHotelsBySearchQueryResponseDto response = JsonReader.readHotelsBySearchQueryResponseDtoFromJson(responseMessage);
+                return response.getHotels();
+            }
+            else {
+                throw new ServiceTimeoutException();
+            }
+
+
+        } catch (AmqpTimeoutException e) {
+            throw new ServiceTimeoutException();
+        }
     }
 
     private List<TransportDto> getFilteredTransportsFromTransportModule(
