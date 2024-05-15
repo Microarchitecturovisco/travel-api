@@ -31,6 +31,12 @@ public class HotelEventProjector {
             if (hotelEvent instanceof CateringOptionCreatedEvent){
                 apply((CateringOptionCreatedEvent) hotelEvent);
             }
+            if (hotelEvent instanceof RoomCreatedEvent){
+                apply((RoomCreatedEvent) hotelEvent);
+            }
+            if (hotelEvent instanceof RoomReservationCreatedEvent){
+                apply((RoomReservationCreatedEvent) hotelEvent);
+            }
         }
     }
 
@@ -41,8 +47,9 @@ public class HotelEventProjector {
                 .id(event.getIdLocation())
                 .country(event.getCountry())
                 .region(event.getRegion())
+                .hotel(new ArrayList<Hotel>())
                 .build();
-
+        hotelLocation.getHotel().add(hotel);
 
         hotel.setLocation(hotelLocation);
         hotel.setId(event.getIdHotel());
@@ -70,6 +77,7 @@ public class HotelEventProjector {
     }
 
     private void apply(RoomCreatedEvent event){
+        Hotel hotel = hotelRepository.findById(event.getIdHotel()).orElseThrow(RuntimeException::new);
         Room room = Room.builder()
                 .id(event.getRoomId())
                 .name(event.getName())
@@ -77,9 +85,9 @@ public class HotelEventProjector {
                 .guestCapacity(event.getGuestCapacity())
                 .pricePerAdult(event.getPricePerAdult())
                 .roomReservations(new ArrayList<>())
+                .hotel(hotel)
                 .build();
 
-        Hotel hotel = hotelRepository.findById(event.getIdHotel()).orElseThrow(RuntimeException::new);
         hotel.getRooms().add(room);
         roomRepository.save(room);
         hotelRepository.save(hotel);
@@ -87,13 +95,14 @@ public class HotelEventProjector {
     }
 
     private void apply(RoomReservationCreatedEvent event){
+        Room room = roomRepository.findById(event.getIdRoom()).orElseThrow(RuntimeException::new);
         RoomReservation roomReservation = RoomReservation.builder()
                 .id(event.getId())
                 .dateFrom(event.getDateFrom())
                 .dateTo(event.getDateTo())
+                .room(room)
                 .build();
 
-        Room room = roomRepository.findById(event.getIdRoom()).orElseThrow(RuntimeException::new);
         room.getRoomReservations().add(roomReservation);
         roomReservationRepository.save(roomReservation);
         roomRepository.save(room);

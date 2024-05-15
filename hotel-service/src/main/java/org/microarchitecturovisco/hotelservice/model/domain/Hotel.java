@@ -29,7 +29,7 @@ public class Hotel {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Room> rooms;
 
     @ElementCollection

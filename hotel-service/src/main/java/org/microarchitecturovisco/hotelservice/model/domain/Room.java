@@ -33,6 +33,6 @@ public class Room {
     @Lob
     private String description;
 
-    @OneToMany(mappedBy="room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RoomReservation> roomReservations;
 }
