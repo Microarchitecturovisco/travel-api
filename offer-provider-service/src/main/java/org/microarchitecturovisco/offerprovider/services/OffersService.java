@@ -12,14 +12,19 @@ import org.microarchitecturovisco.offerprovider.domain.exceptions.ServiceTimeout
 import org.microarchitecturovisco.offerprovider.domain.exceptions.WrongDateFormatException;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonConverter;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonReader;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.AmqpTimeoutException;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +33,8 @@ import java.util.Optional;
 public class OffersService {
 
     private final RabbitTemplate rabbitTemplate;
+    @Qualifier("getTransportsExchange")
+    private final DirectExchange transportsExchange;
 
     public List<TransportDto> getAvailableTransportsBasedOnSearchQuery(
             List<Integer> departureBuses,
@@ -41,7 +48,6 @@ public class OffersService {
             Integer teens
     ) {
         Pair<LocalDateTime, LocalDateTime> tripDates = parseDates(dateFromString, dateToString);
-
 
         return getFilteredTransportsFromTransportModule(departureBuses, departurePlane, arrivals, tripDates.getFirst(), tripDates.getSecond(), adults, infants, kids, teens);
     }
@@ -140,11 +146,8 @@ public class OffersService {
 
         String transportMessageJson = JsonConverter.convertGetTransportsMessage(transportsMessage);
 
-
-        rabbitTemplate.convertAndSend("transports.requests.getTransportsBySearchQuery", transportMessageJson);
-
         try {
-            String responseMessage = (String) rabbitTemplate.receiveAndConvert("transports.responses.getTransportsBySearchQuery", 5000);
+            String responseMessage = (String) rabbitTemplate.convertSendAndReceive(transportsExchange.getName(), "transports.handleTransportsBySearchQuery", transportMessageJson);
 
             if(responseMessage != null) {
                 TransportsBasedOnSearchQueryResponse transportDtoResponse = JsonReader.readTransportsBasedOnSearchQueryResponseFromJson(responseMessage);
@@ -154,8 +157,7 @@ public class OffersService {
                 throw new ServiceTimeoutException();
             }
 
-
-        } catch (AmqpTimeoutException e) {
+        } catch (AmqpException e) {
             throw new ServiceTimeoutException();
         }
 

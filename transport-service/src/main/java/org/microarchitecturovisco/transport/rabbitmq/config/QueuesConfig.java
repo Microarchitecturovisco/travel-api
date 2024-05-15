@@ -1,5 +1,8 @@
 package org.microarchitecturovisco.transport.rabbitmq.config;
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,12 +11,22 @@ import org.springframework.context.annotation.Configuration;
 public class QueuesConfig {
 
     @Bean
-    public Queue getTransportsRequest() {
+    public Queue getTransportsResponse() {
+        return new Queue("transports.responses.getTransportsBySearchQuery", false);
+    }
+
+    @Bean
+    public Queue handleTransportsBySearchQuery() {
         return new Queue("transports.requests.getTransportsBySearchQuery", false);
     }
 
     @Bean
-    public Queue getTransportsResponse() {
-        return new Queue("transports.responses.getTransportsBySearchQuery", false);
+    public DirectExchange handleTransportsBySearchQueryExchange() {
+        return new DirectExchange("transports.requests.getTransportsBySearchQuery");
+    }
+
+    @Bean
+    public Binding handleTransportsBySearchQueryRequestBinding(DirectExchange handleTransportExchange, Queue handleTransportsBySearchQuery) {
+        return BindingBuilder.bind(handleTransportsBySearchQuery).to(handleTransportExchange).with("transports.handleTransportsBySearchQuery");
     }
 }
