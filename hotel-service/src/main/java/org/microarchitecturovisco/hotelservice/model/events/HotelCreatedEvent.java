@@ -27,13 +27,14 @@ public class HotelCreatedEvent extends HotelEvent {
     private String name;
     private float rating;
     private String description;
+    private List<String> photos;
 
     private UUID idLocation;
     private String country;
     private String region;
 
-    public HotelCreatedEvent(UUID idEvent, LocalDateTime eventTimeStamp, HotelDto hotelDto) {
-        this.setIdHotel(idEvent);
+
+    public HotelCreatedEvent(LocalDateTime eventTimeStamp, HotelDto hotelDto) {
         this.setEventTimeStamp(eventTimeStamp);
 
         this.setIdHotel(hotelDto.getHotelId());
@@ -44,6 +45,7 @@ public class HotelCreatedEvent extends HotelEvent {
         this.setIdLocation(hotelDto.getLocation().getIdLocation());
         this.setCountry(hotelDto.getLocation().getCountry());
         this.setRegion(hotelDto.getLocation().getRegion());
+        this.setPhotos(hotelDto.getPhotos());
 
     }
 }

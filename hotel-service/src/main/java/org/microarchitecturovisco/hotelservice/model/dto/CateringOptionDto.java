@@ -3,7 +3,8 @@ package org.microarchitecturovisco.hotelservice.model.dto;
 import lombok.Builder;
 import lombok.Data;
 import org.microarchitecturovisco.hotelservice.model.domain.CateringType;
-
+import lombok.Builder;
+import lombok.Data;
 import java.util.UUID;
 
 @Data

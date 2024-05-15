@@ -27,8 +27,7 @@ public class RoomCreatedEvent extends HotelEvent  {
     private float pricePerAdult;
     private String description;
 
-    public RoomCreatedEvent(UUID idEvent, LocalDateTime eventTimeStamp, RoomDto roomDto, UUID idHotel) {
-        this.setId(idEvent);
+    public RoomCreatedEvent(LocalDateTime eventTimeStamp, RoomDto roomDto, UUID idHotel) {
         this.setEventTimeStamp(eventTimeStamp);
         this.setIdHotel(idHotel);
 
