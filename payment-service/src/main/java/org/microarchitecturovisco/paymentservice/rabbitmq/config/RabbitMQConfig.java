@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
 public class RabbitMQConfig {
-
     @Bean
     public SimpleMessageConverter converter() {
         SimpleMessageConverter converter = new SimpleMessageConverter();
