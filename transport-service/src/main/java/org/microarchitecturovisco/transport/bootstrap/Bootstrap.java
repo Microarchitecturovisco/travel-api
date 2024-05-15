@@ -12,7 +12,11 @@ import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
 import org.microarchitecturovisco.transport.services.TransportCommandService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
@@ -28,19 +32,24 @@ public class Bootstrap implements CommandLineRunner {
     private final TransportCoursesParser transportCoursesParser;
     private final TransportCommandService transportCommandService;
 
+    public File loadCSVIinitFiles(String filepathInResources)
+            throws FileNotFoundException {
+        return ResourceUtils.getFile(
+                filepathInResources);
+    }
+
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws IOException {
         Logger logger = Logger.getLogger("Bootstrap");
 
-        String dataDirectory = "transport-service\\src\\main\\java\\org\\microarchitecturovisco\\transport\\bootstrap\\data\\";
-        String hotelCsvFile = dataDirectory + "hotels.csv";
-        String hotelDepartureOptionsCsvFile = dataDirectory + "hotel_departure_options.csv";
+        File hotelCsvFile = loadCSVIinitFiles("classpath:initData/hotels.csv");
+        File hotelDepartureOptionsCsvFile = loadCSVIinitFiles("classpath:initData/hotel_departure_options.csv");
 
-        List<LocationDto> planeArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile, "PLANE");
-        List<LocationDto> busArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile, "BUS");
-        List<LocationDto> departureLocations = locationParser.importLocationsPoland(hotelDepartureOptionsCsvFile);
+        List<LocationDto> planeArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile.getPath(), "PLANE");
+        List<LocationDto> busArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile.getPath(), "BUS");
+        List<LocationDto> departureLocations = locationParser.importLocationsPoland(hotelDepartureOptionsCsvFile.getPath());
 
-        Map<String, List<TransportCourseDto>> transportCoursesMap = transportCoursesParser.createTransportCourses(hotelCsvFile, hotelDepartureOptionsCsvFile, busArrivalLocations, planeArrivalLocations, departureLocations);
+        Map<String, List<TransportCourseDto>> transportCoursesMap = transportCoursesParser.createTransportCourses(hotelCsvFile.getPath(), hotelDepartureOptionsCsvFile.getPath(), busArrivalLocations, planeArrivalLocations, departureLocations);
 
         List<TransportCourseDto> planeCourses = transportCoursesMap.get("PLANE");
         List<TransportCourseDto> busCourses = transportCoursesMap.get("BUS");
