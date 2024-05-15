@@ -2,7 +2,6 @@ package org.microarchitecturovisco.hotelservice.model.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
-import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelResponseDto;
 
 import java.io.Serializable;
