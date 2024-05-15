@@ -27,19 +27,24 @@ import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class OffersService {
 
     private final RabbitTemplate rabbitTemplate;
-    @Qualifier("getTransportsExchange")
+
     private final DirectExchange transportsExchange;
 
+    public OffersService(RabbitTemplate rabbitTemplate, @Qualifier("getTransportsExchange") DirectExchange transportsExchange) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.transportsExchange = transportsExchange;
+    }
+
     public List<TransportDto> getAvailableTransportsBasedOnSearchQuery(
-            List<Integer> departureBuses,
-            List<Integer> departurePlane,
-            List<Integer> arrivals,
+            List<UUID> departureBuses,
+            List<UUID> departurePlane,
+            List<UUID> arrivals,
             String dateFromString,
             String dateToString,
             Integer adults,
@@ -119,9 +124,9 @@ public class OffersService {
     }
 
     private List<TransportDto> getFilteredTransportsFromTransportModule(
-            List<Integer> departureBuses,
-            List<Integer> departurePlane,
-            List<Integer> arrivals,
+            List<UUID> departureBuses,
+            List<UUID> departurePlane,
+            List<UUID> arrivals,
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
             Integer adults,

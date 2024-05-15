@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +21,9 @@ public class OffersController {
 
     @GetMapping("/transports")
     public List<OfferDto> getOffersBasedOnSearchQuery(
-            @RequestParam(name = "departureBus") List<Integer> departureBuses,
-            @RequestParam(name = "departurePlane") List<Integer> departurePlane,
-            @RequestParam(name = "arrivals") List<Integer> arrivals,
+            @RequestParam(name = "departureBus") List<String> departureBuses,
+            @RequestParam(name = "departurePlane") List<String> departurePlane,
+            @RequestParam(name = "arrivals") List<String> arrivals,
             @RequestParam(name = "date_from") String dateFrom,
             @RequestParam(name = "date_to") String dateTo,
             @RequestParam(name = "adults") Integer adults,
@@ -32,6 +33,21 @@ public class OffersController {
 
     ) {
 
+        List<UUID> bds = departureBuses.stream().map(UUID::fromString).toList();
+        List<UUID> bps = departureBuses.stream().map(UUID::fromString).toList();
+        List<UUID> ars = departureBuses.stream().map(UUID::fromString).toList();
+
+
+        offersService.getAvailableTransportsBasedOnSearchQuery(
+                bds,
+                bps,
+                ars,
+                dateFrom,
+                dateTo,
+                adults,
+                infants,
+                kids,
+                teens);
         return List.of();
     }
 }
