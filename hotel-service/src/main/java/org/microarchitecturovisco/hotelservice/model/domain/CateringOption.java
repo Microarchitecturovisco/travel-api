@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -12,8 +14,7 @@ import lombok.*;
 @Builder
 public class CateringOption {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @NotNull
     @Enumerated(EnumType.STRING)

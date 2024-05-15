@@ -10,13 +10,10 @@ import java.util.List;
 @Data
 @Builder
 public class GetHotelsBySearchQueryRequestDto implements Serializable {
-    private String uuid;
 
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
 
-    private List<Integer> departureLocationIdsByPlane;
-    private List<Integer> departureLocationIdsByBus;
     private List<Integer> arrivalLocationIds;
 
     private Integer adults;

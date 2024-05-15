@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.microarchitecturovisco.hotelservice.utils.JsonConverter;
 
 @RestController()
 @RequestMapping("/hotels")
@@ -28,7 +29,7 @@ public class HotelsController {
 
         System.out.println("Send hotels response size " + responseDto.getHotels().size());
 
-        rabbitTemplate.convertAndSend("hotels.responses.getHotelsBySearchQuery", responseDto);
+        rabbitTemplate.convertAndSend("hotels.responses.getHotelsBySearchQuery", JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto));
     }
 }
 

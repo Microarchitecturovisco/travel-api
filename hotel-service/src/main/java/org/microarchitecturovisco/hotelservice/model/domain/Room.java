@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -15,8 +16,7 @@ import java.util.List;
 @Builder
 public class Room {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="hotel_id")

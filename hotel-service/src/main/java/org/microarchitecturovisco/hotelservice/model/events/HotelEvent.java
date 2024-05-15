@@ -2,6 +2,7 @@ package org.microarchitecturovisco.hotelservice.model.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,12 +13,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class RoomEvent {
+@SuperBuilder
+public abstract class HotelEvent {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    public final LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime eventTimeStamp;
 
-    private int idRoom;
+    private UUID idHotel;
 }

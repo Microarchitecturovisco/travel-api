@@ -65,9 +65,7 @@ public class HotelsService {
             }
         }
         return GetHotelsBySearchQueryResponseDto.builder()
-                .uuid(requestDto.getUuid())
-                .pricePerAdult(pricesPerAdult)
-                .hotels(HotelMapper.mapList(availableHotels))
+                .hotels(HotelMapper.mapList(availableHotels, pricesPerAdult))
                 .build();
     }
 
