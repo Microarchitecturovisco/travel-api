@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.hotelservice.model.events;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class RoomCreatedEvent extends HotelEvent  {
     private String name;
     private int guestCapacity;
     private float pricePerAdult;
+    @Lob
     private String description;
 
     public RoomCreatedEvent(LocalDateTime eventTimeStamp, RoomDto roomDto, UUID idHotel) {

@@ -19,7 +19,7 @@ public class Hotel {
     private String name;
 
     private float rating;
-
+    @Lob
     private String description;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)

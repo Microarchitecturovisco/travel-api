@@ -1,23 +1,22 @@
 package org.microarchitecturovisco.hotelservice.model.dto;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Builder
 public class RoomReservationDto {
 
     private UUID reservationId;
 
+    private UUID roomId;
+
+    private UUID hotelId;
+
     private LocalDateTime dateFrom;
 
     private LocalDateTime dateTo;
-
-    private RoomDto room;
-
-    public RoomReservationDto(){}
 }

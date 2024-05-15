@@ -53,11 +53,17 @@ public class HotelParser {
         LocationDto location = findLocation(hotelLocations, country, region);
         List<String> photos = photoParser.hotelPhotosMap.getOrDefault(hotelId, Collections.emptyList());
 
-        UUID uuid = UUID.randomUUID(); // Generate random UUID
-
-        return new HotelDto(uuid, name, description, rating, location, null, photos, null);
+        return HotelDto.builder()
+                .hotelId(UUID.randomUUID())
+                .name(name)
+                .description(description)
+                .rating(rating)
+                .location(location)
+                .cateringOptions(new ArrayList<>())
+                .photos(photos)
+                .rooms(new ArrayList<>())
+                .build();
     }
-
 
     private LocationDto findLocation(List<LocationDto> locationDtos, String country, String region) {
         return locationDtos.stream()

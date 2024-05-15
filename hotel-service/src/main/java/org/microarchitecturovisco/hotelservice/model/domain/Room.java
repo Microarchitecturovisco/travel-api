@@ -30,7 +30,7 @@ public class Room {
 
     @NotNull
     private float pricePerAdult;
-
+    @Lob
     private String description;
 
     @OneToMany(mappedBy="room", cascade = CascadeType.ALL)
