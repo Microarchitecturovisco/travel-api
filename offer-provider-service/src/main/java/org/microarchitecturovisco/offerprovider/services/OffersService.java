@@ -35,10 +35,12 @@ public class OffersService {
     private final RabbitTemplate rabbitTemplate;
 
     private final DirectExchange transportsExchange;
+    private final DirectExchange hotelsExchange;
 
-    public OffersService(RabbitTemplate rabbitTemplate, @Qualifier("getTransportsExchange") DirectExchange transportsExchange) {
+    public OffersService(RabbitTemplate rabbitTemplate, @Qualifier("getTransportsExchange") DirectExchange transportsExchange, @Qualifier("getHotelsExchange") DirectExchange hotelsExchange) {
         this.rabbitTemplate = rabbitTemplate;
         this.transportsExchange = transportsExchange;
+        this.hotelsExchange = hotelsExchange;
     }
 
     public List<TransportDto> getAvailableTransportsBasedOnSearchQuery(
@@ -104,10 +106,9 @@ public class OffersService {
                 .build();
 
         String messageJson = JsonConverter.convert(message);
-        rabbitTemplate.convertAndSend("hotels.requests.getHotelsBySearchQuery", messageJson);
 
         try {
-            String responseMessage = (String) rabbitTemplate.receiveAndConvert("hotels.responses.getHotelsBySearchQuery", 5000);
+            String responseMessage = (String) rabbitTemplate.convertSendAndReceive(hotelsExchange.getName(), "hotels.requests.getHotelsBySearchQuery", messageJson);
 
             if(responseMessage != null) {
                 GetHotelsBySearchQueryResponseDto response = JsonReader.readHotelsBySearchQueryResponseDtoFromJson(responseMessage);
