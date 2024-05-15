@@ -30,27 +30,6 @@ public class Bootstrap implements CommandLineRunner {
     private final TransportCoursesParser transportCoursesParser;
     private final TransportCommandService transportCommandService;
 
-    private void logLocations(String locationType, List<LocationDto> locations) {
-        Logger logger = Logger.getLogger("Bootstrap | Transport");
-
-        logger.info(locationType + ":");
-        for (LocationDto location : locations) {
-            logger.info("ID: " + location.getIdLocation() + ", Country: " + location.getCountry() + ", Region: " + location.getRegion());
-        }
-    }
-
-    private void logTransportCourses(String type, List<TransportCourseDto> transportCourses) {
-        Logger logger = Logger.getLogger("Bootstrap | Transport");
-
-        logger.info(type + ":");
-        for (TransportCourseDto course : transportCourses) {
-            logger.info("ID: " + course.getIdTransportCourse() +
-                    ", Departure: " + course.getDepartureFromLocation().getRegion() +
-                    ", Arrival: " + course.getArrivalAtLocation().getRegion() +
-                    ", Type: " + course.getType());
-        }
-    }
-
     @Override
     public void run(String... args) {
         Logger logger = Logger.getLogger("Bootstrap");
@@ -58,7 +37,6 @@ public class Bootstrap implements CommandLineRunner {
         String dataDirectory = "transport-service\\src\\main\\java\\org\\microarchitecturovisco\\transport\\bootstrap\\data\\";
         String hotelCsvFile = dataDirectory + "hotels.csv";
         String hotelDepartureOptionsCsvFile = dataDirectory + "hotel_departure_options.csv";
-        String transportsSampleCsvFile = dataDirectory + "transports_sample.csv";
 
         List<LocationDto> planeArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile, "PLANE");
         List<LocationDto> busArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile, "BUS");
@@ -69,13 +47,9 @@ public class Bootstrap implements CommandLineRunner {
         List<TransportCourseDto> planeCourses = transportCoursesMap.get("PLANE");
         List<TransportCourseDto> busCourses = transportCoursesMap.get("BUS");
 
-        logTransportCourses("Plane Courses", planeCourses);
-        logTransportCourses("Bus Courses", busCourses);
-
-
         LocalDateTime bootstrapBeginDay = LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0);
 
-//        generate transport for each course and every day of two months
+        // generate transport for each course and every day of two months
         for (int day = 0; day < 10; day++) {
             for (TransportCourseDto planeCourse : planeCourses) {
                 int capacity = ThreadLocalRandom.current().nextInt(80, 100);
