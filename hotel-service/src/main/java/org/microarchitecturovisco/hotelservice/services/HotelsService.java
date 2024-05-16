@@ -2,9 +2,13 @@ package org.microarchitecturovisco.hotelservice.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.model.domain.*;
-import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
+
+import org.microarchitecturovisco.hotelservice.model.dto.request.*;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySearchQueryResponseDto;
+import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
+import org.microarchitecturovisco.hotelservice.model.mappers.CateringMapper;
 import org.microarchitecturovisco.hotelservice.model.mappers.HotelMapper;
+import org.microarchitecturovisco.hotelservice.model.mappers.LocationMapper;
 import org.microarchitecturovisco.hotelservice.repositories.HotelRepository;
 import org.microarchitecturovisco.hotelservice.repositories.RoomRepository;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,32 @@ import java.util.stream.Collectors;
 public class HotelsService {
 
     private final RoomRepository roomRepository;
+    private final HotelRepository hotelRepository;
 
+<<<<<<< Updated upstream
+=======
+
+    public GetHotelDetailsResponseDto getHotelDetails(GetHotelDetailsRequestDto requestDto){
+        LocalDateTime dateFrom = requestDto.getDateFrom();
+        LocalDateTime dateTo = requestDto.getDateTo();
+
+        Hotel hotel = hotelRepository.findById(requestDto.getHotelId()).orElseThrow();
+
+        GetHotelDetailsResponseDto responseDto = GetHotelDetailsResponseDto.builder()
+                .description(hotel.getDescription())
+                .rating(hotel.getRating())
+                .hotelName(hotel.getName())
+                .photos(hotel.getPhotos())
+                .location(LocationMapper.map(hotel.getLocation()))
+                .cateringOptions(CateringMapper.mapList(hotel.getCateringOptions()))
+                .roomsConfigurations(new ArrayList<>())
+                .build();
+
+        return responseDto;
+
+    }
+
+>>>>>>> Stashed changes
     public GetHotelsBySearchQueryResponseDto GetHotelsBySearchQuery(GetHotelsBySearchQueryRequestDto requestDto) {
         LocalDateTime dateFrom = requestDto.getDateFrom();
         LocalDateTime dateTo = requestDto.getDateTo();
