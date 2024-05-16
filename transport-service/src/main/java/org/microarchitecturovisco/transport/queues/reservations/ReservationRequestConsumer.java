@@ -19,7 +19,7 @@ public class ReservationRequestConsumer {
 
     @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_BOOK_REQ)
     public String consumeMessageFromQueue(ReservationRequest request) {
-        System.out.println("Message received from queue - example: " + request);
+        System.out.println("Message received from queue: " + request);
 
         GetTransportsBySearchQueryRequestDto searchQuery = createSearchQuery(request);
         GetTransportsBySearchQueryResponseDto transports = transportsQueryService.getTransportsBySearchQuery(searchQuery);

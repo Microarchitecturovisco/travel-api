@@ -5,8 +5,6 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -18,9 +16,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReservationController {
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
     private final ReservationService reservationService;
 
     @PostMapping("/reservation")
@@ -29,9 +24,9 @@ public class ReservationController {
             UUID reservationId = reservationService.bookOrchestration(reservationRequest);
         }
         catch (ReservationFailException exception){
-            return "FAILED";
+            return "EXCEPTION ReservationFailException";
         }
-        return "sent success";
+        return "SUCCESS";
     }
 
     @GetMapping("/test")
