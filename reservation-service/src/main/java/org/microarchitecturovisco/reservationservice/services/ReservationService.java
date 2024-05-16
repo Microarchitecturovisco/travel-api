@@ -51,11 +51,11 @@ public class ReservationService {
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-        System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
+        System.out.println("hotelIsAvailable: " + hotelIsAvailable);
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
         boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        System.out.println("transportIsAvailable: "+ hotelIsAvailable);
+        System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 

@@ -18,6 +18,8 @@ public class BookHotelsSaga {
                 reservationRequest
         );
 
+        System.out.println("checkIfHotelIsAvailable result:" + result);
+
         return Boolean.parseBoolean(result);
     }
 

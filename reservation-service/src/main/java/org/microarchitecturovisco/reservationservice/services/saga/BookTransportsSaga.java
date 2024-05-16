@@ -1,7 +1,6 @@
 package org.microarchitecturovisco.reservationservice.services.saga;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.reservationservice.queues.config.QueuesHotelConfig;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesTransportConfig;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
