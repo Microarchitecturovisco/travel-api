@@ -1,10 +1,11 @@
-package org.microarchitecturovisco.hotelservice.domain;
+package org.microarchitecturovisco.hotelservice.model.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -14,8 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class RoomReservation {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @NotNull
     private LocalDateTime dateFrom;

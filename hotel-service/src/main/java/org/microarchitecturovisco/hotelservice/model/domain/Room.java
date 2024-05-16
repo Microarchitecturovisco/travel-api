@@ -1,10 +1,11 @@
-package org.microarchitecturovisco.hotelservice.domain;
+package org.microarchitecturovisco.hotelservice.model.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -15,8 +16,7 @@ import java.util.List;
 @Builder
 public class Room {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="hotel_id")
@@ -30,9 +30,9 @@ public class Room {
 
     @NotNull
     private float pricePerAdult;
-
+    @Lob
     private String description;
 
-    @OneToMany(mappedBy="room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RoomReservation> roomReservations;
 }

@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.hotelservice.domain;
+package org.microarchitecturovisco.hotelservice.model.domain;
 
 public enum CateringType {
     ALL_INCLUSIVE,

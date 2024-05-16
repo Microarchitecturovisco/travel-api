@@ -1,9 +1,10 @@
-package org.microarchitecturovisco.hotelservice.domain;
+package org.microarchitecturovisco.hotelservice.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -13,13 +14,12 @@ import java.util.List;
 @Builder
 public class Hotel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     private String name;
 
     private float rating;
-
+    @Lob
     private String description;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
@@ -29,7 +29,7 @@ public class Hotel {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Room> rooms;
 
     @ElementCollection
