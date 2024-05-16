@@ -46,8 +46,7 @@ public class HotelsController {
 
         GetHotelsBySearchQueryResponseDto hotels = hotelsService.GetHotelsBySearchQuery(query);
 
-//        return Boolean.toString(!hotels.getHotels().isEmpty());
-        return Boolean.toString(true);
+        return Boolean.toString(!hotels.getHotels().isEmpty());
     }
 }
 
