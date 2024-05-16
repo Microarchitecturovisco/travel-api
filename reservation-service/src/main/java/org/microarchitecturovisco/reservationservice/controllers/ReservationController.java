@@ -1,13 +1,13 @@
 package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.reservationservice.domain.dto.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
-import org.microarchitecturovisco.reservationservice.domain.model.CreateReservationRequest;
+import org.microarchitecturovisco.reservationservice.queues.config.QueuesConfig;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,11 +16,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationController {
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     private final ReservationService reservationService;
 
     @PostMapping("/reservation")
-    public String addReservation(@RequestBody CreateReservationRequest request) {
-        return "reservation added";
+    public String addReservation(@RequestBody ReservationRequest reservationRequest) {
+        rabbitTemplate.convertAndSend(
+                QueuesConfig.EXCHANGE_HOTEL,
+                QueuesConfig.ROUTING_KEY_HOTEL_BOOK,
+                reservationRequest
+                );
+        return "sent success";
     }
 
     @GetMapping("/test")
