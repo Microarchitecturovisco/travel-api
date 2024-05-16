@@ -15,7 +15,6 @@ import java.util.UUID;
 @SuperBuilder
 public abstract class HotelEvent {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private LocalDateTime eventTimeStamp;

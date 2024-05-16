@@ -21,15 +21,15 @@ public class HotelsController {
     private final RabbitTemplate rabbitTemplate;
 
 
-    @RabbitListener(queues = "hotels.requests.getHotelsBySearchQuery")
-    public void consumeGetHotelsRequest(String requestDtoJson) {
+    @RabbitListener(queues = "hotels.requests.hotelsBySearchQuery")
+    public String consumeGetHotelsRequest(String requestDtoJson) {
 
         GetHotelsBySearchQueryRequestDto requestDto = JsonReader.readGetHotelsBySearchQueryRequestFromJson(requestDtoJson);
         GetHotelsBySearchQueryResponseDto responseDto = hotelsService.GetHotelsBySearchQuery(requestDto);
 
         System.out.println("Send hotels response size " + responseDto.getHotels().size());
 
-        rabbitTemplate.convertAndSend("hotels.responses.getHotelsBySearchQuery", JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto));
+        return JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto);
     }
 }
 

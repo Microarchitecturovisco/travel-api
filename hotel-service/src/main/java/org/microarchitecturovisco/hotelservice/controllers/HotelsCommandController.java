@@ -12,10 +12,4 @@ import org.springframework.stereotype.Component;
 public class HotelsCommandController {
     private final HotelsCommandService hotelsCommandService;
 
-    @RabbitListener(queues = "#{createRoomReservationRequestQueue.name}")
-    public void consumeCreateRoomReservationCommand(String commandDtoJson) {
-        CreateRoomReservationCommand command = JsonReader.readCreateRoomReservationCommand(commandDtoJson);
-
-        hotelsCommandService.createReservation(command);
-    }
 }

@@ -15,6 +15,7 @@ import org.microarchitecturovisco.hotelservice.repositories.HotelEventStore;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +27,14 @@ public class HotelsCommandService {
     public void createHotel(CreateHotelCommand command) {
         HotelCreatedEvent hotelCreatedEvent =  new HotelCreatedEvent(command.getCommandTimeStamp(),
                 command.getHotelDto());
+        hotelCreatedEvent.setId(UUID.randomUUID());
         hotelEventStore.save(hotelCreatedEvent);
         hotelEventProjector.project(List.of(hotelCreatedEvent));
 
         for (RoomDto roomDto : command.getHotelDto().getRooms()){
             RoomCreatedEvent roomCreatedEvent = new RoomCreatedEvent(command.getCommandTimeStamp(),
                     roomDto, command.getHotelDto().getHotelId());
+            roomCreatedEvent.setId(UUID.randomUUID());
             hotelEventStore.save(roomCreatedEvent);
             hotelEventProjector.project(List.of(roomCreatedEvent));
         }
@@ -43,6 +46,7 @@ public class HotelsCommandService {
                     .rating(cateringOptionDto.getRating())
                     .price(cateringOptionDto.getPrice())
                     .build();
+            cateringOptionCreatedEvent.setId(UUID.randomUUID());
             hotelEventStore.save(cateringOptionCreatedEvent);
             hotelEventProjector.project(List.of(cateringOptionCreatedEvent));
         }
@@ -57,6 +61,7 @@ public class HotelsCommandService {
                 .idHotel(command.getHotelId())
                 .idRoom(command.getRoomId())
                 .build();
+        reservationCreatedEvent.setId(UUID.randomUUID());
         hotelEventStore.save(reservationCreatedEvent);
         hotelEventProjector.project(List.of(reservationCreatedEvent));
     }

@@ -7,19 +7,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ExchangesConfig {
 
-    // create reservation
+
     @Bean
-    public FanoutExchange createRoomReservationRequestExchange() {
-        return new FanoutExchange("hotels.requests.createReservation");
+    public DirectExchange hotelsBySearchQuery() {
+        return new DirectExchange("hotels.requests.hotelsBySearchQuery");
     }
 
     @Bean
-    public Queue createRoomReservationRequestQueue() {
-        return new AnonymousQueue();
-    }
+    public Queue hotelsBySearchQueryQueue() { return new Queue("hotels.requests.hotelsBySearchQuery", false); }
 
     @Bean
-    public Binding createHotelReservationRequestBinding(FanoutExchange createRoomReservationRequestExchange, Queue createRoomReservationRequestQueue) {
-        return BindingBuilder.bind(createRoomReservationRequestQueue).to(createRoomReservationRequestExchange);
+    public Binding getHotelsBySearchQueryRequestBinding(DirectExchange hotelsBySearchQuery, Queue hotelsBySearchQueryQueue) {
+        return BindingBuilder.bind(hotelsBySearchQueryQueue).to(hotelsBySearchQuery).with("hotels.requests.hotelsBySearchQuery");
     }
+
 }
