@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReservationRequestConsumer {
 
+    private final String HOTEL_AVAILABLE_MESSAGE = "HOTEL AVAILABLE";
+    private final String HOTEL_NOT_AVAILABLE_MESSAGE = "HOTEL NOT AVAILABLE";
+
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
@@ -26,8 +29,8 @@ public class ReservationRequestConsumer {
 
 
         // Prepare the response - hotels available or not available
-        String responseMessage = "Hotel is available";
-        ReservationResponse response = buildResponse(request, responseMessage);
+        ReservationResponse response = buildResponse(request, HOTEL_AVAILABLE_MESSAGE);
+        // ReservationResponse response = buildResponse(request, HOTEL_NOT_AVAILABLE_MESSAGE);
 
         // Send the response message to the reservation service
         rabbitTemplate.convertAndSend(
