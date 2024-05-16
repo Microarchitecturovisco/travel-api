@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.hotelservice.reservations;
+package org.microarchitecturovisco.hotelservice.queues.reservations;
 
 import lombok.*;
 

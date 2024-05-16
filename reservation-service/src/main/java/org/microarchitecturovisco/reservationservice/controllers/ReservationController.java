@@ -1,7 +1,7 @@
 package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.reservationservice.domain.dto.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesConfig;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
@@ -25,7 +25,7 @@ public class ReservationController {
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
         rabbitTemplate.convertAndSend(
                 QueuesConfig.EXCHANGE_HOTEL,
-                QueuesConfig.ROUTING_KEY_HOTEL_BOOK,
+                QueuesConfig.ROUTING_KEY_HOTEL_BOOK_REQ,
                 reservationRequest
                 );
         return "sent success";

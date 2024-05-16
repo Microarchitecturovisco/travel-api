@@ -1,11 +1,9 @@
-package org.microarchitecturovisco.reservationservice.domain.dto;
+package org.microarchitecturovisco.hotelservice.queues.reservations;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
-
-import java.io.Serializable;
 
 @Data
 @Builder

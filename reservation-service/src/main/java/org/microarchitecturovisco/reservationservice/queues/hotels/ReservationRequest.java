@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.reservationservice.domain.dto;
+package org.microarchitecturovisco.reservationservice.queues.hotels;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Id;
