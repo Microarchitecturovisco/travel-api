@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetTransportsBySearchQueryRequestDto implements Serializable {
-    private String uuid;
+    private UUID uuid;
 
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
