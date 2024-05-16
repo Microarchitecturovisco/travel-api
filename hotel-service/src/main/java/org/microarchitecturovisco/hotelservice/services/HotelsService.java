@@ -19,7 +19,6 @@ public class HotelsService {
 
     private final RoomRepository roomRepository;
 
-
     public GetHotelsBySearchQueryResponseDto GetHotelsBySearchQuery(GetHotelsBySearchQueryRequestDto requestDto) {
         LocalDateTime dateFrom = requestDto.getDateFrom();
         LocalDateTime dateTo = requestDto.getDateTo();
@@ -30,6 +29,7 @@ public class HotelsService {
         List<UUID> arrivalLocationIds = requestDto.getArrivalLocationIds();
 
         List<Room> availableRooms = roomRepository.findAvailableRoomsByLocationAndDate(arrivalLocationIds, dateFrom, dateTo);
+
         int numberOfGuests = requestDto.getAdults() + requestDto.getChildrenUnderEighteen() + requestDto.getChildrenUnderTen() + requestDto.getChildrenUnderThree();
         Map<Hotel, List<Room>> roomsByHotel = availableRooms.stream()
                 .collect(Collectors.groupingBy(Room::getHotel));

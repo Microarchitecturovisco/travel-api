@@ -32,9 +32,9 @@ public class ReservationRequest {
 
     private List<String> roomIds;
 
-    private UUID idArrivalTransport;
-
-    private UUID idReturnTransport;
-
     private int userId;
+
+    private List<String> departureLocationIdsByPlane;
+    private List<String> departureLocationIdsByBus;
+    private List<String> arrivalLocationIds;
 }
