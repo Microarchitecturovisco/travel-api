@@ -23,11 +23,7 @@ public class ReservationController {
 
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
-        rabbitTemplate.convertAndSend(
-                QueuesConfig.EXCHANGE_HOTEL,
-                QueuesConfig.ROUTING_KEY_HOTEL_BOOK_REQ,
-                reservationRequest
-                );
+        reservationService.bookAndBuyOrchestration(reservationRequest);
         return "sent success";
     }
 

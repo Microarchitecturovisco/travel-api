@@ -5,11 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @AllArgsConstructor
 @ToString
-public class ReservationResponse {
-    private ReservationRequest reservationRequest;
+public class ReservationResponse implements Serializable {
     private String message;
 }

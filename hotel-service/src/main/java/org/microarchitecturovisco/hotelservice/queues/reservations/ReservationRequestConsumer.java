@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReservationRequestConsumer {
 
-    private final String HOTEL_AVAILABLE_MESSAGE = "HOTEL AVAILABLE";
-    private final String HOTEL_NOT_AVAILABLE_MESSAGE = "HOTEL NOT AVAILABLE";
-
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
@@ -20,7 +17,7 @@ public class ReservationRequestConsumer {
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_BOOK_REQ)
-    public void consumeMessageFromQueue(ReservationRequest request) {
+    public String consumeMessageFromQueue(ReservationRequest request) {
         System.out.println("Message received from queue - example: " + request);
 
         // todo:
@@ -29,17 +26,10 @@ public class ReservationRequestConsumer {
 
 
         // Prepare the response - hotels available or not available
-        ReservationResponse response = buildResponse(request, HOTEL_AVAILABLE_MESSAGE);
-        // ReservationResponse response = buildResponse(request, HOTEL_NOT_AVAILABLE_MESSAGE);
+        boolean response = true;
 
         // Send the response message to the reservation service
-        rabbitTemplate.convertAndSend(
-                QueuesConfig.EXCHANGE_HOTEL,
-                QueuesConfig.ROUTING_KEY_HOTEL_BOOK_RES,
-                response);
+        return Boolean.toString(response);
     }
 
-    private ReservationResponse buildResponse(ReservationRequest request, String responseMessage) {
-        return new ReservationResponse(request, responseMessage);
-    }
 }
