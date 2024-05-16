@@ -13,10 +13,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
+
+    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
+    public static Logger logger = Logger.getLogger(ReservationService.class.getName());
+
     private final ReservationRepository reservationRepository;
     private final ReservationAggregate reservationAggregate;
 
@@ -80,9 +89,20 @@ public class ReservationService {
         //  do aplikacji klienckiej zwracany jest status 2xx oraz idReservation tego zamówienia
         //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
 
+        String reservationId = UUID.randomUUID().toString();
 
+        Runnable paymentTimeoutRunnable = () -> {
+            paymentTimeout(reservationId);
+        };
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
         return null; // Id rezerwacji
+    }
+
+    public void paymentTimeout(String reservationId) {
+        ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationId + " !");
+
     }
 
 }
