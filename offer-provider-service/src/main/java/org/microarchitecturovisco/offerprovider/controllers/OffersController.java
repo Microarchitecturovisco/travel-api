@@ -38,8 +38,7 @@ public class OffersController {
         List<UUID> ars = departureBuses.stream().map(UUID::fromString).toList();
 
 
-        offersService.getAvailableTransportsBasedOnSearchQuery(
-                bds,
+        offersService.getOffersBasedOnSearchQuery(bds,
                 bps,
                 ars,
                 dateFrom,
@@ -48,6 +47,7 @@ public class OffersController {
                 infants,
                 kids,
                 teens);
+
         return List.of();
     }
 }

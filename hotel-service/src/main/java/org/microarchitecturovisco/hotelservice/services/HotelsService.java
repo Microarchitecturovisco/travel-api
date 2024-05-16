@@ -99,7 +99,7 @@ public class HotelsService {
         List<Hotel> availableHotels = new ArrayList<>();
         List<Float> pricesPerAdult = new ArrayList<>();
 
-        List<UUID> arrivalLocationIds = requestDto.getArrivalLocationIds();
+        List<UUID> arrivalLocationIds = requestDto.getArrivalLocationIds().stream().map(UUID::fromString).toList();
 
         List<Room> availableRooms = roomRepository.findAvailableRoomsByLocationAndDate(arrivalLocationIds, dateFrom, dateTo);
 

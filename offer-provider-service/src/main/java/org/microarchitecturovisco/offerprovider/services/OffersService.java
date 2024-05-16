@@ -3,6 +3,7 @@ package org.microarchitecturovisco.offerprovider.services;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.offerprovider.domain.dto.HotelDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.LocationDto;
+import org.microarchitecturovisco.offerprovider.domain.dto.OfferDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetTransportsMessage;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.GetHotelsBySearchQueryResponseDto;
@@ -43,6 +44,40 @@ public class OffersService {
         this.hotelsExchange = hotelsExchange;
     }
 
+    public List<OfferDto> getOffersBasedOnSearchQuery(List<UUID> departureBuses,
+                                                      List<UUID> departurePlane,
+                                                      List<UUID> arrivals,
+                                                      String dateFromString,
+                                                      String dateToString,
+                                                      Integer adults,
+                                                      Integer infants,
+                                                      Integer kids,
+                                                      Integer teens) {
+        List<TransportDto> availableTransports = getAvailableTransportsBasedOnSearchQuery(
+                departureBuses,
+                departurePlane,
+                arrivals,
+                dateFromString,
+                dateToString,
+                adults,
+                infants,
+                kids,
+                teens);
+
+        List<HotelDto> availableHotels = getAvailableHotelsBasedOnSearchQuery(
+                dateFromString,
+                dateToString,
+                arrivals,
+                adults,
+                infants,
+                kids,
+                teens);
+
+        System.out.println(availableHotels);
+
+        return List.of();
+    }
+
     public List<TransportDto> getAvailableTransportsBasedOnSearchQuery(
             List<UUID> departureBuses,
             List<UUID> departurePlane,
@@ -62,7 +97,7 @@ public class OffersService {
     private List<HotelDto> getAvailableHotelsBasedOnSearchQuery(
             String dateFromString,
             String dateToString,
-            List<Integer> arrivalLocationIds,
+            List<UUID> arrivalLocationIds,
             Integer adults,
             Integer infants,
             Integer kids,
@@ -89,7 +124,7 @@ public class OffersService {
     private List<HotelDto> getFilteredHotelsFromTransportModule(
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
-            List<Integer> arrivalLocationIds,
+            List<UUID> arrivalLocationIds,
             Integer adults,
             Integer infants,
             Integer kids,
@@ -98,7 +133,7 @@ public class OffersService {
         GetHotelsBySearchQueryRequestDto message = GetHotelsBySearchQueryRequestDto.builder()
                 .dateFrom(dateFrom)
                 .dateTo(dateTo)
-                .arrivalLocationIds(arrivalLocationIds)
+                .arrivalLocationIds(arrivalLocationIds.stream().map(UUID::toString).toList())
                 .adults(adults)
                 .childrenUnderThree(infants)
                 .childrenUnderTen(kids)
@@ -108,7 +143,7 @@ public class OffersService {
         String messageJson = JsonConverter.convert(message);
 
         try {
-            String responseMessage = (String) rabbitTemplate.convertSendAndReceive(hotelsExchange.getName(), "hotels.requests.getHotelsBySearchQuery", messageJson);
+            String responseMessage = (String) rabbitTemplate.convertSendAndReceive(hotelsExchange.getName(), "hotels.requests.hotelsBySearchQuery", messageJson);
 
             if(responseMessage != null) {
                 GetHotelsBySearchQueryResponseDto response = JsonReader.readHotelsBySearchQueryResponseDtoFromJson(responseMessage);

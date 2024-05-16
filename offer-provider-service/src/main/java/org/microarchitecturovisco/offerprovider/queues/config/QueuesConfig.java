@@ -27,7 +27,7 @@ public class QueuesConfig {
 
     @Bean(name = "getHotelsExchange")
     public DirectExchange getHotelsExchange() {
-        return new DirectExchange("hotels.requests.getHotelsBySearchQuery");
+        return new DirectExchange("hotels.requests.hotelsBySearchQuery");
     }
 
 

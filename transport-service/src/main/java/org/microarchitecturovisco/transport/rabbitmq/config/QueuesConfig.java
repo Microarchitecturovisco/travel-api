@@ -26,7 +26,7 @@ public class QueuesConfig {
     }
 
     @Bean
-    public Binding handleTransportsBySearchQueryRequestBinding(DirectExchange handleTransportExchange, Queue handleTransportsBySearchQuery) {
-        return BindingBuilder.bind(handleTransportsBySearchQuery).to(handleTransportExchange).with("transports.handleTransportsBySearchQuery");
+    public Binding handleTransportsBySearchQueryRequestBinding(DirectExchange handleTransportsBySearchQueryExchange, Queue handleTransportsBySearchQuery) {
+        return BindingBuilder.bind(handleTransportsBySearchQuery).to(handleTransportsBySearchQueryExchange).with("transports.handleTransportsBySearchQuery");
     }
 }

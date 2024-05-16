@@ -5,11 +5,12 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 public class HotelDto implements Serializable {
-    private int hotelId;
+    private UUID hotelId;
     private String name;
     private float rating;
     private String description;
