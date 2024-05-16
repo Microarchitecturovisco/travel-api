@@ -48,7 +48,7 @@ public class ReservationService {
         return reservationRepository.findById(id).orElseThrow(RuntimeException::new);
     }
 
-    public UUID bookAndBuyOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
+    public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
 
@@ -58,10 +58,30 @@ public class ReservationService {
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 
-        return null;
+        //todo: Create Reservation here --> use createReservation()
+        // Tworzony jest obiekt rezerwacji
+        // Orkiestrator wysyła event stworzenia obiektu do kolejki reservations.events.createReservation
+        // Reservations tworzy instancje
+
+
+
+        // todo: reserve hotel
+        //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
+
+
+
+        // todo: reserve transport
+        //  Wysyłany jest event zarezerwowania transportu do kolejki transports.events.createTransportReservation
+
+
+        // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
+        //  (co skutkuje cofnięciem poprzednich operacji);
+        //  do aplikacji klienckiej zwracany jest status 2xx oraz idReservation tego zamówienia
+        //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
+
+
+
+        return null; // Id rezerwacji
     }
 
-    private void bookTransports(ReservationRequest reservationRequest){
-        // todo: continue the booking process, and reserve transport
-    }
 }

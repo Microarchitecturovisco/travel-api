@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
-import org.microarchitecturovisco.reservationservice.queues.config.QueuesConfig;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class ReservationController {
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
         try{
-            UUID reservationId = reservationService.bookAndBuyOrchestration(reservationRequest);
+            UUID reservationId = reservationService.bookOrchestration(reservationRequest);
         }
         catch (ReservationFailException exception){
             return "FAILED";
