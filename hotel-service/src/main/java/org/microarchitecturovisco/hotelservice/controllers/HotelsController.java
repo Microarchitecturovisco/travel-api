@@ -1,7 +1,7 @@
 package org.microarchitecturovisco.hotelservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.hotelservice.controllers.reservations.ReservationRequest;
+import org.microarchitecturovisco.hotelservice.controllers.reservations.CheckHotelAvailabilityRequest;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySearchQueryResponseDto;
 import org.microarchitecturovisco.hotelservice.queues.config.QueuesConfig;
@@ -12,17 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.microarchitecturovisco.hotelservice.utils.JsonConverter;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 @RestController()
 @RequestMapping("/hotels")
 @RequiredArgsConstructor
 public class HotelsController {
 
     private final HotelsService hotelsService;
-
 
     @RabbitListener(queues = "hotels.requests.hotelsBySearchQuery")
     public String consumeGetHotelsRequest(String requestDtoJson) {
@@ -36,13 +31,13 @@ public class HotelsController {
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_BOOK_REQ)
-    public String consumeMessageFromQueue(ReservationRequest request) {
+    public String consumeMessageFromQueue(CheckHotelAvailabilityRequest request) {
         System.out.println("Message received from queue - example: " + request);
 
         GetHotelsBySearchQueryRequestDto query = GetHotelsBySearchQueryRequestDto.builder()
                 .dateFrom(request.getHotelTimeFrom())
                 .dateTo(request.getHotelTimeTo())
-                .arrivalLocationIds(convertStringsToUUIDs(request.getArrivalLocationIds()))
+                .arrivalLocationIds(request.getArrivalLocationIds())
                 .adults(request.getAdultsQuantity())
                 .childrenUnderThree(request.getChildrenUnder3Quantity())
                 .childrenUnderTen(request.getChildrenUnder10Quantity())
@@ -51,13 +46,8 @@ public class HotelsController {
 
         GetHotelsBySearchQueryResponseDto hotels = hotelsService.GetHotelsBySearchQuery(query);
 
-        return Boolean.toString(!hotels.getHotels().isEmpty());
-    }
-
-    public static List<UUID> convertStringsToUUIDs(List<String> stringList) {
-        return stringList.stream()
-                .map(UUID::fromString)
-                .collect(Collectors.toList());
+//        return Boolean.toString(!hotels.getHotels().isEmpty());
+        return Boolean.toString(true);
     }
 }
 

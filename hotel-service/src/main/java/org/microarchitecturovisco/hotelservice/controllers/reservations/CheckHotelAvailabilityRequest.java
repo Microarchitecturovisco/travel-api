@@ -11,9 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ReservationRequest {
-    private UUID hotelId;
-
+public class CheckHotelAvailabilityRequest {
     private LocalDateTime hotelTimeFrom;
 
     private LocalDateTime hotelTimeTo;
@@ -26,11 +24,7 @@ public class ReservationRequest {
 
     private int childrenUnder18Quantity;
 
-    private List<String> roomIds;
-
-    private int userId;
-
-    private List<String> departureLocationIdsByPlane;
-    private List<String> departureLocationIdsByBus;
-    private List<String> arrivalLocationIds;
+    private List<UUID> departureLocationIdsByPlane;
+    private List<UUID> departureLocationIdsByBus;
+    private List<UUID> arrivalLocationIds;
 }
