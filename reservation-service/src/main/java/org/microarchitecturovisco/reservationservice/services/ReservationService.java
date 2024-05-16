@@ -52,10 +52,10 @@ public class ReservationService {
 
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
-
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
         boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        System.out.println("transportIsAvailable: "+ hotelIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 

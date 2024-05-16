@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.transport.rabbitmq.config;
+package org.microarchitecturovisco.transport.queues.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;

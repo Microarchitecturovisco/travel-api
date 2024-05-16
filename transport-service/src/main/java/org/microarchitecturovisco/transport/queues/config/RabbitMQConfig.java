@@ -1,6 +1,6 @@
-package org.microarchitecturovisco.hotelservice.queues.config;
+package org.microarchitecturovisco.transport.queues.config;
 
-import org.microarchitecturovisco.hotelservice.controllers.HotelsController;
+import org.microarchitecturovisco.transport.queues.reservations.ReservationRequestConsumer;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;

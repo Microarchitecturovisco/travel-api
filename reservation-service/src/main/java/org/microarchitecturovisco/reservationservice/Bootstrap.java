@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class Bootstrap implements CommandLineRunner {
 
-    private final TopicExchange topicExchange;
-
     @Override
     public void run(String... args) {
         // Your initialization logic here
