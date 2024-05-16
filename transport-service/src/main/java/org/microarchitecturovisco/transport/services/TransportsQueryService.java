@@ -160,8 +160,10 @@ public class TransportsQueryService {
 
         for (TransportDto departureDto : departureDayTransportsResponse.getTransportDtoList()) {
             for (TransportDto arrivalDto : arrivalDayTransportsResponse.getTransportDtoList()) {
-                if (departureDto.getTransportCourse().getDepartureFromLocation() == arrivalDto.getTransportCourse().getArrivalAtLocation() &&
-                        departureDto.getTransportCourse().getArrivalAtLocation() == arrivalDto.getTransportCourse().getDepartureFromLocation()) {
+                if (departureDto.getTransportCourse().getDepartureFromLocation().equals(arrivalDto.getTransportCourse().getArrivalAtLocation())  &&
+                        departureDto.getTransportCourse().getArrivalAtLocation().equals(arrivalDto.getTransportCourse().getDepartureFromLocation()) &&
+                        departureDto.getTransportCourse().getType().equals(arrivalDto.getTransportCourse().getType())
+                ) {
                     transportPairs.add(Pair.of(departureDto, arrivalDto));
                     break;
                 }
