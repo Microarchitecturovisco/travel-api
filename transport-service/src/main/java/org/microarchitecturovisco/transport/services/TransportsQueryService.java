@@ -14,6 +14,7 @@ import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -155,9 +156,21 @@ public class TransportsQueryService {
                 .build()
         );
 
+        List<Pair<TransportDto, TransportDto>> transportPairs = new ArrayList<>();
+
+        for (TransportDto departureDto : departureDayTransportsResponse.getTransportDtoList()) {
+            for (TransportDto arrivalDto : arrivalDayTransportsResponse.getTransportDtoList()) {
+                if (departureDto.getTransportCourse().getDepartureFromLocation() == arrivalDto.getTransportCourse().getArrivalAtLocation() &&
+                        departureDto.getTransportCourse().getArrivalAtLocation() == arrivalDto.getTransportCourse().getDepartureFromLocation()) {
+                    transportPairs.add(Pair.of(departureDto, arrivalDto));
+                    break;
+                }
+            }
+        }
+
         return GetTransportsBetweenLocationsResponseDto.builder()
                 .uuid(requestDto.getUuid())
-                .transports(Stream.concat(departureDayTransportsResponse.getTransportDtoList().stream(), arrivalDayTransportsResponse.getTransportDtoList().stream()).toList())
+                .transportPairs(transportPairs)
                 .build();
     }
 
