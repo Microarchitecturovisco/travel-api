@@ -3,9 +3,11 @@ package org.microarchitecturovisco.reservationservice.services;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.CreateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
+import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
+import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ public class ReservationService {
     private final ReservationAggregate reservationAggregate;
 
     private final BookHotelsSaga bookHotelsSaga;
+    private final BookTransportsSaga bookTransportsSaga;
     public Reservation createReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
                                          int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
                                          float price, int hotelId, List<String> roomReservationsIds,
@@ -45,23 +48,20 @@ public class ReservationService {
         return reservationRepository.findById(id).orElseThrow(RuntimeException::new);
     }
 
-    public void bookAndBuyOrchestration(ReservationRequest reservationRequest){
+    public UUID bookAndBuyOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
 
-        if(hotelIsAvailable){ // Continue booking
-            bookTransports(reservationRequest);
-        }
-        else { // Rollback
-            stopBookingProcess(reservationRequest);
-        }
+        if(!hotelIsAvailable) { throw new ReservationFailException(); }
+
+        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        if(!transportIsAvailable) { throw new ReservationFailException(); }
+
+
+        return null;
     }
 
     private void bookTransports(ReservationRequest reservationRequest){
         // todo: continue the booking process, and reserve transport
-    }
-    private void stopBookingProcess(ReservationRequest reservationRequest){
-        // todo: do ROLLBACK --> stop the booking process (dont reserve transport)
-
     }
 }

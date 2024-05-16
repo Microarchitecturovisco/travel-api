@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesConfig;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +25,12 @@ public class ReservationController {
 
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
-        reservationService.bookAndBuyOrchestration(reservationRequest);
+        try{
+            UUID reservationId = reservationService.bookAndBuyOrchestration(reservationRequest);
+        }
+        catch (ReservationFailException exception){
+            return "FAILED";
+        }
         return "sent success";
     }
 
