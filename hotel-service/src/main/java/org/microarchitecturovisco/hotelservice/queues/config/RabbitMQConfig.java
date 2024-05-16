@@ -1,17 +1,34 @@
 package org.microarchitecturovisco.hotelservice.queues.config;
 
-import org.springframework.amqp.support.converter.SimpleMessageConverter;
+import org.microarchitecturovisco.hotelservice.queues.reservations.ReservationRequestConsumer;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 public class RabbitMQConfig {
     @Bean
-    public SimpleMessageConverter converter() {
-        SimpleMessageConverter converter = new SimpleMessageConverter();
-        converter.setAllowedListPatterns(List.of("org.microarchitecturovisco.*", "java.*"));
-        return converter;
+    public SimpleMessageListenerContainer listenerContainer(ConnectionFactory connectionFactory,
+                                                            MessageListenerAdapter listenerAdapter) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setMessageListener(listenerAdapter);
+        return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter listenerAdapter(ReservationRequestConsumer consumer, MessageConverter messageConverter) {
+        MessageListenerAdapter adapter = new MessageListenerAdapter(consumer, "consumeMessageFromQueue");
+        adapter.setMessageConverter(messageConverter);
+        return adapter;
+    }
+
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 }
