@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
+import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDepartures;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
@@ -14,6 +15,7 @@ import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -155,9 +157,79 @@ public class TransportsQueryService {
                 .build()
         );
 
+        List<Pair<TransportDto, TransportDto>> transportPairs = new ArrayList<>();
+
+        for (TransportDto departureDto : departureDayTransportsResponse.getTransportDtoList()) {
+            for (TransportDto arrivalDto : arrivalDayTransportsResponse.getTransportDtoList()) {
+                if (departureDto.getTransportCourse().getDepartureFromLocation().equals(arrivalDto.getTransportCourse().getArrivalAtLocation())  &&
+                        departureDto.getTransportCourse().getArrivalAtLocation().equals(arrivalDto.getTransportCourse().getDepartureFromLocation()) &&
+                        departureDto.getTransportCourse().getType().equals(arrivalDto.getTransportCourse().getType())
+                ) {
+                    transportPairs.add(Pair.of(departureDto, arrivalDto));
+                    break;
+                }
+            }
+        }
+
         return GetTransportsBetweenLocationsResponseDto.builder()
                 .uuid(requestDto.getUuid())
-                .transports(Stream.concat(departureDayTransportsResponse.getTransportDtoList().stream(), arrivalDayTransportsResponse.getTransportDtoList().stream()).toList())
+                .transportPairs(transportPairs)
+                .build();
+    }
+
+    public GetTransportsBetweenLocationsResponseDto getTransportsBetweenMultipleLocations(GetTransportsBetweenMultipleLocationsRequestDto requestDto) {
+        LocalDateTime dateFrom = requestDto.getDateFrom()
+                .minusHours(requestDto.getDateFrom().getHour())
+                .minusMinutes(requestDto.getDateFrom().getMinute());
+        LocalDateTime dateTo = requestDto.getDateTo()
+                .minusHours(requestDto.getDateTo().getHour())
+                .minusMinutes(requestDto.getDateTo().getMinute());
+
+        GetTransportsBySearchQueryResponseDto departureDayTransportsResponse = getTransportsBySearchQuery(GetTransportsBySearchQueryRequestDto.builder()
+                .uuid(requestDto.getUuid().toString())
+                .dateFrom(dateFrom)
+                .dateTo(dateFrom.plusHours(23).plusMinutes(59))
+                .adults(requestDto.getAdults())
+                .childrenUnderEighteen(requestDto.getChildrenUnderEighteen())
+                .childrenUnderTen(requestDto.getChildrenUnderTen())
+                .childrenUnderThree(requestDto.getChildrenUnderThree())
+                .departureLocationIdsByPlane(requestDto.getDepartureLocationIds())
+                .departureLocationIdsByBus(List.of())
+                .arrivalLocationIds(requestDto.getArrivalLocationIds())
+                .build()
+        );
+
+        GetTransportsBySearchQueryResponseDto arrivalDayTransportsResponse = getTransportsBySearchQuery(GetTransportsBySearchQueryRequestDto.builder()
+                .uuid(requestDto.getUuid().toString())
+                .dateFrom(dateTo)
+                .dateTo(dateTo.plusHours(23).plusMinutes(59))
+                .adults(requestDto.getAdults())
+                .childrenUnderEighteen(requestDto.getChildrenUnderEighteen())
+                .childrenUnderTen(requestDto.getChildrenUnderTen())
+                .childrenUnderThree(requestDto.getChildrenUnderThree())
+                .departureLocationIdsByPlane(requestDto.getArrivalLocationIds())
+                .departureLocationIdsByBus(List.of())
+                .arrivalLocationIds(requestDto.getDepartureLocationIds())
+                .build()
+        );
+
+        List<Pair<TransportDto, TransportDto>> transportPairs = new ArrayList<>();
+
+        for (TransportDto departureDto : departureDayTransportsResponse.getTransportDtoList()) {
+            for (TransportDto arrivalDto : arrivalDayTransportsResponse.getTransportDtoList()) {
+                if (departureDto.getTransportCourse().getDepartureFromLocation().equals(arrivalDto.getTransportCourse().getArrivalAtLocation())  &&
+                        departureDto.getTransportCourse().getArrivalAtLocation().equals(arrivalDto.getTransportCourse().getDepartureFromLocation()) &&
+                        departureDto.getTransportCourse().getType().equals(arrivalDto.getTransportCourse().getType())
+                ) {
+                    transportPairs.add(Pair.of(departureDto, arrivalDto));
+                    break;
+                }
+            }
+        }
+
+        return GetTransportsBetweenLocationsResponseDto.builder()
+                .uuid(requestDto.getUuid())
+                .transportPairs(transportPairs)
                 .build();
     }
 

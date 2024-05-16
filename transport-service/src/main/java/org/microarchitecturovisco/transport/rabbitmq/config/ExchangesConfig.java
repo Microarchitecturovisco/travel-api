@@ -35,10 +35,29 @@ public class ExchangesConfig {
     }
 
     @Bean
-    public Binding binding(DirectExchange getTransportsBetweenLocationsExchange,
+    public Binding getTransportsBetweenLocationsBinding(DirectExchange getTransportsBetweenLocationsExchange,
                            Queue getTransportsBetweenLocationsQueue) {
         return BindingBuilder.bind(getTransportsBetweenLocationsQueue)
                 .to(getTransportsBetweenLocationsExchange)
                 .with("transports.getTransportsBetweenLocations");
+    }
+
+    // get transports between multiple locations
+    @Bean
+    public Queue getTransportsBetweenMultipleLocationsQueue() {
+        return new Queue("transports.requests.getTransportsBetweenMultipleLocations");
+    }
+
+    @Bean
+    public DirectExchange getTransportsBetweenMultipleLocationsExchange() {
+        return new DirectExchange("transports.requests.getTransportsBetweenMultipleLocations");
+    }
+
+    @Bean
+    public Binding getTransportsBetweenMultipleLocationsBinding(DirectExchange getTransportsBetweenMultipleLocationsExchange,
+                           Queue getTransportsBetweenMultipleLocationsQueue) {
+        return BindingBuilder.bind(getTransportsBetweenMultipleLocationsQueue)
+                .to(getTransportsBetweenMultipleLocationsExchange)
+                .with("transports.getTransportsBetweenMultipleLocations");
     }
 }

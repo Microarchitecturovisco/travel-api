@@ -10,7 +10,7 @@ import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySea
 
 public class JsonReader {
 
-    private static <T> T readDtoFromJson(String json, Class<T> dtoClass) {
+    public static <T> T readDtoFromJson(String json, Class<T> dtoClass) {
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         try {
             return mapper.readValue(json, dtoClass);

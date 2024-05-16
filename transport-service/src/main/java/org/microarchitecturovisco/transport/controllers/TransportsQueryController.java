@@ -3,6 +3,7 @@ package org.microarchitecturovisco.transport.controllers;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
+import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
@@ -59,10 +60,19 @@ public class TransportsQueryController {
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBetweenLocations")
-    public String  getTransportsBetweenLocations(String requestDtoJson) {
+    public String getTransportsBetweenLocations(String requestDtoJson) {
         GetTransportsBetweenLocationsRequestDto requestDto = JsonReader.readGetTransportsBetweenLocationsRequestDtoFromJson(requestDtoJson);
 
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenLocations(requestDto);
+
+        return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
+    }
+
+    @RabbitListener(queues = "transports.requests.getTransportsBetweenMultipleLocations")
+    public String getTransportsBetweenMultipleLocations(String requestDtoJson) {
+        GetTransportsBetweenMultipleLocationsRequestDto requestDto = JsonReader.readDtoFromJson(requestDtoJson, GetTransportsBetweenMultipleLocationsRequestDto.class);
+
+        GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenMultipleLocations(requestDto);
 
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
