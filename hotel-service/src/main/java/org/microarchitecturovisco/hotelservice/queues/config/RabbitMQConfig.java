@@ -1,6 +1,6 @@
 package org.microarchitecturovisco.hotelservice.queues.config;
 
-import org.microarchitecturovisco.hotelservice.queues.reservations.ReservationRequestConsumer;
+import org.microarchitecturovisco.hotelservice.controllers.HotelsController;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
@@ -21,7 +21,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(ReservationRequestConsumer consumer, MessageConverter messageConverter) {
+    public MessageListenerAdapter listenerAdapter(HotelsController consumer, MessageConverter messageConverter) {
         MessageListenerAdapter adapter = new MessageListenerAdapter(consumer, "consumeMessageFromQueue");
         adapter.setMessageConverter(messageConverter);
         return adapter;
