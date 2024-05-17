@@ -52,7 +52,6 @@ public class ReservationService {
         return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
-
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 //        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
         boolean hotelIsAvailable = true;

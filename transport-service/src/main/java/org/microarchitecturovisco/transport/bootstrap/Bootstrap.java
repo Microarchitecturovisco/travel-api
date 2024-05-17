@@ -57,7 +57,7 @@ public class Bootstrap implements CommandLineRunner {
         LocalDateTime bootstrapBeginDay = LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0);
 
         // generate transport for each course and every day of two months
-        for (int day = 0; day < 10; day++) {
+        for (int day = 0; day < 3; day++) {
             for (TransportCourseDto planeCourse : planeCourses) {
                 int capacity = ThreadLocalRandom.current().nextInt(80, 100);
 
