@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 @Builder
 @Getter
 @Setter
 public class ReservationUpdateEvent extends ReservationEvent {
-    private String idReservation;
+    private UUID idReservation;
     private Boolean paid;
 }

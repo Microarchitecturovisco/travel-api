@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -14,10 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class Reservation {
 
     @Id
-    private String id;
+    private UUID id;
 
     @NotNull
     private LocalDateTime hotelTimeFrom;
@@ -41,16 +43,16 @@ public class Reservation {
     private boolean paid;
 
     @NotNull
-    private int hotelId;
+    private UUID hotelId;
 
     @NotNull
     @ElementCollection
-    private List<String> roomReservationsIds;
+    private List<UUID> roomReservationsIds;
 
     @NotNull
     @ElementCollection
-    private List<String> transportReservationsIds;
+    private List<UUID> transportReservationsIds;
 
     @NotNull
-    private int userId;
+    private UUID userId;
 }
