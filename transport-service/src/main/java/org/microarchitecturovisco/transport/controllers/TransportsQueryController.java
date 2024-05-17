@@ -88,7 +88,6 @@ public class TransportsQueryController {
         GetTransportsBetweenMultipleLocationsRequestDto requestDto = JsonReader.readDtoFromJson(requestDtoJson, GetTransportsBetweenMultipleLocationsRequestDto.class);
 
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenMultipleLocations(requestDto);
-
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 }

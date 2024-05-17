@@ -20,7 +20,7 @@ public class GetHotelsBySearchQueryRequestDto implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
 
-    private List<String> arrivalLocationIds;
+    private List<UUID> arrivalLocationIds;
 
     private Integer adults;
     private Integer childrenUnderThree;

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,8 +22,8 @@ public class OffersController {
 
     @GetMapping("/transports")
     public List<OfferDto> getOffersBasedOnSearchQuery(
-            @RequestParam(name = "departureBus") List<String> departureBuses,
-            @RequestParam(name = "departurePlane") List<String> departurePlane,
+            @RequestParam(name = "departureBus", required = false) List<String> departureBuses,
+            @RequestParam(name = "departurePlane", required = false) List<String> departurePlane,
             @RequestParam(name = "arrivals") List<String> arrivals,
             @RequestParam(name = "date_from") String dateFrom,
             @RequestParam(name = "date_to") String dateTo,
@@ -33,12 +34,15 @@ public class OffersController {
 
     ) {
 
+        departureBuses = departureBuses != null ? departureBuses : new ArrayList<>();
+        departurePlane = departurePlane != null ? departurePlane : new ArrayList<>();
+
         List<UUID> bds = departureBuses.stream().map(UUID::fromString).toList();
-        List<UUID> bps = departureBuses.stream().map(UUID::fromString).toList();
-        List<UUID> ars = departureBuses.stream().map(UUID::fromString).toList();
+        List<UUID> bps = departurePlane.stream().map(UUID::fromString).toList();
+        List<UUID> ars = arrivals.stream().map(UUID::fromString).toList();
 
 
-        offersService.getOffersBasedOnSearchQuery(bds,
+        return offersService.getOffersBasedOnSearchQuery(bds,
                 bps,
                 ars,
                 dateFrom,
@@ -47,7 +51,5 @@ public class OffersController {
                 infants,
                 kids,
                 teens);
-
-        return List.of();
     }
 }
