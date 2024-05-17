@@ -10,6 +10,7 @@ import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ReservationCreatedEvent extends ReservationEvent {
-    private String idReservation;
+    private UUID idReservation;
     private LocalDateTime hotelTimeFrom;
     private LocalDateTime hotelTimeTo;
     private int infantsQuantity;
@@ -27,10 +28,10 @@ public class ReservationCreatedEvent extends ReservationEvent {
     private int adultsQuantity;
     private float price;
     private boolean paid;
-    private int hotelId;
+    private UUID hotelId;
     @ElementCollection
-    private List<String> roomReservationsIds;
+    private List<UUID> roomReservationsIds;
     @ElementCollection
-    private List<String> transportReservationsIds;
-    private int userId;
+    private List<UUID> transportReservationsIds;
+    private UUID userId;
 }
