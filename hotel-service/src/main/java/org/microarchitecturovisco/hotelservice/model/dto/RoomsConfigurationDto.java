@@ -7,5 +7,6 @@ import java.util.List;
 @Data
 @Builder
 public class RoomsConfigurationDto {
-    private List<RoomDto> rooms;
+    private List<RoomResponseDto> rooms;
+    private Float pricePerAdult;
 }
