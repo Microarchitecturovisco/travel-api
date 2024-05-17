@@ -12,5 +12,5 @@ import java.util.UUID;
 @Builder
 public class GetTransportsBetweenLocationsResponseDto {
     private UUID uuid;
-    private List<Pair<TransportDto, TransportDto>> transportPairs;
+    private List<List<TransportDto>> transportPairs;
 }

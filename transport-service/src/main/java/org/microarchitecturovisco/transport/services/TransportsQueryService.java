@@ -2,6 +2,7 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
+import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
@@ -12,6 +13,7 @@ import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetw
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
+import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
@@ -31,10 +33,19 @@ public class TransportsQueryService {
 
     private final TransportCourseRepository transportCourseRepository;
     private final TransportRepository transportRepository;
+    private final LocationRepository locationRepository;
 
     public List<TransportDto> getAllTransports() {
         List<Transport> transports = transportRepository.findAll();
         return TransportMapper.mapList(transports);
+    }
+
+    public List<Location> getAllLocations() {
+        return locationRepository.findAll();
+    }
+
+    public Location getLocationByRegionName(String region) {
+        return locationRepository.findFirstByRegionIgnoreCase(region);
     }
 
     public AvailableTransportsDto getAvailableTransports() {
@@ -157,7 +168,7 @@ public class TransportsQueryService {
                 .build()
         );
 
-        List<Pair<TransportDto, TransportDto>> transportPairs = new ArrayList<>();
+        List<List<TransportDto>> transportPairs = new ArrayList<>();
 
         for (TransportDto departureDto : departureDayTransportsResponse.getTransportDtoList()) {
             for (TransportDto arrivalDto : arrivalDayTransportsResponse.getTransportDtoList()) {
@@ -165,7 +176,7 @@ public class TransportsQueryService {
                         departureDto.getTransportCourse().getArrivalAtLocation().equals(arrivalDto.getTransportCourse().getDepartureFromLocation()) &&
                         departureDto.getTransportCourse().getType().equals(arrivalDto.getTransportCourse().getType())
                 ) {
-                    transportPairs.add(Pair.of(departureDto, arrivalDto));
+                    transportPairs.add(List.of(departureDto, arrivalDto));
                     break;
                 }
             }
@@ -213,7 +224,7 @@ public class TransportsQueryService {
                 .build()
         );
 
-        List<Pair<TransportDto, TransportDto>> transportPairs = new ArrayList<>();
+        List<List<TransportDto>> transportPairs = new ArrayList<>();
 
         for (TransportDto departureDto : departureDayTransportsResponse.getTransportDtoList()) {
             for (TransportDto arrivalDto : arrivalDayTransportsResponse.getTransportDtoList()) {
@@ -221,7 +232,7 @@ public class TransportsQueryService {
                         departureDto.getTransportCourse().getArrivalAtLocation().equals(arrivalDto.getTransportCourse().getDepartureFromLocation()) &&
                         departureDto.getTransportCourse().getType().equals(arrivalDto.getTransportCourse().getType())
                 ) {
-                    transportPairs.add(Pair.of(departureDto, arrivalDto));
+                    transportPairs.add(List.of(departureDto, arrivalDto));
                     break;
                 }
             }

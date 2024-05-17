@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
@@ -8,6 +9,7 @@ import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySea
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
+import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.services.TransportsQueryService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
 import org.microarchitecturovisco.transport.utils.json.JsonReader;
@@ -32,6 +34,18 @@ public class TransportsQueryController {
     @GetMapping("/")
     public List<TransportDto> getAllTransports() {
         return transportsQueryService.getAllTransports();
+    }
+
+    @GetMapping("/locations")
+    public List<LocationDto> getLocations() {
+        return LocationMapper.mapList(transportsQueryService.getAllLocations());
+    }
+
+    @GetMapping("/locations/{region}")
+    public LocationDto getLocationByRegionName(
+            @PathVariable String region
+    ) {
+        return LocationMapper.map(transportsQueryService.getLocationByRegionName(region));
     }
 
     @GetMapping("/available")
