@@ -6,13 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class LocationDto implements Serializable {
-    private Integer idLocation;
+    private UUID idLocation;
     private String country;
     private String region;
 }

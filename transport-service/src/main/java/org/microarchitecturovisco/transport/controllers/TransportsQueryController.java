@@ -31,6 +31,7 @@ public class TransportsQueryController {
     private final TransportsQueryService transportsQueryService;
     private final RabbitTemplate rabbitTemplate;
 
+
     @GetMapping("/")
     public List<TransportDto> getAllTransports() {
         return transportsQueryService.getAllTransports();
@@ -59,7 +60,7 @@ public class TransportsQueryController {
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBySearchQuery")
-    public void consumeGetTransportsRequest(String requestDtoJson) {
+    public String consumeGetTransportsRequest(String requestDtoJson) {
         long startTime = System.currentTimeMillis();
 
         GetTransportsBySearchQueryRequestDto requestDto = JsonReader.readGetTransportsBySearchQueryRequestFromJson(requestDtoJson);
@@ -70,7 +71,7 @@ public class TransportsQueryController {
         System.out.println("Send transports response size " + responseDto.getTransportDtoList().size());
         System.out.println("Service call took " + (endTime - startTime) + " ms");
 
-        rabbitTemplate.convertAndSend("transports.responses.getTransportsBySearchQuery", JsonConverter.convertGetTransportsBySearchQueryResponseDto(responseDto));
+        return JsonConverter.convertGetTransportsBySearchQueryResponseDto(responseDto);
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBetweenLocations")
@@ -87,7 +88,6 @@ public class TransportsQueryController {
         GetTransportsBetweenMultipleLocationsRequestDto requestDto = JsonReader.readDtoFromJson(requestDtoJson, GetTransportsBetweenMultipleLocationsRequestDto.class);
 
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenMultipleLocations(requestDto);
-
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 }

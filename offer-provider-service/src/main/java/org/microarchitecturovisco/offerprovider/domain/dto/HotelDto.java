@@ -1,28 +1,24 @@
-package org.microarchitecturovisco.hotelservice.model.dto;
+package org.microarchitecturovisco.offerprovider.domain.dto;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
-public class HotelResponseDto implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+public class HotelDto implements Serializable {
     private UUID hotelId;
-
     private String name;
-
     private float rating;
-    @Lob
     private String description;
-
     private LocationDto location;
-
     private List<String> photos;
-
     private float pricePerAdult;
 }

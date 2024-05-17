@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.util.Pair;
+import org.microarchitecturovisco.offerprovider.domain.dto.HotelDto;
 
+import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransportsBasedOnSearchQueryResponse {
-    private UUID uuid;
-    private List<List<TransportDto>> transportPairs;
+public class GetHotelsBySearchQueryResponseDto implements Serializable {
+    private List<HotelDto> hotels;
 }
