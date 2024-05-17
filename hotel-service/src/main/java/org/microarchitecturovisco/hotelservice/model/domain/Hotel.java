@@ -22,7 +22,7 @@ public class Hotel {
     @Lob
     private String description;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CateringOption> cateringOptions;
 
     @ManyToOne(cascade = CascadeType.ALL)
