@@ -23,7 +23,7 @@ public class JsonConverter {
         return convertToJsonWithLocalDateTime(dto);
     }
 
-    private static String convertToJsonWithLocalDateTime(Object obj) {
+    public static String convertToJsonWithLocalDateTime(Object obj) {
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         String json;
         try {

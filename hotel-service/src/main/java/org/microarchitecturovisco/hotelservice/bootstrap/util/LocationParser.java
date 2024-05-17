@@ -43,7 +43,7 @@ public class LocationParser {
         }
 
         return LocationDto.builder()
-                .idLocation(UUID.randomUUID())
+                .idLocation(UUID.nameUUIDFromBytes((country+region).getBytes()))
                 .country(country)
                 .region(region)
                 .build();

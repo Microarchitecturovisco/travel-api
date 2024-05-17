@@ -54,13 +54,15 @@ public class ReservationService {
     }
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
-//        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-        boolean hotelIsAvailable = true;
-        System.out.println("hotelIsAvailable: " + hotelIsAvailable);
+
+        // boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+        boolean hotelIsAvailable = true; // debug only
+        System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
+
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
-//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        boolean transportIsAvailable = true;
+        // boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 

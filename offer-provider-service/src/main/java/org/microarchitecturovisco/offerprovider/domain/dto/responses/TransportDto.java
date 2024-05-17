@@ -7,13 +7,14 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransportDto implements Serializable {
-    private Integer idTransport;
+    private UUID idTransport;
 
     private LocalDateTime departureDate;
     private Integer capacity;

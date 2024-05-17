@@ -5,12 +5,20 @@ import org.microarchitecturovisco.transport.bootstrap.util.LocationParser;
 import org.microarchitecturovisco.transport.bootstrap.util.TransportCoursesParser;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
+import org.microarchitecturovisco.transport.model.domain.Location;
+import org.microarchitecturovisco.transport.model.domain.TransportType;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
+import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
+import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
+import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.services.TransportCommandService;
+import org.microarchitecturovisco.transport.utils.json.JsonConverter;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
@@ -31,6 +39,8 @@ public class Bootstrap implements CommandLineRunner {
     private final LocationParser locationParser;
     private final TransportCoursesParser transportCoursesParser;
     private final TransportCommandService transportCommandService;
+    private final LocationRepository locationRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     public File loadCSVIinitFiles(String filepathInResources)
             throws FileNotFoundException {
@@ -117,5 +127,34 @@ public class Bootstrap implements CommandLineRunner {
                 );
             }
         }
+    }
+
+//    uncomment to test getMultipleLocations
+//    @Scheduled(fixedDelay = 5000, initialDelay = 30000)
+    public void test() {
+        UUID locationIdA = locationRepository.findFirstByRegion("Gdańsk").getId();
+        UUID locationIdB = locationRepository.findFirstByRegion("Katowice").getId();
+        UUID locationIdC = locationRepository.findFirstByRegion("Durres").getId();
+        UUID locationIdD = locationRepository.findFirstByRegion("Fuerteventura").getId();
+
+        GetTransportsBetweenMultipleLocationsRequestDto requestDto = GetTransportsBetweenMultipleLocationsRequestDto.builder()
+                .uuid(java.util.UUID.randomUUID())
+                .departureLocationIds(List.of(locationIdA, locationIdB))
+                .arrivalLocationIds(List.of(locationIdC, locationIdD))
+                .dateFrom(LocalDateTime.of(2024, Month.MAY, 1, 14, 0, 0))
+                .dateTo(LocalDateTime.of(2024, Month.MAY, 1, 18, 0, 0))
+                .transportType(TransportType.PLANE)
+                .adults(2)
+                .childrenUnderEighteen(2)
+                .childrenUnderTen(0)
+                .childrenUnderThree(0)
+                .build();
+
+        String response = (String) rabbitTemplate.convertSendAndReceive(
+                "transports.requests.getTransportsBetweenMultipleLocations",
+                "transports.getTransportsBetweenMultipleLocations",
+                JsonConverter.convertToJsonWithLocalDateTime(requestDto));
+
+        System.out.println(response + "\n");
     }
 }

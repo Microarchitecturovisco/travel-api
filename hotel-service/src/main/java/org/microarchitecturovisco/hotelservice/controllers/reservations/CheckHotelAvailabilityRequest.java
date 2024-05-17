@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.hotelservice.queues.reservations;
+package org.microarchitecturovisco.hotelservice.controllers.reservations;
 
 import lombok.*;
 
@@ -11,9 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ReservationRequest {
-    private UUID hotelId;
-
+public class CheckHotelAvailabilityRequest {
     private LocalDateTime hotelTimeFrom;
 
     private LocalDateTime hotelTimeTo;
@@ -26,11 +24,7 @@ public class ReservationRequest {
 
     private int childrenUnder18Quantity;
 
-    private List<String> roomIds;
-
-    private UUID idArrivalTransport;
-
-    private UUID idReturnTransport;
-
-    private int userId;
+    private List<UUID> departureLocationIdsByPlane;
+    private List<UUID> departureLocationIdsByBus;
+    private List<UUID> arrivalLocationIds;
 }

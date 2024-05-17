@@ -1,10 +1,7 @@
 package org.microarchitecturovisco.hotelservice.model.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -13,14 +10,11 @@ import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class GetHotelsBySearchQueryRequestDto implements Serializable {
-
+public class GetHotelDetailsRequestDto implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
 
-    private List<UUID> arrivalLocationIds;
+    private UUID hotelId;
 
     private Integer adults;
     private Integer childrenUnderThree;
