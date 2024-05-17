@@ -16,8 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 public class ReservationRequest {
-    private UUID hotelId;
-
     private LocalDateTime hotelTimeFrom;
 
     private LocalDateTime hotelTimeTo;
@@ -30,11 +28,14 @@ public class ReservationRequest {
 
     private int childrenUnder18Quantity;
 
-    private List<String> roomIds;
+    private List<UUID> departureLocationIdsByPlane;
+    private List<UUID> departureLocationIdsByBus;
+    private List<UUID> arrivalLocationIds;
 
-    private UUID idArrivalTransport;
-
-    private UUID idReturnTransport;
-
-    private int userId;
+    private float price;
+    private UUID hotelId;
+    private List<UUID> roomReservationsIds;
+    private List<UUID> transportReservationsIds;
+    private UUID userId;
+    private UUID reservationId;
 }
