@@ -3,7 +3,6 @@ package org.microarchitecturovisco.reservationservice.services;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.CreateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
-import org.microarchitecturovisco.reservationservice.domain.events.ReservationEvent;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
@@ -13,6 +12,8 @@ import org.microarchitecturovisco.reservationservice.services.saga.BookTransport
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +49,7 @@ public class ReservationService {
                 .transportReservationsIds(transportReservationsIds)
                 .userId(userId)
                 .build();
-
+        reservationAggregate.handleCreateReservationCommand(command);
         return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
@@ -64,20 +65,14 @@ public class ReservationService {
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 
-        //todo: Create Reservation here --> use createReservation()
-        // Tworzony jest obiekt rezerwacji
-        // Orkiestrator wysyła event stworzenia obiektu do kolejki reservations.events.createReservation
-        // Reservations tworzy instancje
-        Reservation reservation = createReservationFromRequest(reservationRequest);
-        System.out.println("MAIN reservationCreated: " + reservation);
+        UUID reservationId = UUID.randomUUID();
+        Reservation reservation = createReservationFromRequest(reservationRequest, reservationId);
+        System.out.println("reservationCreated: " + reservation);
         if(reservation==null) { throw new ReservationFailException(); }
-
-
 
 
         // todo: reserve hotel
         //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
-
 
 
         // todo: reserve transport
@@ -91,36 +86,44 @@ public class ReservationService {
 
 
 
-        return null; // Id rezerwacji
+        return null; // reservation.getId()
     }
 
+    private Reservation getReservationAfterCreation(UUID reservationId, long maxWaitTimeInSeconds) {
+        Duration maxWaitTime = Duration.ofSeconds(maxWaitTimeInSeconds);
 
-    public Reservation createReservationFromRequest(ReservationRequest reservationRequest){
-        UUID reservationId = UUID.randomUUID();
+        Instant startTime = Instant.now();
+        Reservation reservation = null;
+        // Loop until the reservation is found or timeout is reached
+        while (reservation == null) {
+            reservation = reservationRepository.findById(reservationId).orElse(null);
 
-        reservationRequest.setReservationId(reservationId);
+            // Check if timeout is reached
+            if (Duration.between(startTime, Instant.now()).compareTo(maxWaitTime) >= 0) {
+                System.out.println("Timeout reached. Reservation not found.");
+                throw new RuntimeException("Timeout reached. Reservation not found.");
+            }
 
-        Reservation reservation = createReservation(
-                reservationRequest.getHotelTimeFrom(),
-                reservationRequest.getHotelTimeTo(),
-                reservationRequest.getChildrenUnder3Quantity(),
-                reservationRequest.getChildrenUnder10Quantity(),
-                reservationRequest.getChildrenUnder18Quantity(),
-                reservationRequest.getAdultsQuantity(),
-                reservationRequest.getPrice(),
-                reservationRequest.getHotelId(),
-                reservationRequest.getRoomReservationsIds(),
-                reservationRequest.getTransportReservationsIds(),
-                reservationRequest.getUserId(),
-                reservationRequest.getReservationId()
-        );
-
-        rabbitTemplate.convertAndSend(
-                QueuesReservationConfig.EXCHANGE_RESERVATION,
-                QueuesReservationConfig.ROUTING_KEY_RESERVATION_CREATE_REQ,
-                reservationRequest
-        );
-
+            // Wait for a short period before checking again
+            try {
+                Thread.sleep(100); // millisecond
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Thread interrupted while waiting for reservation.");
+            }
+        }
         return reservation;
     }
+
+
+
+    public Reservation createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
+        reservationRequest.setId(reservationId);
+
+        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
+
+        // wait until the reservation is created and then return it
+        return getReservationAfterCreation(reservationId, 5);
+    }
+
 }

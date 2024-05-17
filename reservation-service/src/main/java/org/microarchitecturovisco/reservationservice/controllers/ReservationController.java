@@ -2,12 +2,9 @@ package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
-import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,22 +14,19 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/reservations")
 public class ReservationController {
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
 
     private final ReservationService reservationService;
 
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
-        try{
+        try {
             UUID reservationId = reservationService.bookOrchestration(reservationRequest);
+        } catch (ReservationFailException exception) {
+            return "ReservationFailException exception occurred";
         }
-        catch (ReservationFailException exception){
-            return "FAILED";
-        }
-        return "sent success";
+        return "FULL SUCCESS";
     }
 
     @GetMapping("/test")
@@ -51,9 +45,8 @@ public class ReservationController {
                 UUID.randomUUID());
     }
 
-    @RabbitListener(queues = QueuesReservationConfig.QUEUE_RESERVATION_CREATE_REQ)
+    @RabbitListener(queues = "#{handleReservationCreateQueue.name}")
     public void consumeMessageCreateReservation(ReservationRequest reservationRequest) {
-        System.out.println("COPY Message received: " + reservationRequest);
         Reservation reservation = reservationService.createReservation(
                 reservationRequest.getHotelTimeFrom(),
                 reservationRequest.getHotelTimeTo(),
@@ -66,10 +59,8 @@ public class ReservationController {
                 reservationRequest.getRoomReservationsIds(),
                 reservationRequest.getTransportReservationsIds(),
                 reservationRequest.getUserId(),
-                reservationRequest.getReservationId()
+                reservationRequest.getId()
         );
-        System.out.println("COPY: Reservation after creation: " + reservation.getId());
+        System.out.println("Reservation created successfully: " + reservation.getId());
     }
-
-
 }

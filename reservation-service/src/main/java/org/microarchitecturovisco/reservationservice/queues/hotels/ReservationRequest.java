@@ -1,8 +1,5 @@
 package org.microarchitecturovisco.reservationservice.queues.hotels;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
@@ -15,7 +12,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ReservationRequest {
+public class ReservationRequest implements Serializable {
+    private UUID id;
+
     private LocalDateTime hotelTimeFrom;
 
     private LocalDateTime hotelTimeTo;
@@ -37,5 +36,4 @@ public class ReservationRequest {
     private List<UUID> roomReservationsIds;
     private List<UUID> transportReservationsIds;
     private UUID userId;
-    private UUID reservationId;
 }

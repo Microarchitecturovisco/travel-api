@@ -9,7 +9,6 @@ import org.microarchitecturovisco.reservationservice.repositories.ReservationRep
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -32,9 +31,9 @@ public class ReservationProjector {
                 .id(event.getIdReservation())
                 .hotelTimeFrom(event.getHotelTimeFrom())
                 .hotelTimeTo(event.getHotelTimeTo())
-                .infantsQuantity(event.getInfantsQuantity())
-                .kidsQuantity(event.getKidsQuantity())
-                .teensQuantity(event.getTeensQuantity())
+                .childrenUnder3Quantity(event.getInfantsQuantity())
+                .childrenUnder10Quantity(event.getKidsQuantity())
+                .childrenUnder18Quantity(event.getTeensQuantity())
                 .adultsQuantity(event.getAdultsQuantity())
                 .price(event.getPrice())
                 .paid(event.isPaid())
