@@ -201,15 +201,12 @@ public class OffersService {
         String messageJson = JsonConverter.convert(message);
 
         try {
-//            String responseMessage = (String) rabbitTemplate.convertSendAndReceive(hotelsExchange.getName(), "hotels.requests.hotelsBySearchQuery", messageJson);
             byte[] responseMessageB = (byte[]) rabbitTemplate.convertSendAndReceive(hotelsExchange.getName(), "hotels.requests.hotelsBySearchQuery", messageJson);
 
-            String responseMessage = (new String(responseMessageB)).replace("\\", "");
-            responseMessage = responseMessage.substring(1, responseMessage.length() - 1);
-            System.out.println(responseMessage);
-
-            if(responseMessage != null) {
-                System.out.println("Nonull message: " + responseMessage);
+            if(responseMessageB != null) {
+                String responseMessage = (new String(responseMessageB)).replace("\\", "");
+                responseMessage = responseMessage.substring(1, responseMessage.length() - 1);
+                System.out.println(responseMessage);
                 GetHotelsBySearchQueryResponseDto response = JsonReader.readHotelsBySearchQueryResponseDtoFromJson(responseMessage);
                 return response.getHotels();
             }
@@ -238,18 +235,6 @@ public class OffersService {
     ) {
         String correlationId = java.util.UUID.randomUUID().toString();
 
-//        GetTransportsMessage transportsMessage = GetTransportsMessage.builder()
-//                                                .uuid(correlationId)
-//                                                .departureLocationIdsByBus(departureBuses)
-//                                                .departureLocationIdsByPlane(departurePlane)
-//                                                .arrivalLocationIds(arrivals)
-//                                                .dateFrom(dateFrom)
-//                                                .dateTo(dateTo)
-//                                                .adults(adults)
-//                                                .childrenUnderThree(infants)
-//                                                .childrenUnderTen(kids)
-//                                                .childrenUnderEighteen(teens)
-//                                                .build();
         GetTransportsMessage transportsMessage = GetTransportsMessage.builder()
                                                 .uuid(correlationId)
                                                 .departureLocationIds(Stream.concat(departureBuses.stream(), departurePlane.stream()).toList())

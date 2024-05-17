@@ -27,6 +27,7 @@ public class HotelsController {
 
         System.out.println("Send hotels response size " + responseDto.getHotels().size());
 
+
         return JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto);
     }
 

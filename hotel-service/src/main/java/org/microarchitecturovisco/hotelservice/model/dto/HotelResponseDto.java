@@ -1,5 +1,7 @@
 package org.microarchitecturovisco.hotelservice.model.dto;
 
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Lob;
 import lombok.Builder;
 import lombok.Data;
