@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +22,9 @@ public class OffersController {
 
     @GetMapping("/transports")
     public List<OfferDto> getOffersBasedOnSearchQuery(
-            @RequestParam(name = "departureBus") List<Integer> departureBuses,
-            @RequestParam(name = "departurePlane") List<Integer> departurePlane,
-            @RequestParam(name = "arrivals") List<Integer> arrivals,
+            @RequestParam(name = "departureBus", required = false) List<String> departureBuses,
+            @RequestParam(name = "departurePlane", required = false) List<String> departurePlane,
+            @RequestParam(name = "arrivals") List<String> arrivals,
             @RequestParam(name = "date_from") String dateFrom,
             @RequestParam(name = "date_to") String dateTo,
             @RequestParam(name = "adults") Integer adults,
@@ -32,6 +34,22 @@ public class OffersController {
 
     ) {
 
-        return List.of();
+        departureBuses = departureBuses != null ? departureBuses : new ArrayList<>();
+        departurePlane = departurePlane != null ? departurePlane : new ArrayList<>();
+
+        List<UUID> departureBusesWithUUIDs = departureBuses.stream().map(UUID::fromString).toList();
+        List<UUID> departurePlanesWithUUIDs = departurePlane.stream().map(UUID::fromString).toList();
+        List<UUID> arrivalsWithUUIDs = arrivals.stream().map(UUID::fromString).toList();
+
+
+        return offersService.getOffersBasedOnSearchQuery(departureBusesWithUUIDs,
+                departurePlanesWithUUIDs,
+                arrivalsWithUUIDs,
+                dateFrom,
+                dateTo,
+                adults,
+                infants,
+                kids,
+                teens);
     }
 }

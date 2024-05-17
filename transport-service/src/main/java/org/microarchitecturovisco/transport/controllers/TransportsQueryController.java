@@ -2,6 +2,7 @@ package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.controllers.reservations.CheckTransportAvailabilityRequest;
+import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
@@ -10,6 +11,7 @@ import org.microarchitecturovisco.transport.model.dto.response.AvailableTranspor
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.queues.config.QueuesConfig;
+import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.services.TransportsQueryService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
 import org.microarchitecturovisco.transport.utils.json.JsonReader;
@@ -30,9 +32,22 @@ public class TransportsQueryController {
     private final TransportsQueryService transportsQueryService;
     private final RabbitTemplate rabbitTemplate;
 
+
     @GetMapping("/")
     public List<TransportDto> getAllTransports() {
         return transportsQueryService.getAllTransports();
+    }
+
+    @GetMapping("/locations")
+    public List<LocationDto> getLocations() {
+        return LocationMapper.mapList(transportsQueryService.getAllLocations());
+    }
+
+    @GetMapping("/locations/{region}")
+    public LocationDto getLocationByRegionName(
+            @PathVariable String region
+    ) {
+        return LocationMapper.map(transportsQueryService.getLocationByRegionName(region));
     }
 
     @GetMapping("/available")
@@ -46,7 +61,7 @@ public class TransportsQueryController {
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBySearchQuery")
-    public void consumeGetTransportsRequest(String requestDtoJson) {
+    public String consumeGetTransportsRequest(String requestDtoJson) {
         long startTime = System.currentTimeMillis();
 
         GetTransportsBySearchQueryRequestDto requestDto = JsonReader.readGetTransportsBySearchQueryRequestFromJson(requestDtoJson);
@@ -57,7 +72,7 @@ public class TransportsQueryController {
         System.out.println("Send transports response size " + responseDto.getTransportDtoList().size());
         System.out.println("Service call took " + (endTime - startTime) + " ms");
 
-        rabbitTemplate.convertAndSend("transports.responses.getTransportsBySearchQuery", JsonConverter.convertGetTransportsBySearchQueryResponseDto(responseDto));
+        return JsonConverter.convertGetTransportsBySearchQueryResponseDto(responseDto);
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBetweenLocations")
@@ -74,7 +89,6 @@ public class TransportsQueryController {
         GetTransportsBetweenMultipleLocationsRequestDto requestDto = JsonReader.readDtoFromJson(requestDtoJson, GetTransportsBetweenMultipleLocationsRequestDto.class);
 
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenMultipleLocations(requestDto);
-
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 

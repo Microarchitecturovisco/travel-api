@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class OfferDto {
-    private Integer idHotel;
+    private String idHotel;
     private String hotelName;
     private Float price;
     private String destination;

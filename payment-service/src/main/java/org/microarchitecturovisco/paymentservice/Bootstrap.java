@@ -5,6 +5,7 @@ import org.microarchitecturovisco.paymentservice.models.dto.HandlePaymentRequest
 import org.microarchitecturovisco.paymentservice.utils.JsonConverter;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
