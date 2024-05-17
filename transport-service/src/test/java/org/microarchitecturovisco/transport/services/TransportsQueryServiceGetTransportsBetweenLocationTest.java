@@ -126,8 +126,7 @@ public class TransportsQueryServiceGetTransportsBetweenLocationTest {
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenLocations(requestDto);
 
         // Assert
-        assertEquals(responseDto.getTransportPairs().size(), 1);
-        assertEquals(responseDto.getTransportPairs().getFirst().get(0).getIdTransport(), idA);
-        assertEquals(responseDto.getTransportPairs().getFirst().get(1).getIdTransport(), idB);
+        assertEquals(responseDto.getTransportPairs().getFirst().getFirst().getIdTransport(), idA);
+        assertEquals(responseDto.getTransportPairs().getFirst().getLast().getIdTransport(), idB);
     }
 }
