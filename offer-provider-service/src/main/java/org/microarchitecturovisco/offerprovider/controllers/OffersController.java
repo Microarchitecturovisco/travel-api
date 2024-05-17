@@ -37,14 +37,14 @@ public class OffersController {
         departureBuses = departureBuses != null ? departureBuses : new ArrayList<>();
         departurePlane = departurePlane != null ? departurePlane : new ArrayList<>();
 
-        List<UUID> bds = departureBuses.stream().map(UUID::fromString).toList();
-        List<UUID> bps = departurePlane.stream().map(UUID::fromString).toList();
-        List<UUID> ars = arrivals.stream().map(UUID::fromString).toList();
+        List<UUID> departureBusesWithUUIDs = departureBuses.stream().map(UUID::fromString).toList();
+        List<UUID> departurePlanesWithUUIDs = departurePlane.stream().map(UUID::fromString).toList();
+        List<UUID> arrivalsWithUUIDs = arrivals.stream().map(UUID::fromString).toList();
 
 
-        return offersService.getOffersBasedOnSearchQuery(bds,
-                bps,
-                ars,
+        return offersService.getOffersBasedOnSearchQuery(departureBusesWithUUIDs,
+                departurePlanesWithUUIDs,
+                arrivalsWithUUIDs,
                 dateFrom,
                 dateTo,
                 adults,

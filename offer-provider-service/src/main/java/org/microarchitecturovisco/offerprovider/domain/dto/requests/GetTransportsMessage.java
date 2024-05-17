@@ -19,8 +19,6 @@ public class GetTransportsMessage implements Serializable {
 
     private TransportType transportType;
 
-//    private List<UUID> departureLocationIdsByPlane;
-//    private List<UUID> departureLocationIdsByBus;
     private List<UUID> departureLocationIds;
     private List<UUID> arrivalLocationIds;
 
