@@ -22,7 +22,7 @@ public class RabbitMQConfig {
 
     @Bean
     public MessageListenerAdapter listenerAdapter(HotelsController consumer, MessageConverter messageConverter) {
-        MessageListenerAdapter adapter = new MessageListenerAdapter(consumer, "consumeMessageFromQueue");
+        MessageListenerAdapter adapter = new MessageListenerAdapter(consumer, "consumeMessageCreateHotelReservation");
         adapter.setMessageConverter(messageConverter);
         return adapter;
     }

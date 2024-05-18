@@ -1,9 +1,6 @@
 package org.microarchitecturovisco.reservationservice.queues.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +12,7 @@ public class QueuesHotelConfig {
     public static final String QUEUE_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
     public static final String ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.routingKey";
 
-    public static final String QUEUE_HOTEL_CREATE_RESERVATION_REQ = "hotels.events.createHotelReservation.queue";
-    public static final String ROUTING_KEY_HOTEL_CREATE_RESERVATION_REQ = "hotels.events.createHotelReservation.routingKey";
+    public static final String EXCHANGE_HOTEL_FANOUT = "hotels.createReservation.exchange";
 
     @Bean
     @Qualifier("handleHotelExchange")
@@ -37,16 +33,8 @@ public class QueuesHotelConfig {
     }
 
 
-    // todo create fanout hotel exchange
     @Bean
-    @Qualifier("handleCreateHotelReservationQueue")
-    public Queue handleCreateHotelReservationQueue() {
-        return new Queue(QUEUE_HOTEL_CREATE_RESERVATION_REQ, false);
-    }
-
-    @Bean
-    public Binding handleCreateHotelReservationRequestBinding(@Qualifier("handleHotelExchange") TopicExchange exchange,
-                                                              @Qualifier("handleCreateHotelReservationQueue") Queue queue) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_HOTEL_CREATE_RESERVATION_REQ);
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT);
     }
 }
