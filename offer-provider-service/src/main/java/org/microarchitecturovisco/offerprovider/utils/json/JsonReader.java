@@ -27,4 +27,13 @@ public class JsonReader {
         }
     }
 
+    public static <T> T readJson(String json, Class<T> dtoClass) {
+        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        try {
+            return mapper.readValue(json, dtoClass);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Json reader failed");
+        }
+    }
 }

@@ -68,6 +68,7 @@ public class HotelEventProjector {
         CateringOption cateringOption = CateringOption.builder()
                 .id(event.getIdCatering())
                 .price(event.getPrice())
+                .hotel(hotel)
                 .rating(event.getRating())
                 .type(event.getType())
                 .build();

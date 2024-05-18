@@ -1,5 +1,6 @@
 package org.microarchitecturovisco.paymentservice.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.paymentservice.models.dto.HandlePaymentRequestDto;
 import org.microarchitecturovisco.paymentservice.models.dto.HandlePaymentResponseDto;
