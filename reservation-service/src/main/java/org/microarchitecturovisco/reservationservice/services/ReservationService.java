@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.CreateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
+import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,19 +19,21 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
-    private final ReservationRepository reservationRepository;
-    private final ReservationAggregate reservationAggregate;
 
     private final BookHotelsSaga bookHotelsSaga;
     private final BookTransportsSaga bookTransportsSaga;
+
+    private final ReservationRepository reservationRepository;
+    private final ReservationAggregate reservationAggregate;
+    private final RabbitTemplate rabbitTemplate;
+
     public Reservation createReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
-                                         int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
-                                         float price, int hotelId, List<String> roomReservationsIds,
-                                         List<String> transportReservationsIds, int userId) {
-        String id = UUID.randomUUID().toString();
+                                                      int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
+                                                      float price, UUID hotelId, List<UUID> roomReservationsIds,
+                                                      List<UUID> transportReservationsIds, UUID userId, UUID reservationId) {
 
         CreateReservationCommand command = CreateReservationCommand.builder()
-                .id(id)
+                .id(reservationId)
                 .hotelTimeFrom(hotelTimeFrom)
                 .hotelTimeTo(hotelTimeTo)
                 .infantsQuantity(infantsQuantity)
@@ -43,32 +47,31 @@ public class ReservationService {
                 .transportReservationsIds(transportReservationsIds)
                 .userId(userId)
                 .build();
-
         reservationAggregate.handleCreateReservationCommand(command);
-        return reservationRepository.findById(id).orElseThrow(RuntimeException::new);
+        return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+        // boolean hotelIsAvailable = true; // debug only
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
 
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
         boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        // boolean transportIsAvailable = true; // debug only
+        System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 
-        //todo: Create Reservation here --> use createReservation()
-        // Tworzony jest obiekt rezerwacji
-        // Orkiestrator wysyła event stworzenia obiektu do kolejki reservations.events.createReservation
-        // Reservations tworzy instancje
-
+        UUID reservationId = UUID.randomUUID();
+        createReservationFromRequest(reservationRequest, reservationId);
+        System.out.println("reservationCreated: " + reservationId);
 
 
         // todo: reserve hotel
         //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
-
 
 
         // todo: reserve transport
@@ -82,7 +85,13 @@ public class ReservationService {
 
 
 
-        return null; // Id rezerwacji
+        return null; // reservationId
+    }
+
+    public void createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
+        reservationRequest.setId(reservationId);
+
+        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
     }
 
 }
