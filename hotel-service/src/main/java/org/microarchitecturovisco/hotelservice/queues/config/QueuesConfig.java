@@ -14,7 +14,7 @@ public class QueuesConfig {
 
     @Bean
     public Queue handleReservationQueue() {
-        return new Queue(QUEUE_HOTEL_BOOK_REQ);
+        return new Queue(QUEUE_HOTEL_BOOK_REQ, false);
     }
 
     @Bean

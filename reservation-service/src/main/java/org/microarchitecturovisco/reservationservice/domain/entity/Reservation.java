@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,11 +26,11 @@ public class Reservation {
     @NotNull
     private LocalDateTime hotelTimeTo;
 
-    private int infantsQuantity;
+    private int childrenUnder3Quantity;
 
-    private int kidsQuantity;
+    private int childrenUnder10Quantity;
 
-    private int teensQuantity;
+    private int childrenUnder18Quantity;
 
     @NotNull
     private int adultsQuantity;
@@ -46,11 +45,11 @@ public class Reservation {
     private UUID hotelId;
 
     @NotNull
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<UUID> roomReservationsIds;
 
     @NotNull
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<UUID> transportReservationsIds;
 
     @NotNull

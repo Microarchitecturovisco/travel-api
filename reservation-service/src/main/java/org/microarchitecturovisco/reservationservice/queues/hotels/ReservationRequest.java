@@ -11,7 +11,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ReservationRequest {
+public class ReservationRequest implements Serializable {
+    private UUID id;
+
     private LocalDateTime hotelTimeFrom;
 
     private LocalDateTime hotelTimeTo;
@@ -33,5 +35,4 @@ public class ReservationRequest {
     private List<UUID> roomReservationsIds;
     private List<UUID> transportReservationsIds;
     private UUID userId;
-    private UUID reservationId;
 }

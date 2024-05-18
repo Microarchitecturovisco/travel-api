@@ -48,38 +48,31 @@ public class ReservationService {
                 .transportReservationsIds(transportReservationsIds)
                 .userId(userId)
                 .build();
-
+        reservationAggregate.handleCreateReservationCommand(command);
         return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
-//        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-        boolean hotelIsAvailable = true;
-        System.out.println("hotelIsAvailable: " + hotelIsAvailable);
+        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+        // boolean hotelIsAvailable = true; // debug only
+        System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
-//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        boolean transportIsAvailable = true;
+        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        // boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 
-        //todo: Create Reservation here --> use createReservation()
-        // Tworzony jest obiekt rezerwacji
-        // Orkiestrator wysyła event stworzenia obiektu do kolejki reservations.events.createReservation
-        // Reservations tworzy instancje
-        Reservation reservation = createReservationFromRequest(reservationRequest);
-        System.out.println("MAIN reservationCreated: " + reservation);
-        if(reservation==null) { throw new ReservationFailException(); }
-
-
+        UUID reservationId = UUID.randomUUID();
+        createReservationFromRequest(reservationRequest, reservationId);
+        System.out.println("reservationCreated: " + reservationId);
 
 
         // todo: reserve hotel
         //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
-
 
 
         // todo: reserve transport
@@ -92,8 +85,13 @@ public class ReservationService {
         //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
 
 
+        return null; // reservationId
+    }
 
-        return null; // Id rezerwacji
+    public void createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
+        reservationRequest.setId(reservationId);
+
+        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
     }
 
 

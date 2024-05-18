@@ -2,7 +2,9 @@ package org.microarchitecturovisco.hotelservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CheckHotelAvailabilityRequest;
+import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
+import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySearchQueryResponseDto;
 import org.microarchitecturovisco.hotelservice.queues.config.QueuesConfig;
 import org.microarchitecturovisco.hotelservice.services.HotelsService;
@@ -29,6 +31,16 @@ public class HotelsController {
 
 
         return JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto);
+    }
+
+    @RabbitListener(queues = "hotels.requests.getHotelDetails")
+    public String consumeGetHotelDetails(String requestDtoJson) {
+
+        GetHotelDetailsRequestDto requestDto = JsonReader.readGetHotelDetailsRequestFromJson(requestDtoJson);
+        GetHotelDetailsResponseDto responseDto = hotelsService.getHotelDetails(requestDto);
+
+
+        return JsonConverter.convertGetHotelDetailsResponseDto(responseDto);
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_BOOK_REQ)

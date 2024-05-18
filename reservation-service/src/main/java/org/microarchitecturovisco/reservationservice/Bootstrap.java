@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class Bootstrap implements CommandLineRunner {
-
     @Override
     public void run(String... args) {
 

@@ -22,13 +22,12 @@ public class ReservationController {
 
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
-        try{
+        try {
             UUID reservationId = reservationService.bookOrchestration(reservationRequest);
+        } catch (ReservationFailException exception) {
+            return "ReservationFailException exception occurred";
         }
-        catch (ReservationFailException exception){
-            return "EXCEPTION ReservationFailException";
-        }
-        return "SUCCESS";
+        return "FULL SUCCESS";
     }
 
     @GetMapping("/test")
@@ -47,9 +46,8 @@ public class ReservationController {
                 UUID.randomUUID());
     }
 
-    @RabbitListener(queues = QueuesReservationConfig.QUEUE_RESERVATION_CREATE_REQ)
+    @RabbitListener(queues = "#{handleReservationCreateQueue.name}")
     public void consumeMessageCreateReservation(ReservationRequest reservationRequest) {
-        System.out.println("COPY Message received: " + reservationRequest);
         Reservation reservation = reservationService.createReservation(
                 reservationRequest.getHotelTimeFrom(),
                 reservationRequest.getHotelTimeTo(),
@@ -62,10 +60,8 @@ public class ReservationController {
                 reservationRequest.getRoomReservationsIds(),
                 reservationRequest.getTransportReservationsIds(),
                 reservationRequest.getUserId(),
-                reservationRequest.getReservationId()
+                reservationRequest.getId()
         );
-        System.out.println("COPY: Reservation after creation: " + reservation.getId());
+        System.out.println("Reservation created successfully: " + reservation.getId());
     }
-
-
 }
