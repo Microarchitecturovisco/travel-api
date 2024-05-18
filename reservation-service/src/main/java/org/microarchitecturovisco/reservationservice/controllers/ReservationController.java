@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.reservationservice.domain.model.PurchaseRequestBody;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
@@ -15,13 +16,10 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/reservations")
 @RequiredArgsConstructor
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
 
     private final ReservationService reservationService;
 
@@ -39,12 +37,12 @@ public class ReservationController {
     @GetMapping("/test")
     public Reservation test() {
         return reservationService.createReservation(LocalDateTime.now(), LocalDateTime.now(), 1, 1, 0, 2,
-                9642.01f, 1, List.of(), List.of(), 1);
+                9642.01f, UUID.randomUUID().toString(), List.of(), List.of(), 1);
     }
 
     @PostMapping("/purchase")
-    public ReservationConfirmationResponse purchase() {
-        return null;
+    public ReservationConfirmationResponse purchase(@RequestBody PurchaseRequestBody requestBody) {
+        return reservationService.purchaseReservation(requestBody.getReservationId(), requestBody.getCardNumber());
     }
 
 }

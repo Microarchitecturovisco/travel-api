@@ -41,7 +41,7 @@ public class Reservation {
     private boolean paid;
 
     @NotNull
-    private int hotelId;
+    private String hotelId;
 
     @NotNull
     @ElementCollection

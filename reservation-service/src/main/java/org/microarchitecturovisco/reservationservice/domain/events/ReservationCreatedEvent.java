@@ -27,7 +27,7 @@ public class ReservationCreatedEvent extends ReservationEvent {
     private int adultsQuantity;
     private float price;
     private boolean paid;
-    private int hotelId;
+    private String hotelId;
     @ElementCollection
     private List<String> roomReservationsIds;
     @ElementCollection

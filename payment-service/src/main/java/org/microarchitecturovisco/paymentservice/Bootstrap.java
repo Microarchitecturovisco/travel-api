@@ -30,9 +30,8 @@ public class Bootstrap implements CommandLineRunner {
 
         String response = (String) rabbitTemplate.convertSendAndReceive(exchange.getName(), "payments.handlePayment", JsonConverter.convertHandlePaymentRequestDto(
                 HandlePaymentRequestDto.builder()
-                        .id(testId)
                         .cardNumber("1234567812345678")
-                        .idReservation(UUID.randomUUID())
+                        .idReservation(UUID.randomUUID().toString())
                         .build()
         ));
 
@@ -48,9 +47,8 @@ public class Bootstrap implements CommandLineRunner {
 
         String response = (String) rabbitTemplate.convertSendAndReceive(exchange.getName(), "payments.handlePayment", JsonConverter.convertHandlePaymentRequestDto(
                 HandlePaymentRequestDto.builder()
-                        .id(testId)
                         .cardNumber("1234567812345677")
-                        .idReservation(UUID.randomUUID())
+                        .idReservation(UUID.randomUUID().toString())
                         .build()
         ));
 
