@@ -34,6 +34,7 @@ public class HotelsService {
         Hotel hotel = hotelRepository.findById(requestDto.getHotelId()).orElseThrow();
 
         GetHotelDetailsResponseDto responseDto = GetHotelDetailsResponseDto.builder()
+                .hotelId(hotel.getId())
                 .description(hotel.getDescription())
                 .rating(hotel.getRating())
                 .hotelName(hotel.getName())

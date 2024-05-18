@@ -12,10 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Component
@@ -63,6 +60,15 @@ public class CateringOptionParser {
 
             if (hotelOpt.isPresent()) {
                 cateringOption.setHotelId(hotelOpt.get().getHotelId());
+                HotelDto hotelDto = hotels.stream().filter(hotel -> {
+                    try {
+                        return Objects.equals(hotel.getName(), HotelCsvReader.getHotelNameById(hotelId));
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList().getFirst();
+                hotelDto.getCateringOptions().add(cateringOption);
+
                 return cateringOption;
             } else {
                 logger.info("Hotel not found for catering option with ID: " + hotelId);
