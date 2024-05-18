@@ -93,34 +93,4 @@ public class ReservationService {
 
         rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
     }
-
-
-    public Reservation createReservationFromRequest(ReservationRequest reservationRequest){
-        UUID reservationId = UUID.randomUUID();
-
-        reservationRequest.setReservationId(reservationId);
-
-        Reservation reservation = createReservation(
-                reservationRequest.getHotelTimeFrom(),
-                reservationRequest.getHotelTimeTo(),
-                reservationRequest.getChildrenUnder3Quantity(),
-                reservationRequest.getChildrenUnder10Quantity(),
-                reservationRequest.getChildrenUnder18Quantity(),
-                reservationRequest.getAdultsQuantity(),
-                reservationRequest.getPrice(),
-                reservationRequest.getHotelId(),
-                reservationRequest.getRoomReservationsIds(),
-                reservationRequest.getTransportReservationsIds(),
-                reservationRequest.getUserId(),
-                reservationRequest.getReservationId()
-        );
-
-        rabbitTemplate.convertAndSend(
-                QueuesReservationConfig.EXCHANGE_RESERVATION,
-                QueuesReservationConfig.ROUTING_KEY_RESERVATION_CREATE_REQ,
-                reservationRequest
-        );
-
-        return reservation;
-    }
 }

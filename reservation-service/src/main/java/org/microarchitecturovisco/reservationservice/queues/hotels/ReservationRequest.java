@@ -2,12 +2,15 @@ package org.microarchitecturovisco.reservationservice.queues.hotels;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Builder
 @Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

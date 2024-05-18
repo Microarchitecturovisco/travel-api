@@ -2,7 +2,6 @@ package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
-import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
