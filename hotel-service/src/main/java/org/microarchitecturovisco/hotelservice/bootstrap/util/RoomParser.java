@@ -47,12 +47,13 @@ public class RoomParser {
         String description = data[2];
         int guestCapacity = capacityCalculator.calculateGuestCapacity(roomName);
         float pricePerAdult = Float.parseFloat(data[3]);
+        UUID roomId = UUID.fromString((data[4]));
 
         Optional<HotelDto> hotelOpt = searchForHotel(hotelDtos, hotelId);
 
         if (hotelOpt.isPresent()) {
             return RoomDto.builder()
-                    .roomId(UUID.randomUUID())
+                    .roomId(roomId)
                     .hotelId(hotelOpt.get().getHotelId())
                     .name(roomName)
                     .description(description)
