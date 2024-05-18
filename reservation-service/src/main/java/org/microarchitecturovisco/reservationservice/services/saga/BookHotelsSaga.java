@@ -20,13 +20,11 @@ public class BookHotelsSaga {
 
         return Boolean.parseBoolean(result);
     }
-    public boolean createHotelReservation(ReservationRequest reservationRequest) {
-        String result = (String) rabbitTemplate.convertSendAndReceive(
+    public void createHotelReservation(ReservationRequest reservationRequest) {
+        rabbitTemplate.convertAndSend(
                 QueuesHotelConfig.EXCHANGE_HOTEL,
                 QueuesHotelConfig.ROUTING_KEY_HOTEL_CREATE_RESERVATION_REQ,
                 reservationRequest
         );
-
-        return Boolean.parseBoolean(result);
     }
 }

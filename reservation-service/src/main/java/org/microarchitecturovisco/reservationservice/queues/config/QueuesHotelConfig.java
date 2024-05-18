@@ -36,6 +36,8 @@ public class QueuesHotelConfig {
         return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ);
     }
 
+
+    // todo create fanout hotel exchange
     @Bean
     @Qualifier("handleCreateHotelReservationQueue")
     public Queue handleCreateHotelReservationQueue() {
