@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
@@ -39,6 +40,11 @@ public class ReservationController {
     public Reservation test() {
         return reservationService.createReservation(LocalDateTime.now(), LocalDateTime.now(), 1, 1, 0, 2,
                 9642.01f, 1, List.of(), List.of(), 1);
+    }
+
+    @PostMapping("/purchase")
+    public ReservationConfirmationResponse purchase() {
+        return null;
     }
 
 }
