@@ -7,6 +7,7 @@ import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetails
 import org.microarchitecturovisco.offerprovider.services.OffersService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,12 +52,22 @@ public class OffersController {
                 teens);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idHotel}")
     public GetOfferDetailsResponseDto getOfferDetails(
-            @PathVariable Integer idOffer
+            @PathVariable UUID idHotel,
+            @RequestParam(name = "date_from") String dateFrom,
+            @RequestParam(name = "date_to") String dateTo,
+            @RequestParam(name = "departure_buses", required = false) List<UUID> departureBuses,
+            @RequestParam(name = "departure_planes", required = false) List<UUID> departurePlanes,
+            @RequestParam(name = "adults") Integer adults,
+            @RequestParam(name = "infants") Integer infants,
+            @RequestParam(name = "kids") Integer kids,
+            @RequestParam(name = "teens") Integer teens
     ) {
+        GetOfferDetailsResponseDto responseDto = offersService.getOfferDetails(
+                idHotel, dateFrom, dateTo, departureBuses, departurePlanes, adults, infants, kids, teens
+        );
 
-
-        return null;
+        return responseDto;
     }
 }

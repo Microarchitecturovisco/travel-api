@@ -1,11 +1,11 @@
 package org.microarchitecturovisco.offerprovider.services;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.offerprovider.domain.dto.HotelDto;
-import org.microarchitecturovisco.offerprovider.domain.dto.LocationDto;
-import org.microarchitecturovisco.offerprovider.domain.dto.OfferDto;
+import org.microarchitecturovisco.offerprovider.domain.dto.*;
+import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.requests.GetTransportsMessage;
+import org.microarchitecturovisco.offerprovider.domain.dto.responses.GetHotelDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.GetHotelsBySearchQueryResponseDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportsBasedOnSearchQueryResponse;
@@ -14,6 +14,7 @@ import org.microarchitecturovisco.offerprovider.domain.exceptions.WrongDateForma
 import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonConverter;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonReader;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.AmqpTimeoutException;
 import org.springframework.amqp.core.DirectExchange;
@@ -23,16 +24,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class OffersService {
 
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(OffersService.class);
     private final RabbitTemplate rabbitTemplate;
 
     private final DirectExchange transportsExchange;
@@ -272,7 +277,96 @@ public class OffersService {
 
     }
 
-    public GetOfferDetailsResponseDto getOfferDetails() {
-        
+    public GetOfferDetailsResponseDto getOfferDetails(
+            UUID idHotel,
+            String dateFrom,
+            String dateTo,
+            List<UUID> departureBuses,
+            List<UUID> departurePlanes,
+            Integer adults,
+            Integer infants,
+            Integer kids,
+            Integer teens
+    ) {
+        Pair<LocalDateTime, LocalDateTime> dates = parseDates(dateFrom, dateTo);
+
+        GetHotelDetailsRequestDto requestDto = GetHotelDetailsRequestDto.builder()
+                .hotelId(idHotel)
+                .dateFrom(dates.getFirst())
+                .dateTo(dates.getSecond())
+                .adults(adults)
+                .childrenUnderThree(infants)
+                .childrenUnderTen(kids)
+                .childrenUnderEighteen(teens)
+                .build();
+
+        String getOfferDetailsRequestString = JsonConverter.convert(requestDto);
+
+        try {
+            byte[] getOfferDetailsBytes = (byte[]) rabbitTemplate.convertSendAndReceive(
+                    "hotels.requests.getHotelDetails",
+                    "hotels.requests.getHotelDetails",
+                    getOfferDetailsRequestString
+            );
+
+            if (getOfferDetailsBytes != null) {
+                String getOfferDetailsResponseString = (new String(getOfferDetailsBytes)).replace("\\", "");
+                getOfferDetailsResponseString = getOfferDetailsResponseString.substring(1, getOfferDetailsResponseString.length() - 1);
+                GetHotelDetailsResponseDto responseDto = JsonReader.readJson(getOfferDetailsResponseString, GetHotelDetailsResponseDto.class);
+
+                Logger logger = Logger.getLogger("Offer Provider");
+                logger.info("Offer details" + idHotel + ": Received hotel details");
+
+                List<TransportDto> transportsToHotel = getFilteredTransportsFromTransportModule(
+                        departureBuses, departurePlanes,
+                        List.of(responseDto.getLocation().getIdLocation()),
+                        dates.getFirst(), dates.getSecond(),
+                        adults, infants, kids, teens
+                ).stream()
+                        .filter(list -> list.size() > 1)
+                        .map(List::getFirst)
+                        .sorted(Comparator.comparing(TransportDto::getPricePerAdult))
+                        .toList();
+                logger.info("Offer details " + idHotel + ": Received transports to hotel");
+
+                List<List<RoomResponseDto>> roomConfigs = responseDto
+                        .getRoomsConfigurations().stream()
+                        .sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult))
+                        .map(RoomsConfigurationDto::getRooms)
+                        .toList();
+
+                List<CateringOptionDto> catering = responseDto.getCateringOptions().stream()
+                        .sorted(Comparator.comparing(CateringOptionDto::getPrice)).toList();
+
+                return GetOfferDetailsResponseDto.builder()
+                        .idHotel(responseDto.getHotelId())
+                        .hotelName(responseDto.getHotelName())
+                        .description(responseDto.getDescription())
+                        .destination(responseDto.getLocation())
+                        .price(calculatePrice(
+                                (int) ChronoUnit.DAYS.between(dates.getFirst(), dates.getSecond()),
+                                adults, infants, kids, teens,
+                                responseDto.getRoomsConfigurations().stream().sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult)).toList().getFirst().getPricePerAdult(),
+                                catering.isEmpty() ? 0.0f : catering.getFirst().getPrice(),
+                                (int) ChronoUnit.DAYS.between(dates.getFirst(), LocalDateTime.now()),
+                                transportsToHotel.getFirst().getPricePerAdult())
+                        )
+                        .roomConfiguration(roomConfigs.getFirst())
+                        .possibleRoomConfigurations(roomConfigs.subList(1, roomConfigs.size()))
+                        .departure(transportsToHotel.getFirst())
+                        .possibleDepartures(transportsToHotel.subList(1, transportsToHotel.size()))
+                        .imageUrls(responseDto.getPhotos())
+                        .cateringOptions(catering)
+                        .build();
+            }
+            else {
+                System.out.println("Null message at: getOfferDetails()");
+                throw new ServiceTimeoutException();
+            }
+        }
+        catch (AmqpException e) {
+            e.printStackTrace();
+            throw new ServiceTimeoutException();
+        }
     }
 }
