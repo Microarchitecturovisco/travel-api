@@ -12,8 +12,6 @@ import org.microarchitecturovisco.reservationservice.services.saga.BookTransport
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -55,22 +53,21 @@ public class ReservationService {
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
-        // boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-        boolean hotelIsAvailable = true; // debug only
+        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+        // boolean hotelIsAvailable = true; // debug only
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
 
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
-        // boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        boolean transportIsAvailable = true; // debug only
+        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        // boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 
         UUID reservationId = UUID.randomUUID();
-        Reservation reservation = createReservationFromRequest(reservationRequest, reservationId);
-        System.out.println("reservationCreated: " + reservation);
-        if(reservation==null) { throw new ReservationFailException(); }
+        createReservationFromRequest(reservationRequest, reservationId);
+        System.out.println("reservationCreated: " + reservationId);
 
 
         // todo: reserve hotel
@@ -88,44 +85,13 @@ public class ReservationService {
 
 
 
-        return null; // reservation.getId()
+        return null; // reservationId
     }
 
-    private Reservation getReservationAfterCreation(UUID reservationId, long maxWaitTimeInSeconds) {
-        Duration maxWaitTime = Duration.ofSeconds(maxWaitTimeInSeconds);
-
-        Instant startTime = Instant.now();
-        Reservation reservation = null;
-        // Loop until the reservation is found or timeout is reached
-        while (reservation == null) {
-            reservation = reservationRepository.findById(reservationId).orElse(null);
-
-            // Check if timeout is reached
-            if (Duration.between(startTime, Instant.now()).compareTo(maxWaitTime) >= 0) {
-                System.out.println("Timeout reached. Reservation not found.");
-                throw new RuntimeException("Timeout reached. Reservation not found.");
-            }
-
-            // Wait for a short period before checking again
-            try {
-                Thread.sleep(100); // millisecond
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Thread interrupted while waiting for reservation.");
-            }
-        }
-        return reservation;
-    }
-
-
-
-    public Reservation createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
+    public void createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
         reservationRequest.setId(reservationId);
 
         rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
-
-        // wait until the reservation is created and then return it
-        return getReservationAfterCreation(reservationId, 5);
     }
 
 }
