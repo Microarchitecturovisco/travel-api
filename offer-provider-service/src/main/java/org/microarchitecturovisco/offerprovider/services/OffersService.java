@@ -11,6 +11,7 @@ import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDt
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportsBasedOnSearchQueryResponse;
 import org.microarchitecturovisco.offerprovider.domain.exceptions.ServiceTimeoutException;
 import org.microarchitecturovisco.offerprovider.domain.exceptions.WrongDateFormatException;
+import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonConverter;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonReader;
 import org.springframework.amqp.AmqpException;
@@ -269,5 +270,9 @@ public class OffersService {
             throw new ServiceTimeoutException();
         }
 
+    }
+
+    public GetOfferDetailsResponseDto getOfferDetails() {
+        
     }
 }

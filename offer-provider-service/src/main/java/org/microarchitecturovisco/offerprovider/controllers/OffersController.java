@@ -3,11 +3,9 @@ package org.microarchitecturovisco.offerprovider.controllers;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.offerprovider.domain.dto.OfferDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDto;
+import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.services.OffersService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +18,7 @@ public class OffersController {
 
     private final OffersService offersService;
 
-    @GetMapping("/transports")
+    @GetMapping("/")
     public List<OfferDto> getOffersBasedOnSearchQuery(
             @RequestParam(name = "departureBus", required = false) List<String> departureBuses,
             @RequestParam(name = "departurePlane", required = false) List<String> departurePlane,
@@ -51,5 +49,14 @@ public class OffersController {
                 infants,
                 kids,
                 teens);
+    }
+
+    @GetMapping("/{id}")
+    public GetOfferDetailsResponseDto getOfferDetails(
+            @PathVariable Integer idOffer
+    ) {
+
+
+        return null;
     }
 }
