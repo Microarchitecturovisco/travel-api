@@ -7,8 +7,7 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,27 +16,18 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/reservations")
 public class ReservationController {
-
 
     private final ReservationService reservationService;
 
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
-        try{
+        try {
             UUID reservationId = reservationService.bookOrchestration(reservationRequest);
+        } catch (ReservationFailException exception) {
+            return "ReservationFailException exception occurred";
         }
-        catch (ReservationFailException exception){
-            return "FAILED";
-        }
-        return "sent success";
-    }
-
-    @GetMapping("/test")
-    public Reservation test() {
-        return reservationService.createReservation(LocalDateTime.now(), LocalDateTime.now(), 1, 1, 0, 2,
-                9642.01f, UUID.randomUUID().toString(), List.of(), List.of(), 1);
+        return "FULL SUCCESS";
     }
 
     @PostMapping("/purchase")
@@ -45,4 +35,22 @@ public class ReservationController {
         return reservationService.purchaseReservation(requestBody.getReservationId(), requestBody.getCardNumber());
     }
 
+    @RabbitListener(queues = "#{handleReservationCreateQueue.name}")
+    public void consumeMessageCreateReservation(ReservationRequest reservationRequest) {
+        Reservation reservation = reservationService.createReservation(
+                reservationRequest.getHotelTimeFrom(),
+                reservationRequest.getHotelTimeTo(),
+                reservationRequest.getChildrenUnder3Quantity(),
+                reservationRequest.getChildrenUnder10Quantity(),
+                reservationRequest.getChildrenUnder18Quantity(),
+                reservationRequest.getAdultsQuantity(),
+                reservationRequest.getPrice(),
+                reservationRequest.getHotelId(),
+                reservationRequest.getRoomReservationsIds(),
+                reservationRequest.getTransportReservationsIds(),
+                reservationRequest.getUserId(),
+                reservationRequest.getId()
+        );
+        System.out.println("Reservation created successfully: " + reservation.getId());
+    }
 }

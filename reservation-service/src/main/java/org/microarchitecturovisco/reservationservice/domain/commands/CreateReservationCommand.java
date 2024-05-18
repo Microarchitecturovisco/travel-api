@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -19,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateReservationCommand {
     @Id
-    private String id;
+    private UUID id;
     private LocalDateTime hotelTimeFrom;
     private LocalDateTime hotelTimeTo;
     private int infantsQuantity;
@@ -30,8 +31,8 @@ public class CreateReservationCommand {
     private boolean paid;
     private String hotelId;
     @ElementCollection
-    private List<String> roomReservationsIds;
+    private List<UUID> roomReservationsIds;
     @ElementCollection
-    private List<String> transportReservationsIds;
-    private int userId;
+    private List<UUID> transportReservationsIds;
+    private UUID userId;
 }

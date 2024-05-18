@@ -5,8 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
+
 
 @Entity
 @Getter
@@ -14,10 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class Reservation {
 
     @Id
-    private String id;
+    private UUID id;
 
     @NotNull
     private LocalDateTime hotelTimeFrom;
@@ -25,11 +27,11 @@ public class Reservation {
     @NotNull
     private LocalDateTime hotelTimeTo;
 
-    private int infantsQuantity;
+    private int childrenUnder3Quantity;
 
-    private int kidsQuantity;
+    private int childrenUnder10Quantity;
 
-    private int teensQuantity;
+    private int childrenUnder18Quantity;
 
     @NotNull
     private int adultsQuantity;
@@ -44,13 +46,13 @@ public class Reservation {
     private String hotelId;
 
     @NotNull
-    @ElementCollection
-    private List<String> roomReservationsIds;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<UUID> roomReservationsIds;
 
     @NotNull
-    @ElementCollection
-    private List<String> transportReservationsIds;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<UUID> transportReservationsIds;
 
     @NotNull
-    private int userId;
+    private UUID userId;
 }

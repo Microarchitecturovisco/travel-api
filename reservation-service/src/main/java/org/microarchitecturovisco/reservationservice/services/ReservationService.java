@@ -13,6 +13,7 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.domain.model.LocationReservationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
+import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
@@ -48,13 +49,12 @@ public class ReservationService {
     private final RabbitTemplate rabbitTemplate;
 
     public Reservation createReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
-                                         int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
-                                         float price, String hotelId, List<String> roomReservationsIds,
-                                         List<String> transportReservationsIds, int userId) {
-        String id = UUID.randomUUID().toString();
+                                                      int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
+                                                      float price, UUID hotelId, List<UUID> roomReservationsIds,
+                                                      List<UUID> transportReservationsIds, UUID userId, UUID reservationId) {
 
         CreateReservationCommand command = CreateReservationCommand.builder()
-                .id(id)
+                .id(reservationId)
                 .hotelTimeFrom(hotelTimeFrom)
                 .hotelTimeTo(hotelTimeTo)
                 .infantsQuantity(infantsQuantity)
@@ -63,37 +63,36 @@ public class ReservationService {
                 .adultsQuantity(adultsQuantity)
                 .price(price)
                 .paid(false)
-                .hotelId(hotelId)
+                .hotelId(hotelId.toString())
                 .roomReservationsIds(roomReservationsIds)
                 .transportReservationsIds(transportReservationsIds)
                 .userId(userId)
                 .build();
-
         reservationAggregate.handleCreateReservationCommand(command);
-        return reservationRepository.findById(id).orElseThrow(RuntimeException::new);
+        return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+        // boolean hotelIsAvailable = true; // debug only
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
 
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
         boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        // boolean transportIsAvailable = true; // debug only
+        System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
 
-        //todo: Create Reservation here --> use createReservation()
-        // Tworzony jest obiekt rezerwacji
-        // Orkiestrator wysyła event stworzenia obiektu do kolejki reservations.events.createReservation
-        // Reservations tworzy instancje
-
+        UUID reservationId = UUID.randomUUID();
+        createReservationFromRequest(reservationRequest, reservationId);
+        System.out.println("reservationCreated: " + reservationId);
 
 
         // todo: reserve hotel
         //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
-
 
 
         // todo: reserve transport
@@ -108,15 +107,19 @@ public class ReservationService {
 
         // Tu jest nie dokończony kod, który stanowi podstawę pod obsługę płatności (reservationId będzie gdzieś z góry)
 
-        String reservationId = UUID.randomUUID().toString();
-
         Runnable paymentTimeoutRunnable = () -> {
-            paymentTimeout(reservationId);
+            paymentTimeout(reservationId.toString());
         };
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-        return null; // Id rezerwacji
+        return null; // reservationId
+    }
+
+    public void createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
+        reservationRequest.setId(reservationId);
+
+        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
     }
 
     public void paymentTimeout(String reservationId) {
@@ -137,10 +140,10 @@ public class ReservationService {
             throw new RuntimeException(); //temporary
         }
 
-        reservationAggregate.handleReservationUpdateCommand(UpdateReservationCommand.builder().reservationId(reservationId).paid(true).build());
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(ReservationNotFoundAfterPaymentException::new);
+        reservationAggregate.handleReservationUpdateCommand(UpdateReservationCommand.builder().reservationId(UUID.fromString(reservationId)).paid(true).build());
+        Reservation reservation = reservationRepository.findById(UUID.fromString(reservationId)).orElseThrow(ReservationNotFoundAfterPaymentException::new);
         HotelInfo hotelInfo = getHotelInformation(reservation.getHotelId());
-        TransportReservationResponse transportInfo = getTransportInformation(reservation.getTransportReservationsIds());
+        TransportReservationResponse transportInfo = getTransportInformation(reservation.getTransportReservationsIds().stream().map(UUID::toString).toList());
 
         return ReservationConfirmationResponse.builder()
                 .hotelName(hotelInfo.getName())
@@ -148,9 +151,9 @@ public class ReservationService {
                 .dateFrom(reservation.getHotelTimeFrom())
                 .dateTo(reservation.getHotelTimeTo())
                 .adults(reservation.getAdultsQuantity())
-                .infants(reservation.getInfantsQuantity())
-                .kids(reservation.getKidsQuantity())
-                .teens(reservation.getTeensQuantity())
+                .infants(reservation.getChildrenUnder3Quantity())
+                .kids(reservation.getChildrenUnder10Quantity())
+                .teens(reservation.getChildrenUnder18Quantity())
                 .roomTypes(hotelInfo.getRoomTypes())
                 .transport(transportInfo)
                 .build();
