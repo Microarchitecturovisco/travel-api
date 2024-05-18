@@ -64,10 +64,11 @@ public class OffersController {
             @RequestParam(name = "kids") Integer kids,
             @RequestParam(name = "teens") Integer teens
     ) {
-        GetOfferDetailsResponseDto responseDto = offersService.getOfferDetails(
+        departureBuses = departureBuses != null ? departureBuses : new ArrayList<>();
+        departurePlanes = departurePlanes != null ? departurePlanes : new ArrayList<>();
+
+        return offersService.getOfferDetails(
                 idHotel, dateFrom, dateTo, departureBuses, departurePlanes, adults, infants, kids, teens
         );
-
-        return responseDto;
     }
 }
