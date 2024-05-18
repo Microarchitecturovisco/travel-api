@@ -1,8 +1,11 @@
 package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.transport.controllers.reservations.CreateTransportReservationRequest;
+import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
+import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
@@ -10,6 +13,8 @@ import org.microarchitecturovisco.transport.model.dto.response.AvailableTranspor
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
+import org.microarchitecturovisco.transport.rabbitmq.config.QueuesConfig;
+import org.microarchitecturovisco.transport.services.TransportCommandService;
 import org.microarchitecturovisco.transport.services.TransportsQueryService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
 import org.microarchitecturovisco.transport.utils.json.JsonReader;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +37,7 @@ public class TransportsQueryController {
     private final TransportsQueryService transportsQueryService;
     private final RabbitTemplate rabbitTemplate;
 
+    private final TransportCommandService transportCommandService;
 
     @GetMapping("/")
     public List<TransportDto> getAllTransports() {
@@ -89,5 +96,35 @@ public class TransportsQueryController {
 
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenMultipleLocations(requestDto);
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
+    }
+
+    @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_CREATE_RESERVATION_REQ)
+    public void consumeMessageCreateHotelReservation(CreateTransportReservationRequest request) {
+        System.out.println("Message received from queue: " + request);
+
+        int numberOfTransportsInReservation = request.getTransportReservationsIds().size();
+
+        for (int i = 0; i < numberOfTransportsInReservation; i++) {
+            UUID idTransport = request.getTransportReservationsIds().get(i);
+
+            int occupiedSeats = request.getAdultsQuantity() +
+                                request.getChildrenUnder3Quantity() +
+                                request.getChildrenUnder10Quantity() +
+                                request.getChildrenUnder18Quantity();
+
+            TransportReservationDto reservationDto = TransportReservationDto.builder()
+                    .numberOfSeats(occupiedSeats)
+                    .idTransport(idTransport)
+                    .idTransportReservation(request.getReservationId())
+                    .build();
+
+            transportCommandService.createReservation(CreateTransportReservationCommand.builder()
+                    .uuid(reservationDto.getIdTransportReservation())
+                    .commandTimeStamp(LocalDateTime.now())
+                    .transportReservationDto(reservationDto)
+                    .build()
+            );
+        }
+
     }
 }

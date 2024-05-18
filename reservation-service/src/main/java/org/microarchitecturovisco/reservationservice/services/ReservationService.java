@@ -97,7 +97,7 @@ public class ReservationService {
 
         // todo: reserve transport
         //  Wysyłany jest event zarezerwowania transportu do kolejki transports.events.createTransportReservation
-
+        bookTransportsSaga.createTransportReservation(reservationRequest);
 
         // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
         //  (co skutkuje cofnięciem poprzednich operacji);
