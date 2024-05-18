@@ -1,16 +1,17 @@
-package org.microarchitecturovisco.paymentservice.models.dto;
+package org.microarchitecturovisco.reservationservice.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class HandlePaymentResponseDto implements Serializable {
+@NoArgsConstructor
+public class PaymentResponseDto {
     private String reservationId;
     private boolean transactionApproved;
 }

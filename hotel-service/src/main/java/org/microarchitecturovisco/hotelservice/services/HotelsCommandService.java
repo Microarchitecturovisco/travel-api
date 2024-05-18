@@ -40,13 +40,14 @@ public class HotelsCommandService {
         }
         for (CateringOptionDto cateringOptionDto : command.getHotelDto().getCateringOptions()){
             CateringOptionCreatedEvent cateringOptionCreatedEvent = CateringOptionCreatedEvent.builder()
+                    .id(UUID.randomUUID())
+                    .idHotel(command.getHotelDto().getHotelId())
                     .eventTimeStamp(command.getCommandTimeStamp())
                     .idCatering(cateringOptionDto.getCateringId())
                     .type(cateringOptionDto.getType())
                     .rating(cateringOptionDto.getRating())
                     .price(cateringOptionDto.getPrice())
                     .build();
-            cateringOptionCreatedEvent.setId(UUID.randomUUID());
             hotelEventStore.save(cateringOptionCreatedEvent);
             hotelEventProjector.project(List.of(cateringOptionCreatedEvent));
         }
