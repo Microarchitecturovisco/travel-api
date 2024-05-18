@@ -1,0 +1,64 @@
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery:8010/eureka
+  instance:
+    prefer-ip-address: true
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowed-origins:
+              - "*"
+            allowed-methods:
+              - "*"
+          "/**":
+            allowed-origin-patterns:
+              - "*"
+            allowed-methods:
+              - "*"
+      routes:
+        - id: hotel-service
+          uri: lb://hotel-service
+          predicates:
+            - Path=/hotels/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: transport-service
+          uri: lb://transport-service
+          predicates:
+            - Path=/transports/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: offer-provider-service
+          uri: lb://offer-provider-service
+          predicates:
+            - Path=/offers/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: reservation-service
+          uri: lb://reservation-service
+          predicates:
+            - Path=/reservations/**
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/payments/**
+          filters:
+            - RemoveRequestHeader=Cookie
