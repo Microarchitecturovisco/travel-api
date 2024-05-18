@@ -312,14 +312,14 @@ public class OffersService {
             if (getOfferDetailsBytes != null) {
                 String getOfferDetailsResponseString = (new String(getOfferDetailsBytes)).replace("\\", "");
                 getOfferDetailsResponseString = getOfferDetailsResponseString.substring(1, getOfferDetailsResponseString.length() - 1);
-                GetHotelDetailsResponseDto responseDto = JsonReader.readJson(getOfferDetailsResponseString, GetHotelDetailsResponseDto.class);
+                GetHotelDetailsResponseDto hotelResponseDto = JsonReader.readJson(getOfferDetailsResponseString, GetHotelDetailsResponseDto.class);
 
                 Logger logger = Logger.getLogger("Offer Provider");
                 logger.info("Offer details" + idHotel + ": Received hotel details");
 
                 List<TransportDto> transportsToHotel = getFilteredTransportsFromTransportModule(
                         departureBuses, departurePlanes,
-                        List.of(responseDto.getLocation().getIdLocation()),
+                        List.of(hotelResponseDto.getLocation().getIdLocation()),
                         dates.getFirst(), dates.getSecond(),
                         adults, infants, kids, teens
                 ).stream()
@@ -329,24 +329,24 @@ public class OffersService {
                         .toList();
                 logger.info("Offer details " + idHotel + ": Received transports to hotel");
 
-                List<List<RoomResponseDto>> roomConfigs = responseDto
+                List<List<RoomResponseDto>> roomConfigs = hotelResponseDto
                         .getRoomsConfigurations().stream()
                         .sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult))
                         .map(RoomsConfigurationDto::getRooms)
                         .toList();
 
-                List<CateringOptionDto> catering = responseDto.getCateringOptions().stream()
+                List<CateringOptionDto> catering = hotelResponseDto.getCateringOptions().stream()
                         .sorted(Comparator.comparing(CateringOptionDto::getPrice)).toList();
 
                 return GetOfferDetailsResponseDto.builder()
-                        .idHotel(responseDto.getHotelId())
-                        .hotelName(responseDto.getHotelName())
-                        .description(responseDto.getDescription())
-                        .destination(responseDto.getLocation())
+                        .idHotel(hotelResponseDto.getHotelId())
+                        .hotelName(hotelResponseDto.getHotelName())
+                        .description(hotelResponseDto.getDescription())
+                        .destination(hotelResponseDto.getLocation())
                         .price(calculatePrice(
                                 (int) ChronoUnit.DAYS.between(dates.getFirst(), dates.getSecond()),
                                 adults, infants, kids, teens,
-                                responseDto.getRoomsConfigurations().stream().sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult)).toList().getFirst().getPricePerAdult(),
+                                hotelResponseDto.getRoomsConfigurations().stream().sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult)).toList().getFirst().getPricePerAdult(),
                                 catering.isEmpty() ? 0.0f : catering.getFirst().getPrice(),
                                 (int) ChronoUnit.DAYS.between(dates.getFirst(), LocalDateTime.now()),
                                 transportsToHotel.getFirst().getPricePerAdult())
@@ -355,7 +355,7 @@ public class OffersService {
                         .possibleRoomConfigurations(roomConfigs.subList(1, roomConfigs.size()))
                         .departure(transportsToHotel.getFirst())
                         .possibleDepartures(transportsToHotel.subList(1, transportsToHotel.size()))
-                        .imageUrls(responseDto.getPhotos())
+                        .imageUrls(hotelResponseDto.getPhotos())
                         .cateringOptions(catering)
                         .build();
             }
