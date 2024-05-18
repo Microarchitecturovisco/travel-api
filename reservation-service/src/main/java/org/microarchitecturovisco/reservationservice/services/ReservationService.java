@@ -53,30 +53,23 @@ public class ReservationService {
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
-        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-        // boolean hotelIsAvailable = true; // debug only
-        System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
+        checkHotelAvailability(reservationRequest);
 
-        if(!hotelIsAvailable) { throw new ReservationFailException(); }
-
-        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        // boolean transportIsAvailable = true; // debug only
-        System.out.println("transportIsAvailable: " + transportIsAvailable);
-        if(!transportIsAvailable) { throw new ReservationFailException(); }
-
+        checkTransportAvailability(reservationRequest);
 
         UUID reservationId = UUID.randomUUID();
-        createReservationFromRequest(reservationRequest, reservationId);
-        System.out.println("reservationCreated: " + reservationId);
+        reservationRequest.setId(reservationId);
+
+        createReservationFromRequest(reservationRequest);
 
 
         // todo: reserve hotel
         //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
-
+        bookHotelsSaga.createHotelReservation(reservationRequest);
 
         // todo: reserve transport
         //  Wysyłany jest event zarezerwowania transportu do kolejki transports.events.createTransportReservation
-
+        
 
         // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
         //  (co skutkuje cofnięciem poprzednich operacji);
@@ -88,10 +81,23 @@ public class ReservationService {
         return null; // reservationId
     }
 
-    public void createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
-        reservationRequest.setId(reservationId);
+    private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
+        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+//        boolean hotelIsAvailable = true; // debug only
+        System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
+        if(!hotelIsAvailable) { throw new ReservationFailException(); }
+    }
 
+    private void checkTransportAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
+        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+//        boolean transportIsAvailable = true; // debug only
+        System.out.println("transportIsAvailable: " + transportIsAvailable);
+        if(!transportIsAvailable) { throw new ReservationFailException(); }
+    }
+
+    public void createReservationFromRequest(ReservationRequest reservationRequest) {
         rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
+        System.out.println("reservationCreated: " + reservationRequest.getId());
     }
 
 }
