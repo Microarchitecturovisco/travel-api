@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QueuesConfig {
     public static final String EXCHANGE_HOTEL = "hotels.requests.checkAvailabilityByQuery.exchange";
-    public static final String QUEUE_HOTEL_BOOK_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
+    public static final String QUEUE_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
 
     @Bean
     public Queue handleReservationQueue() {
-        return new Queue(QUEUE_HOTEL_BOOK_REQ, false);
+        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false);
     }
 
     @Bean
@@ -24,6 +24,6 @@ public class QueuesConfig {
 
     @Bean
     public Binding handleReservationRequestBinding(TopicExchange handleReservationExchange, Queue handleReservationQueue) {
-        return BindingBuilder.bind(handleReservationQueue).to(handleReservationExchange).with(QUEUE_HOTEL_BOOK_REQ);
+        return BindingBuilder.bind(handleReservationQueue).to(handleReservationExchange).with(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ);
     }
 }

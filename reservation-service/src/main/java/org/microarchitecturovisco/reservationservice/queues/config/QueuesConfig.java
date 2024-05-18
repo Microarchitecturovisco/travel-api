@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Configuration;
 public class QueuesConfig {
 
     public static final String EXCHANGE_HOTEL = "hotels.requests.checkAvailabilityByQuery.exchange";
-    public static final String QUEUE_HOTEL_BOOK_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
-    public static final String ROUTING_KEY_HOTEL_BOOK_REQ = "hotels.requests.checkAvailabilityByQuery.routingKey";
+    public static final String QUEUE_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
+    public static final String ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.routingKey";
 
     public static final String EXCHANGE_TRANSPORT = "transports.requests.checkAvailabilityByQuery.exchange";
-    public static final String QUEUE_TRANSPORT_BOOK_REQ = "transports.requests.checkAvailabilityByQuery.queue";
-    public static final String ROUTING_KEY_TRANSPORT_BOOK_REQ = "transports.requests.checkAvailabilityByQuery.routingKey";
+    public static final String QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ = "transports.requests.checkAvailabilityByQuery.queue";
+    public static final String ROUTING_KEY_TRANSPORT_CHECK_AVAILABILITY_REQ = "transports.requests.checkAvailabilityByQuery.routingKey";
 
 
     @Bean
@@ -24,10 +24,10 @@ public class QueuesConfig {
 
     @Bean
     public Queue handleReservationQueue() {
-        return new Queue(QUEUE_HOTEL_BOOK_REQ, false);
+        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false);
     }
     @Bean
     public Binding handleReservationRequestBinding(TopicExchange handleReservationExchange, Queue handleReservationQueue) {
-        return BindingBuilder.bind(handleReservationQueue).to(handleReservationExchange).with(ROUTING_KEY_HOTEL_BOOK_REQ);
+        return BindingBuilder.bind(handleReservationQueue).to(handleReservationExchange).with(ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ);
     }
 }

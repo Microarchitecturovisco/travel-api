@@ -14,11 +14,14 @@ public class BookHotelsSaga {
     public boolean checkIfHotelIsAvailable(ReservationRequest reservationRequest) {
         String result = (String) rabbitTemplate.convertSendAndReceive(
                 QueuesConfig.EXCHANGE_HOTEL,
-                QueuesConfig.ROUTING_KEY_HOTEL_BOOK_REQ,
+                QueuesConfig.ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ,
                 reservationRequest
         );
 
         return Boolean.parseBoolean(result);
     }
+    public boolean createHotelReservation(ReservationRequest reservationRequest) {
 
+        return true;
+    }
 }

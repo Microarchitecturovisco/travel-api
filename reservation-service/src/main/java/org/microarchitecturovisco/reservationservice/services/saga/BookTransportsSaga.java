@@ -14,7 +14,7 @@ public class BookTransportsSaga {
     public boolean checkIfTransportIsAvailable(ReservationRequest reservationRequest) {
         String result = (String) rabbitTemplate.convertSendAndReceive(
                 QueuesConfig.EXCHANGE_TRANSPORT,
-                QueuesConfig.ROUTING_KEY_TRANSPORT_BOOK_REQ,
+                QueuesConfig.ROUTING_KEY_TRANSPORT_CHECK_AVAILABILITY_REQ,
                 reservationRequest
         );
 

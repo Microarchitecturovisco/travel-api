@@ -43,7 +43,7 @@ public class HotelsController {
         return JsonConverter.convertGetHotelDetailsResponseDto(responseDto);
     }
 
-    @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_BOOK_REQ)
+    @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CHECK_AVAILABILITY_REQ)
     public String consumeMessageFromQueue(CheckHotelAvailabilityRequest request) {
         System.out.println("Message received from queue - example: " + request);
 
