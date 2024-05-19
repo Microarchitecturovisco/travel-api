@@ -5,32 +5,27 @@ import org.microarchitecturovisco.transport.bootstrap.util.LocationParser;
 import org.microarchitecturovisco.transport.bootstrap.util.TransportCoursesParser;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
-import org.microarchitecturovisco.transport.model.domain.Location;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
-import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.services.TransportCommandService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 @Component
@@ -41,8 +36,7 @@ public class Bootstrap implements CommandLineRunner {
     private final TransportCommandService transportCommandService;
     private final LocationRepository locationRepository;
     private final RabbitTemplate rabbitTemplate;
-
-    public File loadCSVIinitFiles(String filepathInResources)
+    public File loadCSVInitFiles(String filepathInResources)
             throws FileNotFoundException {
         return ResourceUtils.getFile(
                 filepathInResources);
@@ -50,10 +44,10 @@ public class Bootstrap implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws IOException {
-        Logger logger = Logger.getLogger("Bootstrap");
+        Logger logger = Logger.getLogger("Bootstrap | Transports");
 
-        File hotelCsvFile = loadCSVIinitFiles("classpath:initData/hotels.csv");
-        File hotelDepartureOptionsCsvFile = loadCSVIinitFiles("classpath:initData/hotel_departure_options.csv");
+        File hotelCsvFile = loadCSVInitFiles("classpath:initData/hotels.csv");
+        File hotelDepartureOptionsCsvFile = loadCSVInitFiles("classpath:initData/hotel_departure_options.csv");
 
         List<LocationDto> planeArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile.getPath(), "PLANE");
         List<LocationDto> busArrivalLocations = locationParser.importLocationsAbroad(hotelCsvFile.getPath(), "BUS");
@@ -66,69 +60,99 @@ public class Bootstrap implements CommandLineRunner {
 
         LocalDateTime bootstrapBeginDay = LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0);
 
+        int randomSeed = 12345678;
+        Random random = new Random(randomSeed);
+
+        int numberOfDays = 10;
+
         // generate transport for each course and every day of two months
-        for (int day = 0; day < 3; day++) {
+        for (int day = 0; day < numberOfDays; day++) {
             for (TransportCourseDto planeCourse : planeCourses) {
-                int capacity = ThreadLocalRandom.current().nextInt(80, 100);
+                int capacity = random.nextInt(10, 15);
+
+                LocalDateTime departureDate = bootstrapBeginDay.plusDays(day);
+
+                UUID transportId = UUID.nameUUIDFromBytes((
+                                  departureDate
+                                + planeCourse.toString()
+                                + capacity
+                                + day).getBytes());
 
                 TransportDto transportDto = TransportDto.builder()
-                        .idTransport(UUID.randomUUID())
-                        .departureDate(bootstrapBeginDay.plusDays(day))
+                        .idTransport(transportId)
+                        .departureDate(departureDate)
                         .transportCourse(planeCourse)
                         .capacity(capacity)
-                        .pricePerAdult(ThreadLocalRandom.current().nextFloat(100, 500))
+                        .pricePerAdult(random.nextFloat(100, 500))
                         .build();
 
                 transportCommandService.createTransport(CreateTransportCommand.builder()
-                        .uuid(UUID.randomUUID())
+                        .uuid(transportId)
                         .commandTimeStamp(LocalDateTime.now())
                         .transportDto(transportDto)
                         .build()
                 );
 
                 // make reservations for transport
-                int numberOfReservationsToMake = ThreadLocalRandom.current().nextInt(0, 10) > 6 ? capacity : (int) ( capacity * 0.8);
+                int numberOfReservationsToMake = random.nextInt(0, 10) > 6 ? capacity : (int) (capacity * 0.8);
 
                 while (numberOfReservationsToMake > 0) {
-                    int occupiedSeats = ThreadLocalRandom.current().nextInt(1, 8);
+                    int occupiedSeats = random.nextInt(1, 8);
 
                     if (numberOfReservationsToMake - occupiedSeats < 0) continue;
+
+                    UUID transportReservationId = UUID.nameUUIDFromBytes((
+                                    planeCourse.toString()
+                                    + capacity
+                                    + transportDto.getIdTransport()
+                                    + numberOfReservationsToMake).getBytes());
 
                     TransportReservationDto reservationDto = TransportReservationDto.builder()
                             .numberOfSeats(occupiedSeats)
                             .idTransport(transportDto.getIdTransport())
-                            .idTransportReservation(UUID.randomUUID())
+                            .idTransportReservation(transportReservationId)
                             .build();
+
                     numberOfReservationsToMake -= occupiedSeats;
 
                     transportCommandService.createReservation(CreateTransportReservationCommand.builder()
-                            .uuid(UUID.randomUUID())
+                            .uuid(transportReservationId)
                             .commandTimeStamp(LocalDateTime.now())
                             .transportReservationDto(reservationDto)
                             .build()
                     );
                 }
-
             }
+
             for (TransportCourseDto busCourse : busCourses) {
+                int capacity = random.nextInt(10, 15);
+                LocalDateTime departureDate = bootstrapBeginDay.plusDays(day);
+
+                UUID transportId = UUID.nameUUIDFromBytes((
+                                  departureDate
+                                + busCourse.toString()
+                                + capacity
+                                + day).getBytes());
+
                 TransportDto transportDto = TransportDto.builder()
-                        .idTransport(UUID.randomUUID())
+                        .idTransport(transportId)
                         .transportCourse(busCourse)
-                        .departureDate(bootstrapBeginDay.plusDays(day))
-                        .capacity(ThreadLocalRandom.current().nextInt(20, 50))
-                        .pricePerAdult(ThreadLocalRandom.current().nextFloat(50, 200))
+                        .departureDate(departureDate)
+                        .capacity(capacity)
+                        .pricePerAdult(random.nextFloat(50, 200))
                         .build();
 
                 transportCommandService.createTransport(CreateTransportCommand.builder()
-                        .uuid(UUID.randomUUID())
+                        .uuid(transportId)
                         .commandTimeStamp(LocalDateTime.now())
                         .transportDto(transportDto)
                         .build()
                 );
             }
+            logger.info("Bootstrap imported day " + (day + 1) + " out of " + numberOfDays + " days");
         }
+        logger.info("Bootstrap finished importing data");
     }
-
 //    uncomment to test getMultipleLocations
 //    @Scheduled(fixedDelay = 5000, initialDelay = 30000)
     public void test() {
