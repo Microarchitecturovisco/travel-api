@@ -4,10 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.userservice.domain.User;
 import org.microarchitecturovisco.userservice.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @Component
@@ -17,35 +23,49 @@ public class Bootstrap implements CommandLineRunner {
     private final UserRepository userRepository;
 
     @Override
-    public void run(String... args) throws Exception {
-        Logger logger = Logger.getLogger("Bootstrap");
+    public void run(String... args) {
+        Logger logger = Logger.getLogger("Bootstrap | User");
 
+        File userCsvFile = loadCSVInitFile("initData/users.csv");
+        List<User> users = importUsersFromCSV(userCsvFile.getPath());
+
+        userRepository.saveAll(users);
+
+        logger.info("Saved " + users.size() + " users");
+    }
+
+    private File loadCSVInitFile(String filePath) {
+        try {
+            return new ClassPathResource(filePath).getFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to load CSV file: " + filePath, e);
+        }
+    }
+
+    private List<User> importUsersFromCSV(String csvFilePath) {
         List<User> users = new ArrayList<>();
-        
-        User user1 = new User("john0@gmail.com", "password1", "John", "Johnson");
-        User user2 = new User("emma1@gmail.com", "password2", "Emma", "Washington");
-        User user3 = new User("michael2@gmail.com", "password3", "Michael", "Smith");
-        User user4 = new User("sophia3@gmail.com", "password4", "Sophia", "Williams");
-        User user5 = new User("william4@gmail.com", "password5", "William", "Jones");
-        User user6 = new User("olivia5@gmail.com", "password6", "Olivia", "Brown");
-        User user7 = new User("james6@gmail.com", "password7", "James", "Davis");
-        User user8 = new User("ava7@gmail.com", "password8", "Ava", "Miller");
-        User user9 = new User("alexander8@gmail.com", "password9", "Alexander", "Jackson");
-        User user10 = new User("isabella9@gmail.com", "password10", "Isabella", "Harris");
 
-        // Save the users
-        users.add(userRepository.save(user1));
-        users.add(userRepository.save(user2));
-        users.add(userRepository.save(user3));
-        users.add(userRepository.save(user4));
-        users.add(userRepository.save(user5));
-        users.add(userRepository.save(user6));
-        users.add(userRepository.save(user7));
-        users.add(userRepository.save(user8));
-        users.add(userRepository.save(user9));
-        users.add(userRepository.save(user10));
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+            String line;
+            br.readLine(); // Skip header line
 
-        // Log the saved users
-        logger.info("Saved users: " + users);
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+
+                String email = data[0];
+                String password = data[1];
+                String firstName = data[2];
+                String lastName = data[3];
+                UUID userId = UUID.nameUUIDFromBytes((email + password + firstName + lastName).getBytes());
+
+                User user = new User(userId, email, password, firstName, lastName);
+                users.add(user);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 }
