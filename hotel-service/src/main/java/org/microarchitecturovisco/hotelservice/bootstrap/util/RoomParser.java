@@ -1,5 +1,6 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util;
 
+import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.hotel.HotelCsvReader;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.room.RoomCapacityCalculator;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
@@ -14,7 +15,10 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 @Component
+@RequiredArgsConstructor
 public class RoomParser {
+
+    private final HotelCsvReader hotelCsvReader;
 
     public void importRooms(Resource resource, List<HotelDto> hotelDtos) {
         Logger logger = Logger.getLogger("Bootstrap | Rooms");
@@ -64,10 +68,9 @@ public class RoomParser {
         }
     }
 
-    private static Optional<HotelDto> searchForHotel(List<HotelDto> hotelDtos, int hotelId) throws FileNotFoundException {
-        HotelCsvReader hotelCsvReader = new HotelCsvReader();
+    private Optional<HotelDto> searchForHotel(List<HotelDto> hotelDtos, int hotelId) throws FileNotFoundException {
         // Retrieve hotel name from hotels.csv based on hotelId
-        String hotelName = HotelCsvReader.getHotelNameById(hotelId);
+        String hotelName = hotelCsvReader.getHotelNameById(hotelId);
 
         // Check if the hotel exists in the provided list
         Optional<HotelDto> hotelOpt = hotelDtos.stream()
