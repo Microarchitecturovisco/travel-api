@@ -101,13 +101,18 @@ public class Bootstrap implements CommandLineRunner {
 
                     if (numberOfReservationsToMake - occupiedSeats < 0) continue;
 
-                    UUID transportReservationId = UUID.randomUUID();
+                    UUID transportReservationId = UUID.nameUUIDFromBytes((
+                                    planeCourse.toString()
+                                    + capacity
+                                    + transportDto.getIdTransport()
+                                    + numberOfReservationsToMake).getBytes());
 
                     TransportReservationDto reservationDto = TransportReservationDto.builder()
                             .numberOfSeats(occupiedSeats)
                             .idTransport(transportDto.getIdTransport())
                             .idTransportReservation(transportReservationId)
                             .build();
+
                     numberOfReservationsToMake -= occupiedSeats;
 
                     transportCommandService.createReservation(CreateTransportReservationCommand.builder()
@@ -124,7 +129,7 @@ public class Bootstrap implements CommandLineRunner {
                 LocalDateTime departureDate = bootstrapBeginDay.plusDays(day);
 
                 UUID transportId = UUID.nameUUIDFromBytes((
-                        departureDate
+                                  departureDate
                                 + busCourse.toString()
                                 + capacity
                                 + day).getBytes());
@@ -146,7 +151,7 @@ public class Bootstrap implements CommandLineRunner {
             }
             logger.info("Bootstrap imported day " + (day + 1) + " out of " + numberOfDays + " days");
         }
-        logger.info("Bootstrap imported importing ");
+        logger.info("Bootstrap finished importing data");
     }
 //    uncomment to test getMultipleLocations
 //    @Scheduled(fixedDelay = 5000, initialDelay = 30000)
