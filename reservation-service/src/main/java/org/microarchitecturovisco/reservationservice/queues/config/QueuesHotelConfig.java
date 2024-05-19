@@ -9,20 +9,32 @@ import org.springframework.context.annotation.Configuration;
 public class QueuesHotelConfig {
 
     public static final String EXCHANGE_HOTEL = "hotels.requests.checkAvailabilityByQuery.exchange";
-    public static final String QUEUE_HOTEL_BOOK_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
-    public static final String ROUTING_KEY_HOTEL_BOOK_REQ = "hotels.requests.checkAvailabilityByQuery.routingKey";
+    public static final String QUEUE_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
+    public static final String ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.routingKey";
 
-    @Bean(name="handleReservationExchange")
-    public TopicExchange handleReservationExchange() {
+    @Bean(name="handleHotelExchange")
+    public TopicExchange handleHotelExchange() {
         return new TopicExchange(EXCHANGE_HOTEL);
     }
-    @Bean
+
+
+    @Bean(name="handleReservationQueue")
     public Queue handleReservationQueue() {
-        return new Queue(QUEUE_HOTEL_BOOK_REQ);
+        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false, false, true);
     }
+
     @Bean
-    public Binding handleReservationRequestBinding(@Qualifier("handleReservationExchange") TopicExchange handleReservationExchange, Queue handleReservationQueue) {
-        return BindingBuilder.bind(handleReservationQueue).to(handleReservationExchange).with(ROUTING_KEY_HOTEL_BOOK_REQ);
+    public Binding handleReservationRequestBinding(@Qualifier("handleHotelExchange") TopicExchange exchange,
+                                                   @Qualifier("handleReservationQueue") Queue queue) {
+        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ);
+    }
+
+
+    public static final String EXCHANGE_HOTEL_FANOUT = "hotels.createReservation.exchange";
+
+    @Bean(name="fanoutExchangeHotel")
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT);
     }
 
 }

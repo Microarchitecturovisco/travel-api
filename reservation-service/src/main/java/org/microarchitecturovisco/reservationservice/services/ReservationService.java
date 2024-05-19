@@ -75,28 +75,17 @@ public class ReservationService {
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
-//        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-         boolean hotelIsAvailable = true; // debug only
-        System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
-        if(!hotelIsAvailable) { throw new ReservationFailException(); }
+        checkHotelAvailability(reservationRequest);
 
-//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-         boolean transportIsAvailable = true; // debug only
-        System.out.println("transportIsAvailable: " + transportIsAvailable);
-        if(!transportIsAvailable) { throw new ReservationFailException(); }
-
+        checkTransportAvailability(reservationRequest);
 
         UUID reservationId = UUID.randomUUID();
-        createReservationFromRequest(reservationRequest, reservationId);
-        System.out.println("reservationCreated: " + reservationId);
+        reservationRequest.setId(reservationId);
 
+        createReservationFromRequest(reservationRequest);
 
-        // todo: reserve hotel
-        //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
+        bookHotelsSaga.createHotelReservation(reservationRequest);
 
-
-        // todo: reserve transport
-        //  Wysyłany jest event zarezerwowania transportu do kolejki transports.events.createTransportReservation
         bookTransportsSaga.createTransportReservation(reservationRequest);
 
         // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
@@ -104,8 +93,12 @@ public class ReservationService {
         //  do aplikacji klienckiej zwracany jest status 2xx oraz idReservation tego zamówienia
         //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
 
+        // todo: dodać rollback do rezerwacji hotelu
+        // todo: dodać rollback do rezerwacji transportu
 
-        // Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności (reservationId będzie gdzieś z góry)
+        // todo:
+        //  Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności
+        //  (reservationId będzie gdzieś z góry)
 
         Runnable paymentTimeoutRunnable = () -> {
             paymentTimeout(reservationId.toString());
@@ -116,10 +109,23 @@ public class ReservationService {
         return null; // reservationId
     }
 
-    public void createReservationFromRequest(ReservationRequest reservationRequest, UUID reservationId) {
-        reservationRequest.setId(reservationId);
+    private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
+        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+//        boolean hotelIsAvailable = true; // debug only
+        System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
+        if(!hotelIsAvailable) { throw new ReservationFailException(); }
+    }
 
+    private void checkTransportAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
+        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+//        boolean transportIsAvailable = true; // debug only
+        System.out.println("transportIsAvailable: " + transportIsAvailable);
+        if(!transportIsAvailable) { throw new ReservationFailException(); }
+    }
+
+    public void createReservationFromRequest(ReservationRequest reservationRequest) {
         rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
+        System.out.println("reservationCreated: " + reservationRequest.getId());
     }
 
     public void paymentTimeout(String reservationId) {

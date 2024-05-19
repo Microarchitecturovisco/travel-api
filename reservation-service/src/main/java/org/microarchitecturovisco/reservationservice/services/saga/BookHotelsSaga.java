@@ -14,13 +14,17 @@ public class BookHotelsSaga {
     public boolean checkIfHotelIsAvailable(ReservationRequest reservationRequest) {
         String result = (String) rabbitTemplate.convertSendAndReceive(
                 QueuesHotelConfig.EXCHANGE_HOTEL,
-                QueuesHotelConfig.ROUTING_KEY_HOTEL_BOOK_REQ,
+                QueuesHotelConfig.ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ,
                 reservationRequest
         );
 
-        System.out.println("checkIfHotelIsAvailable result:" + result);
-
         return Boolean.parseBoolean(result);
     }
-
+    public void createHotelReservation(ReservationRequest reservationRequest) {
+        rabbitTemplate.convertAndSend(
+                QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT,
+                "", // Routing key is ignored for FanoutExchange
+                reservationRequest
+        );
+    }
 }

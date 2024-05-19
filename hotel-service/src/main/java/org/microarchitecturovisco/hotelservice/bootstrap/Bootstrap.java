@@ -43,7 +43,6 @@ public class Bootstrap implements CommandLineRunner {
         Logger logger = Logger.getLogger("Bootstrap");
 
         File hotelCsvFile = loadCSVInitFiles("classpath:initData/hotels.csv");
-        File hotelDepartureOptionsCsvFile = loadCSVInitFiles("classpath:initData/hotel_departure_options.csv");
         File hotelPhotosCsvFile = loadCSVInitFiles("classpath:initData/hotel_photos.csv");
         File hotelRoomsCsvFile = loadCSVInitFiles("classpath:initData/hotel_rooms.csv");
         File hotelCateringOptionsCsvFile = loadCSVInitFiles("classpath:initData/hotel_food_options.csv");
@@ -56,7 +55,7 @@ public class Bootstrap implements CommandLineRunner {
 
         for (HotelDto hotelDto : hotels){
             hotelsCommandService.createHotel(CreateHotelCommand.builder()
-                    .uuid(UUID.randomUUID())
+                    .uuid(hotelDto.getHotelId())
                     .commandTimeStamp(LocalDateTime.now())
                     .hotelDto(hotelDto)
                     .build());

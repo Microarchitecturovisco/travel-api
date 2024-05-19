@@ -4,11 +4,9 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Random;
 import java.util.UUID;
 
 @Configuration
@@ -24,7 +22,7 @@ public class QueuesReservationConfig {
     @Bean
     public Queue handleReservationCreateQueue() {
         String uniqueQueueName = "reservations.events.createReservation.queue." + UUID.randomUUID();
-        return new Queue(uniqueQueueName, true);
+        return new Queue(uniqueQueueName, false, false, true);
     }
 
     @Bean

@@ -42,19 +42,20 @@ public class HotelParser {
     }
 
     private HotelDto createHotelDto(String[] data, PhotoParser photoParser, List<LocationDto> hotelLocations) {
-        int hotelId = Integer.parseInt(data[0]);
+        int hotelScrappedId = Integer.parseInt(data[0]);
         String name = data[1];
         String description = data[2];
         float rating = Float.parseFloat(data[3]);
         String country = data[4];
         String region = data[5];
+        UUID hotelIdAsUUID = UUID.fromString(data[6]);
 
         // Find the LocationDto in the list
         LocationDto location = findLocation(hotelLocations, country, region);
-        List<String> photos = photoParser.hotelPhotosMap.getOrDefault(hotelId, Collections.emptyList());
+        List<String> photos = photoParser.hotelPhotosMap.getOrDefault(hotelScrappedId, Collections.emptyList());
 
         return HotelDto.builder()
-                .hotelId(UUID.randomUUID())
+                .hotelId(hotelIdAsUUID)
                 .name(name)
                 .description(description)
                 .rating(rating)

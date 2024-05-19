@@ -14,7 +14,7 @@ public class QueuesTransportConfig {
 
     public static final String EXCHANGE_TRANSPORT_FANOUT = "transports.createReservation.exchange";
 
-    @Bean
+    @Bean(name="fanoutExchangeTransport")
     public FanoutExchange fanoutExchange() {
         return new FanoutExchange(EXCHANGE_TRANSPORT_FANOUT);
     }
@@ -27,7 +27,7 @@ public class QueuesTransportConfig {
 
     @Bean
     public Queue handleTransportReservationQueue() {
-        return new Queue(QUEUE_TRANSPORT_BOOK_REQ);
+        return new Queue(QUEUE_TRANSPORT_BOOK_REQ, false, false, true);
     }
     
     @Bean
