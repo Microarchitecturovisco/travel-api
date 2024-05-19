@@ -1,7 +1,7 @@
 package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.transport.controllers.reservations.CreateTransportReservationRequest;
+import org.microarchitecturovisco.transport.controllers.reservations.ReservationRequest;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
@@ -13,7 +13,6 @@ import org.microarchitecturovisco.transport.model.dto.response.AvailableTranspor
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
-import org.microarchitecturovisco.transport.rabbitmq.config.QueuesConfig;
 import org.microarchitecturovisco.transport.services.TransportCommandService;
 import org.microarchitecturovisco.transport.services.TransportsQueryService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
@@ -98,8 +97,8 @@ public class TransportsQueryController {
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 
-    @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_CREATE_RESERVATION_REQ)
-    public void consumeMessageCreateHotelReservation(CreateTransportReservationRequest request) {
+    @RabbitListener(queues = "#{handleCreateTransportReservationQueue.name}")
+    public void consumeMessageCreateTransportReservation(ReservationRequest request) {
         System.out.println("Message received from queue: " + request);
 
         int numberOfTransportsInReservation = request.getTransportReservationsIds().size();
@@ -108,14 +107,14 @@ public class TransportsQueryController {
             UUID idTransport = request.getTransportReservationsIds().get(i);
 
             int occupiedSeats = request.getAdultsQuantity() +
-                                request.getChildrenUnder3Quantity() +
-                                request.getChildrenUnder10Quantity() +
-                                request.getChildrenUnder18Quantity();
+                    request.getChildrenUnder3Quantity() +
+                    request.getChildrenUnder10Quantity() +
+                    request.getChildrenUnder18Quantity();
 
             TransportReservationDto reservationDto = TransportReservationDto.builder()
                     .numberOfSeats(occupiedSeats)
                     .idTransport(idTransport)
-                    .idTransportReservation(request.getReservationId())
+                    .idTransportReservation(request.getId())
                     .build();
 
             transportCommandService.createReservation(CreateTransportReservationCommand.builder()
@@ -125,6 +124,5 @@ public class TransportsQueryController {
                     .build()
             );
         }
-
     }
 }

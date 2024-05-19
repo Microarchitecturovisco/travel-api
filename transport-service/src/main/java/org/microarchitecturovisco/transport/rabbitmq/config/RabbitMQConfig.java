@@ -1,17 +1,19 @@
 package org.microarchitecturovisco.transport.rabbitmq.config;
 
-import org.springframework.amqp.support.converter.SimpleMessageConverter;
+import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 public class RabbitMQConfig {
     @Bean
-    public SimpleMessageConverter converter() {
-        SimpleMessageConverter converter = new SimpleMessageConverter();
-        converter.setAllowedListPatterns(List.of("org.microarchitecturovisco.*", "java.*"));
+    public MessageConverter jsonMessageConverter() {
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
+        typeMapper.setTrustedPackages("org.microarchitecturovisco.*");
+        converter.setJavaTypeMapper(typeMapper);
         return converter;
     }
 }

@@ -93,35 +93,7 @@ public class Bootstrap implements CommandLineRunner {
                         .build()
                 );
 
-                // make reservations for transport
-                int numberOfReservationsToMake = random.nextInt(0, 10) > 6 ? capacity : (int) (capacity * 0.8);
-
-                while (numberOfReservationsToMake > 0) {
-                    int occupiedSeats = random.nextInt(1, 8);
-
-                    if (numberOfReservationsToMake - occupiedSeats < 0) continue;
-
-                    UUID transportReservationId = UUID.nameUUIDFromBytes((
-                                    planeCourse.toString()
-                                    + capacity
-                                    + transportDto.getIdTransport()
-                                    + numberOfReservationsToMake).getBytes());
-
-                    TransportReservationDto reservationDto = TransportReservationDto.builder()
-                            .numberOfSeats(occupiedSeats)
-                            .idTransport(transportDto.getIdTransport())
-                            .idTransportReservation(transportReservationId)
-                            .build();
-
-                    numberOfReservationsToMake -= occupiedSeats;
-
-                    transportCommandService.createReservation(CreateTransportReservationCommand.builder()
-                            .uuid(transportReservationId)
-                            .commandTimeStamp(LocalDateTime.now())
-                            .transportReservationDto(reservationDto)
-                            .build()
-                    );
-                }
+//                createReservationsForTransport(random, planeCourse, capacity, transportDto);
             }
 
             for (TransportCourseDto busCourse : busCourses) {
@@ -153,7 +125,39 @@ public class Bootstrap implements CommandLineRunner {
         }
         logger.info("Bootstrap finished importing data");
     }
-//    uncomment to test getMultipleLocations
+
+    private void createReservationsForTransport(Random random, TransportCourseDto planeCourse, int capacity, TransportDto transportDto) {
+        int numberOfReservationsToMake = random.nextInt(0, 10) > 6 ? capacity : (int) (capacity * 0.8);
+
+        while (numberOfReservationsToMake > 0) {
+            int occupiedSeats = random.nextInt(1, 8);
+
+            if (numberOfReservationsToMake - occupiedSeats < 0) continue;
+
+            UUID transportReservationId = UUID.nameUUIDFromBytes((
+                            planeCourse.toString()
+                            + capacity
+                            + transportDto.getIdTransport()
+                            + numberOfReservationsToMake).getBytes());
+
+            TransportReservationDto reservationDto = TransportReservationDto.builder()
+                    .numberOfSeats(occupiedSeats)
+                    .idTransport(transportDto.getIdTransport())
+                    .idTransportReservation(transportReservationId)
+                    .build();
+
+            numberOfReservationsToMake -= occupiedSeats;
+
+            transportCommandService.createReservation(CreateTransportReservationCommand.builder()
+                    .uuid(transportReservationId)
+                    .commandTimeStamp(LocalDateTime.now())
+                    .transportReservationDto(reservationDto)
+                    .build()
+            );
+        }
+    }
+
+    //    uncomment to test getMultipleLocations
 //    @Scheduled(fixedDelay = 5000, initialDelay = 30000)
     public void test() {
         UUID locationIdA = locationRepository.findFirstByRegion("Gdańsk").getId();

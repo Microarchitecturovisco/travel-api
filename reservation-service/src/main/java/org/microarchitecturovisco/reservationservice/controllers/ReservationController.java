@@ -1,21 +1,23 @@
 package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
+import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.domain.model.PurchaseRequestBody;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
-import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
-import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
-import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
+import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;

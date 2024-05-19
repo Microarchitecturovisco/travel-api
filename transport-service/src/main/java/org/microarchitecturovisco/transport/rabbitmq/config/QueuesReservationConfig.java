@@ -1,0 +1,35 @@
+package org.microarchitecturovisco.transport.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.UUID;
+
+@Configuration
+public class QueuesReservationConfig {
+
+    public static final String QUEUE_TRANSPORT_CREATE_RESERVATION_REQ_PREFIX = "transports.createTransportReservation.queue.";
+    public static final String EXCHANGE_TRANSPORT_FANOUT = "transports.createReservation.exchange";
+
+    @Bean
+    @Qualifier("fanoutExchange")
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange(EXCHANGE_TRANSPORT_FANOUT);
+    }
+
+    @Bean
+    @Qualifier("handleCreateTransportReservationQueue")
+    public Queue handleCreateTransportReservationQueue() {
+        String uniqueQueueName = QUEUE_TRANSPORT_CREATE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
+        return new Queue(uniqueQueueName, false);
+    }
+
+    @Bean
+    public Binding handleCreateTransportReservationBinding(
+            @Qualifier("fanoutExchange") FanoutExchange fanoutExchange,
+            @Qualifier("handleCreateTransportReservationQueue") Queue handleCreateTransportReservationQueue) {
+        return BindingBuilder.bind(handleCreateTransportReservationQueue).to(fanoutExchange);
+    }
+}

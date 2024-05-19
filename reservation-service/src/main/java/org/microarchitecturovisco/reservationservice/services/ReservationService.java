@@ -14,7 +14,7 @@ import org.microarchitecturovisco.reservationservice.domain.model.LocationReserv
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
-import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
@@ -74,14 +74,14 @@ public class ReservationService {
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
-        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-        // boolean hotelIsAvailable = true; // debug only
+//        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+         boolean hotelIsAvailable = true; // debug only
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
 
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
-        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        // boolean transportIsAvailable = true; // debug only
+//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+         boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
 
