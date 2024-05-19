@@ -3,18 +3,20 @@ package org.microarchitecturovisco.hotelservice.bootstrap.util;
 
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.LocationDto;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.logging.Logger;
 
 @Component
 public class HotelParser {
 
-    public List<HotelDto> importHotels(String hotelCsvFilePath, String hotelPhotosCsvFilePath, List<LocationDto> hotelLocations) throws IOException {
+    public List<HotelDto> importHotels(Resource hotelCsvFilePath, Resource hotelPhotosCsvFilePath, List<LocationDto> hotelLocations) throws IOException {
         Logger logger = Logger.getLogger("HotelDataParser");
 
         // Load and parse the photos CSV file
@@ -24,7 +26,7 @@ public class HotelParser {
         List<HotelDto> hotelDtos = new ArrayList<>();
 
         // Read the hotel CSV file and create hotel DTOs
-        try (BufferedReader br = new BufferedReader(new FileReader(hotelCsvFilePath))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader( hotelCsvFilePath.getInputStream() ))) {
             String line;
             br.readLine();  // Skip header line
 

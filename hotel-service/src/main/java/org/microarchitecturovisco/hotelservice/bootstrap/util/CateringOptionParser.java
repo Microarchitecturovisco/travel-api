@@ -6,24 +6,22 @@ import org.microarchitecturovisco.hotelservice.bootstrap.util.hotel.HotelCsvRead
 import org.microarchitecturovisco.hotelservice.model.domain.CateringType;
 import org.microarchitecturovisco.hotelservice.model.dto.CateringOptionDto;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
 @Component
 public class CateringOptionParser {
 
-    public List<CateringOptionDto> importCateringOptions(String csvFilePath, List<HotelDto> hotels) {
+    public List<CateringOptionDto> importCateringOptions(Resource resource, List<HotelDto> hotels) {
         Logger logger = Logger.getLogger("Bootstrap | CateringOptions");
         List<CateringOptionDto> cateringOptions = new ArrayList<>();
         CateringPriceCalculator cateringPriceCalculator = new CateringPriceCalculator();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             br.readLine(); // Skip header line
 

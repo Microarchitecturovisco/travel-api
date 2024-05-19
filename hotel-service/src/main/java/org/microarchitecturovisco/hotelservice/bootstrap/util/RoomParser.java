@@ -4,12 +4,10 @@ import org.microarchitecturovisco.hotelservice.bootstrap.util.hotel.HotelCsvRead
 import org.microarchitecturovisco.hotelservice.bootstrap.util.room.RoomCapacityCalculator;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomDto;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,10 +16,10 @@ import java.util.logging.Logger;
 @Component
 public class RoomParser {
 
-    public void importRooms(String csvFilePath, List<HotelDto> hotelDtos) {
+    public void importRooms(Resource resource, List<HotelDto> hotelDtos) {
         Logger logger = Logger.getLogger("Bootstrap | Rooms");
         RoomCapacityCalculator capacityCalculator = new RoomCapacityCalculator();
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             br.readLine(); // Skip header line
             while ((line = br.readLine()) != null) {

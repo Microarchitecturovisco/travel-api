@@ -8,6 +8,8 @@ import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomRes
 import org.microarchitecturovisco.hotelservice.model.dto.*;
 import org.microarchitecturovisco.hotelservice.services.HotelsCommandService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
@@ -29,7 +31,7 @@ public class Bootstrap implements CommandLineRunner {
     private final RoomReservationParser roomReservationParser;
     private final HotelsCommandService hotelsCommandService;
     private final RoomParser roomParser;
-
+    private final ResourceLoader resourceLoader;
 
     public File loadCSVInitFiles(String filepathInResources)
             throws FileNotFoundException {
@@ -42,15 +44,15 @@ public class Bootstrap implements CommandLineRunner {
     public void run(String... args) throws IOException {
         Logger logger = Logger.getLogger("Bootstrap");
 
-        File hotelCsvFile = loadCSVInitFiles("classpath:initData/hotels.csv");
-        File hotelPhotosCsvFile = loadCSVInitFiles("classpath:initData/hotel_photos.csv");
-        File hotelRoomsCsvFile = loadCSVInitFiles("classpath:initData/hotel_rooms.csv");
-        File hotelCateringOptionsCsvFile = loadCSVInitFiles("classpath:initData/hotel_food_options.csv");
+        Resource hotelCsvFile = resourceLoader.getResource("classpath:initData/hotels.csv");
+        Resource hotelPhotosCsvFile = resourceLoader.getResource("classpath:initData/hotel_photos.csv");
+        Resource hotelRoomsCsvFile = resourceLoader.getResource("classpath:initData/hotel_rooms.csv");
+        Resource hotelCateringOptionsCsvFile = resourceLoader.getResource("classpath:initData/hotel_food_options.csv");
 
-        List<LocationDto> hotelLocations = locationParser.importLocations(hotelCsvFile.getPath());
-        List<HotelDto> hotels = hotelParser.importHotels(hotelCsvFile.getPath(), hotelPhotosCsvFile.getPath(), hotelLocations);
-        List<CateringOptionDto> cateringOptions = cateringOptionParser.importCateringOptions(hotelCateringOptionsCsvFile.getPath(), hotels);
-        roomParser.importRooms(hotelRoomsCsvFile.getPath(), hotels);
+        List<LocationDto> hotelLocations = locationParser.importLocations(hotelCsvFile);
+        List<HotelDto> hotels = hotelParser.importHotels(hotelCsvFile, hotelPhotosCsvFile, hotelLocations);
+        List<CateringOptionDto> cateringOptions = cateringOptionParser.importCateringOptions(hotelCateringOptionsCsvFile, hotels);
+        roomParser.importRooms(hotelRoomsCsvFile, hotels);
         List<RoomReservationDto> roomReservations = roomReservationParser.importRoomReservations(hotels);
 
         for (HotelDto hotelDto : hotels){

@@ -3,17 +3,19 @@ package org.microarchitecturovisco.transport.bootstrap.util;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
 import org.microarchitecturovisco.transport.model.domain.TransportType;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 @Component
 public class TransportCoursesParser {
 
-    public Map<String, List<TransportCourseDto>> createTransportCourses(String hotelCsvFile, String hotelDepartureOptionsCsvFile, List<LocationDto> busArrivalLocations, List<LocationDto> planeArrivalLocations, List<LocationDto> departureLocations) {
+    public Map<String, List<TransportCourseDto>> createTransportCourses(Resource hotelCsvFile, Resource hotelDepartureOptionsCsvFile, List<LocationDto> busArrivalLocations, List<LocationDto> planeArrivalLocations, List<LocationDto> departureLocations) {
         List<TransportCourseDto> planeCourses = new ArrayList<>();
         List<TransportCourseDto> busCourses = new ArrayList<>();
 
@@ -33,10 +35,10 @@ public class TransportCoursesParser {
         return transportCoursesMap;
     }
 
-    private Map<Integer, List<String>> readDepartureCities(String filename) {
+    private Map<Integer, List<String>> readDepartureCities(Resource resource) {
         Map<Integer, List<String>> departureCitiesMap = new HashMap<>();
 
-        try (Scanner scanner = new Scanner(new FileReader(filename))) {
+        try (Scanner scanner = new Scanner(new InputStreamReader(resource.getInputStream()))) {
             scanner.nextLine(); // Skip header line
 
             while (scanner.hasNextLine()) {
@@ -61,10 +63,10 @@ public class TransportCoursesParser {
         return departureCitiesMap;
     }
 
-    private Map<Integer, LocationDto> readHotelLocations(String filename, List<LocationDto> planeArrivalLocations) {
+    private Map<Integer, LocationDto> readHotelLocations(Resource resource, List<LocationDto> planeArrivalLocations) {
         Map<Integer, LocationDto> hotelLocationMap = new HashMap<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             br.readLine(); // Skip header line
 
