@@ -1,24 +1,26 @@
 package org.microarchitecturovisco.userservice.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.UUID;
+
 
 @Entity
 @Builder
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private UUID id;
 
     @NotNull
     @Email(regexp = ".+[@].+[\\.].+")
@@ -35,11 +37,4 @@ public class User {
     @NotNull
     @Size(max = 50)
     private String surname;
-
-    public User(String email, String password, String name, String surname){
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.surname = surname;
-    }
 }
