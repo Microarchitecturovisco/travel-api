@@ -13,14 +13,12 @@ public class QueuesReservationConfig {
     public static final String QUEUE_TRANSPORT_CREATE_RESERVATION_REQ_PREFIX = "transports.createTransportReservation.queue.";
     public static final String EXCHANGE_TRANSPORT_FANOUT = "transports.createReservation.exchange";
 
-    @Bean
-    @Qualifier("fanoutExchange")
+    @Bean(name="fanoutExchange")
     public FanoutExchange fanoutExchange() {
         return new FanoutExchange(EXCHANGE_TRANSPORT_FANOUT);
     }
 
-    @Bean
-    @Qualifier("handleCreateTransportReservationQueue")
+    @Bean(name="handleCreateTransportReservationQueue")
     public Queue handleCreateTransportReservationQueue() {
         String uniqueQueueName = QUEUE_TRANSPORT_CREATE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
         return new Queue(uniqueQueueName, false);

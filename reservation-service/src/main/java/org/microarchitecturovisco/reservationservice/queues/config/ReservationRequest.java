@@ -11,7 +11,6 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class ReservationRequest implements Serializable {
     private UUID id;
 
