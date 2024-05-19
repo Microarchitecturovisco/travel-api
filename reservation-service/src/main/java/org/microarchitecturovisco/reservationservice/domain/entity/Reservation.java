@@ -43,7 +43,7 @@ public class Reservation {
     private boolean paid;
 
     @NotNull
-    private UUID hotelId;
+    private String hotelId;
 
     @NotNull
     @ElementCollection(fetch = FetchType.EAGER)
