@@ -11,16 +11,14 @@ public class QueuesConfig {
     public static final String QUEUE_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
 
 
-    @Bean
-    @Qualifier("handleReservationExchange")
+    @Bean(name="handleReservationExchange")
     public TopicExchange handleReservationExchange() {
         return new TopicExchange(EXCHANGE_HOTEL);
     }
 
-    @Bean
-    @Qualifier("handleReservationQueue")
+    @Bean(name="handleReservationQueue")
     public Queue handleReservationQueue() {
-        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false);
+        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false, false, true);
     }
 
     @Bean
@@ -42,7 +40,7 @@ public class QueuesConfig {
     @Bean
     @Qualifier("handleCreateHotelReservationQueue")
     public Queue handleCreateHotelReservationQueue() {
-        return new Queue(QUEUE_HOTEL_CREATE_RESERVATION_REQ, false);
+        return new Queue(QUEUE_HOTEL_CREATE_RESERVATION_REQ, false, false, true);
     }
 
     @Bean

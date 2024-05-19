@@ -66,7 +66,7 @@ public class CateringOptionParser {
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }
-                }).toList().getFirst();
+                }).toList().get(0);
                 hotelDto.getCateringOptions().add(cateringOption);
 
                 return cateringOption;

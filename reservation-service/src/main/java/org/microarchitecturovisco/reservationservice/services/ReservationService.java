@@ -84,13 +84,8 @@ public class ReservationService {
 
         createReservationFromRequest(reservationRequest);
 
-
-        // todo: reserve hotel
-        //  Wysyłany jest event zarezerwowania hotelu do kolejki hotels.events.createHotelReservation
         bookHotelsSaga.createHotelReservation(reservationRequest);
 
-        // todo: reserve transport
-        //  Wysyłany jest event zarezerwowania transportu do kolejki transports.events.createTransportReservation
         bookTransportsSaga.createTransportReservation(reservationRequest);
 
         // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
@@ -98,8 +93,12 @@ public class ReservationService {
         //  do aplikacji klienckiej zwracany jest status 2xx oraz idReservation tego zamówienia
         //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
 
+        // todo: dodać rollback do rezerwacji hotelu
+        // todo: dodać rollback do rezerwacji transportu
 
-        // Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności (reservationId będzie gdzieś z góry)
+        // todo:
+        //  Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności
+        //  (reservationId będzie gdzieś z góry)
 
         Runnable paymentTimeoutRunnable = () -> {
             paymentTimeout(reservationId.toString());

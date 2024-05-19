@@ -12,18 +12,15 @@ public class QueuesHotelConfig {
     public static final String QUEUE_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
     public static final String ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.routingKey";
 
-    public static final String EXCHANGE_HOTEL_FANOUT = "hotels.createReservation.exchange";
-
-    @Bean
-    @Qualifier("handleHotelExchange")
+    @Bean(name="handleHotelExchange")
     public TopicExchange handleHotelExchange() {
         return new TopicExchange(EXCHANGE_HOTEL);
     }
 
-    @Bean
-    @Qualifier("handleReservationQueue")
+
+    @Bean(name="handleReservationQueue")
     public Queue handleReservationQueue() {
-        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false);
+        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false, false, true);
     }
 
     @Bean
@@ -33,13 +30,11 @@ public class QueuesHotelConfig {
     }
 
 
-    @Bean
+    public static final String EXCHANGE_HOTEL_FANOUT = "hotels.createReservation.exchange";
+
+    @Bean(name="fanoutExchangeHotel")
     public FanoutExchange fanoutExchange() {
         return new FanoutExchange(EXCHANGE_HOTEL_FANOUT);
     }
-    
-    public static final String EXCHANGE_TRANSPORT = "transports.requests.checkAvailabilityByQuery.exchange";
-    public static final String QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ = "transports.requests.checkAvailabilityByQuery.queue";
-    public static final String ROUTING_KEY_TRANSPORT_CHECK_AVAILABILITY_REQ = "transports.requests.checkAvailabilityByQuery.routingKey";
 
 }
