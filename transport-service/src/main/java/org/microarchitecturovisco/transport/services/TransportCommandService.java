@@ -32,6 +32,7 @@ public class TransportCommandService {
                 .id(command.getUuid())
                 .eventTimeStamp(command.getCommandTimeStamp())
                 .idTransportReservation(command.getTransportReservationDto().getIdTransportReservation())
+                .numberOfSeats(command.getTransportReservationDto().getNumberOfSeats())
                 .idTransport(command.getTransportReservationDto().getIdTransport())
                 .build();
 
