@@ -9,11 +9,8 @@ import java.util.UUID;
 
 @Builder
 @Data
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class ReservationRequest implements Serializable {
     private UUID id;
 
