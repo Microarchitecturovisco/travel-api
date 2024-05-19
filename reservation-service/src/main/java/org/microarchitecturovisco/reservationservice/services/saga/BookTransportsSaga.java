@@ -1,8 +1,8 @@
 package org.microarchitecturovisco.reservationservice.services.saga;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.reservationservice.queues.config.QueuesConfig;
-import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.queues.config.QueuesTransportConfig;
+import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,14 @@ public class BookTransportsSaga {
         );
 
         return Boolean.parseBoolean(result);
+    }
+
+    public void createTransportReservation(ReservationRequest reservationRequest) {
+        rabbitTemplate.convertAndSend(
+                QueuesTransportConfig.EXCHANGE_TRANSPORT_FANOUT,
+                "", // Routing key is ignored for FanoutExchange
+                reservationRequest
+        );
     }
 
 }

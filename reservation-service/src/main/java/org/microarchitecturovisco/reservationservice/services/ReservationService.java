@@ -14,7 +14,7 @@ import org.microarchitecturovisco.reservationservice.domain.model.LocationReserv
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
-import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
@@ -72,6 +72,7 @@ public class ReservationService {
         return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
+
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
         checkHotelAvailability(reservationRequest);
@@ -90,7 +91,7 @@ public class ReservationService {
 
         // todo: reserve transport
         //  Wysyłany jest event zarezerwowania transportu do kolejki transports.events.createTransportReservation
-        
+        bookTransportsSaga.createTransportReservation(reservationRequest);
 
         // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
         //  (co skutkuje cofnięciem poprzednich operacji);
@@ -98,7 +99,7 @@ public class ReservationService {
         //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
 
 
-        // Tu jest nie dokończony kod, który stanowi podstawę pod obsługę płatności (reservationId będzie gdzieś z góry)
+        // Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności (reservationId będzie gdzieś z góry)
 
         Runnable paymentTimeoutRunnable = () -> {
             paymentTimeout(reservationId.toString());
