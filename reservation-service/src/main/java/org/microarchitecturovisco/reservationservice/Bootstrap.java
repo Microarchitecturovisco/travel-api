@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public class Bootstrap implements CommandLineRunner {
     @Override
     public void run(String... args) {
-        // Your initialization logic here
+
     }
 }

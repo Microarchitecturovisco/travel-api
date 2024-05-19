@@ -6,10 +6,11 @@ import org.microarchitecturovisco.transport.model.dto.TransportDto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 public class GetTransportsBySearchQueryResponseDto implements Serializable {
-    private String uuid;
+    private UUID uuid;
     private List<TransportDto> transportDtoList;
 }

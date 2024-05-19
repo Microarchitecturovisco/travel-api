@@ -7,6 +7,7 @@ import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseDto;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
+import org.microarchitecturovisco.reservationservice.domain.events.ReservationEvent;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationNotFoundAfterPaymentException;
@@ -72,12 +73,12 @@ public class ReservationService {
         return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
+
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
         // boolean hotelIsAvailable = true; // debug only
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
-
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
 
         boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
@@ -105,7 +106,7 @@ public class ReservationService {
         //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
 
 
-        // Tu jest nie dokończony kod, który stanowi podstawę pod obsługę płatności (reservationId będzie gdzieś z góry)
+        // Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności (reservationId będzie gdzieś z góry)
 
         Runnable paymentTimeoutRunnable = () -> {
             paymentTimeout(reservationId.toString());

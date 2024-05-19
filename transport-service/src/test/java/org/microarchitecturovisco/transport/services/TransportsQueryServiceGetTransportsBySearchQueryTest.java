@@ -35,7 +35,7 @@ public class TransportsQueryServiceGetTransportsBySearchQueryTest {
 
         // Arrange
         GetTransportsBySearchQueryRequestDto requestDto = GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(java.util.UUID.randomUUID().toString())
+                .uuid(java.util.UUID.randomUUID())
                 .dateFrom(LocalDateTime.of(2024, Month.MAY, 1, 12, 0, 0))
                 .dateTo(LocalDateTime.of(2024, Month.MAY, 14, 12, 0, 0))
                 .departureLocationIdsByPlane(List.of(locationIdA))
@@ -63,7 +63,7 @@ public class TransportsQueryServiceGetTransportsBySearchQueryTest {
     public void testGetTransportsBySearchQuery_DateRange() {
         // Arrange
         GetTransportsBySearchQueryRequestDto requestDto = GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(java.util.UUID.randomUUID().toString())
+                .uuid(java.util.UUID.randomUUID())
                 .dateFrom(LocalDateTime.of(2024, Month.MAY, 6, 12, 0, 0))
                 .dateTo(LocalDateTime.of(2024, Month.MAY, 12, 12, 0, 0))
                 .build();
@@ -153,7 +153,7 @@ public class TransportsQueryServiceGetTransportsBySearchQueryTest {
         UUID reservationIdC = UUID.randomUUID();
 
         GetTransportsBySearchQueryRequestDto requestDto = GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(java.util.UUID.randomUUID().toString())
+                .uuid(java.util.UUID.randomUUID())
                 .departureLocationIdsByPlane(List.of(locationIdA))
                 .departureLocationIdsByBus(List.of())
                 .arrivalLocationIds(List.of(locationIdB))
@@ -218,7 +218,7 @@ public class TransportsQueryServiceGetTransportsBySearchQueryTest {
         UUID reservationIdC = UUID.randomUUID();
 
         GetTransportsBySearchQueryRequestDto requestDto = GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(java.util.UUID.randomUUID().toString())
+                .uuid(java.util.UUID.randomUUID())
                 .adults(2)
                 .childrenUnderThree(1)
                 .childrenUnderTen(1)

@@ -1,8 +1,7 @@
-package org.microarchitecturovisco.reservationservice.queues.hotels;
+package org.microarchitecturovisco.transport.controllers.reservations;
 
 import lombok.*;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -11,9 +10,8 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservationRequest implements Serializable {
-    private UUID id;
-
+@ToString
+public class CheckTransportAvailabilityRequest {
     private LocalDateTime hotelTimeFrom;
 
     private LocalDateTime hotelTimeTo;
@@ -29,10 +27,4 @@ public class ReservationRequest implements Serializable {
     private List<UUID> departureLocationIdsByPlane;
     private List<UUID> departureLocationIdsByBus;
     private List<UUID> arrivalLocationIds;
-
-    private float price;
-    private UUID hotelId;
-    private List<UUID> roomReservationsIds;
-    private List<UUID> transportReservationsIds;
-    private UUID userId;
 }

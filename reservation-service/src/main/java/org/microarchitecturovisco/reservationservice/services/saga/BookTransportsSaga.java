@@ -1,7 +1,7 @@
 package org.microarchitecturovisco.reservationservice.services.saga;
 
 import lombok.RequiredArgsConstructor;
-import org.microarchitecturovisco.reservationservice.queues.config.QueuesConfig;
+import org.microarchitecturovisco.reservationservice.queues.config.QueuesTransportConfig;
 import org.microarchitecturovisco.reservationservice.queues.hotels.ReservationRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -13,8 +13,8 @@ public class BookTransportsSaga {
 
     public boolean checkIfTransportIsAvailable(ReservationRequest reservationRequest) {
         String result = (String) rabbitTemplate.convertSendAndReceive(
-                QueuesConfig.EXCHANGE_TRANSPORT,
-                QueuesConfig.ROUTING_KEY_TRANSPORT_BOOK_REQ,
+                QueuesTransportConfig.EXCHANGE_TRANSPORT,
+                QueuesTransportConfig.ROUTING_KEY_TRANSPORT_BOOK_REQ,
                 reservationRequest
         );
 
