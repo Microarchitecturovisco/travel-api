@@ -7,7 +7,6 @@ import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseDto;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
-import org.microarchitecturovisco.reservationservice.domain.events.ReservationEvent;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationNotFoundAfterPaymentException;
