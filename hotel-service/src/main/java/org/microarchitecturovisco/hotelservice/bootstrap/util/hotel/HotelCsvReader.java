@@ -1,28 +1,31 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util.hotel;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
+@RequiredArgsConstructor
 public class HotelCsvReader {
 
-    public static File loadCSVInitFiles(String filepathInResources) throws FileNotFoundException {
-        return ResourceUtils.getFile("classpath:" + filepathInResources);
-    }
+    private final ResourceLoader resourceLoader;
 
     // Method to read hotels.csv and retrieve hotel name based on hotelId
-    public static String getHotelNameById(int hotelId) throws FileNotFoundException {
-        File hotelCsvFile = loadCSVInitFiles("initData/hotels.csv");
-        Map<Integer, String> hotelIdToNameMap = readHotelCsvFile(hotelCsvFile);
+    public String getHotelNameById(int hotelId) throws FileNotFoundException {
+        Map<Integer, String> hotelIdToNameMap = readHotelCsvFile(resourceLoader.getResource("classpath:initData/hotels.csv"));
         return hotelIdToNameMap.getOrDefault(hotelId, "Hotel not found"); // Return hotel name or "Hotel not found" if not found
     }
 
     // Method to read hotels.csv and create a mapping of hotelId to hotelName
-    private static Map<Integer, String> readHotelCsvFile(File hotelCsvFile) {
+    private static Map<Integer, String> readHotelCsvFile(Resource resource) {
         Map<Integer, String> hotelIdToNameMap = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(hotelCsvFile))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             br.readLine(); // Skip header line
             while ((line = br.readLine()) != null) {
