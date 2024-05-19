@@ -3,6 +3,7 @@ package org.microarchitecturovisco.transport.controllers;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.controllers.reservations.ReservationRequest;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
+import org.microarchitecturovisco.transport.controllers.reservations.CheckTransportAvailabilityRequest;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
@@ -12,6 +13,7 @@ import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySea
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
+import org.microarchitecturovisco.transport.queues.config.QueuesConfig;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.services.TransportCommandService;
 import org.microarchitecturovisco.transport.services.TransportsQueryService;
@@ -123,6 +125,34 @@ public class TransportsQueryController {
                     .transportReservationDto(reservationDto)
                     .build()
             );
+        }
+    }
+    
+    @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_BOOK_REQ)
+    public String consumeMessageFromQueue(CheckTransportAvailabilityRequest request) {
+        System.out.println("Message received from queue: " + request);
+
+        GetTransportsBySearchQueryRequestDto searchQuery = GetTransportsBySearchQueryRequestDto.builder()
+                .uuid(UUID.randomUUID())
+                .dateFrom(request.getHotelTimeFrom())
+                .dateTo(request.getHotelTimeTo())
+                .departureLocationIdsByPlane(request.getDepartureLocationIdsByPlane())
+                .departureLocationIdsByBus(request.getDepartureLocationIdsByBus())
+                .arrivalLocationIds(request.getArrivalLocationIds())
+                .adults(request.getAdultsQuantity())
+                .childrenUnderThree(request.getChildrenUnder3Quantity())
+                .childrenUnderTen(request.getChildrenUnder10Quantity())
+                .childrenUnderEighteen(request.getChildrenUnder18Quantity())
+                .build();
+        GetTransportsBySearchQueryResponseDto transports = transportsQueryService.getTransportsBySearchQuery(searchQuery);
+
+        System.out.println("TRANSPORTS: " + transports.toString());
+
+        if(transports.getTransportDtoList().size()>0){
+            return Boolean.toString(true);
+        }
+        else{
+            return Boolean.toString(false);
         }
     }
 }

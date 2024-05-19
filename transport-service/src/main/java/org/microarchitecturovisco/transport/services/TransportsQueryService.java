@@ -141,7 +141,7 @@ public class TransportsQueryService {
                 .minusMinutes(requestDto.getDateTo().getMinute());
 
         GetTransportsBySearchQueryResponseDto departureDayTransportsResponse = getTransportsBySearchQuery(GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(requestDto.getUuid().toString())
+                .uuid(requestDto.getUuid())
                 .dateFrom(dateFrom)
                 .dateTo(dateFrom.plusHours(23).plusMinutes(59))
                 .adults(requestDto.getAdults())
@@ -155,7 +155,7 @@ public class TransportsQueryService {
         );
 
         GetTransportsBySearchQueryResponseDto arrivalDayTransportsResponse = getTransportsBySearchQuery(GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(requestDto.getUuid().toString())
+                .uuid(requestDto.getUuid())
                 .dateFrom(dateTo)
                 .dateTo(dateTo.plusHours(23).plusMinutes(59))
                 .adults(requestDto.getAdults())
@@ -197,7 +197,7 @@ public class TransportsQueryService {
                 .minusMinutes(requestDto.getDateTo().getMinute());
 
         GetTransportsBySearchQueryResponseDto departureDayTransportsResponse = getTransportsBySearchQuery(GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(requestDto.getUuid().toString())
+                .uuid(requestDto.getUuid())
                 .dateFrom(dateFrom)
                 .dateTo(dateFrom.plusHours(23).plusMinutes(59))
                 .adults(requestDto.getAdults())
@@ -211,7 +211,7 @@ public class TransportsQueryService {
         );
 
         GetTransportsBySearchQueryResponseDto arrivalDayTransportsResponse = getTransportsBySearchQuery(GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(requestDto.getUuid().toString())
+                .uuid(requestDto.getUuid())
                 .dateFrom(dateTo)
                 .dateTo(dateTo.plusHours(23).plusMinutes(59))
                 .adults(requestDto.getAdults())
