@@ -7,6 +7,8 @@ import org.microarchitecturovisco.reservationservice.queues.config.ReservationRe
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.logging.Logger;
+
 @Service
 @RequiredArgsConstructor
 public class BookHotelsSaga {
@@ -18,6 +20,9 @@ public class BookHotelsSaga {
                 QueuesHotelConfig.ROUTING_KEY_HOTEL_CHECK_AVAILABILITY_REQ,
                 reservationRequest
         );
+
+        Logger logger = Logger.getLogger("checkIfHotelIsAvailable");
+        logger.info("Result from hotels " + result);
 
         return Boolean.parseBoolean(result);
     }

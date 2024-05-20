@@ -69,8 +69,6 @@ public class OffersService {
                 kids,
                 teens);
 
-        System.out.println("Available transports: " + availableTransports);
-
         List<HotelDto> availableHotels = getAvailableHotelsBasedOnSearchQuery(
                 dateFromString,
                 dateToString,
@@ -79,8 +77,6 @@ public class OffersService {
                 infants,
                 kids,
                 teens);
-
-        System.out.println("Available hotels: " + availableHotels);
 
         Pair<LocalDateTime, LocalDateTime> tripDates = parseDates(dateFromString, dateToString);
 
@@ -139,7 +135,7 @@ public class OffersService {
         final float LAST_MINUTE_DISCOUNT_FACTOR = 0.7f;
         final float HIGH_PRICE_FACTOR = 1.2f;
 
-        float adultHotelPrice = (pricePerAdultPerRoomPerDay + cateringPrice);
+        float adultHotelPrice = (pricePerAdultPerRoomPerDay / 10 + cateringPrice);
 
         float priceForAdultsPerDayPerRoom = adults * adultHotelPrice;
         float priceForInfantPerDayPerRoom = infants * adultHotelPrice * INFANT_DISCOUNT_FACTOR;
@@ -212,7 +208,6 @@ public class OffersService {
             if(responseMessageB != null) {
                 String responseMessage = (new String(responseMessageB)).replace("\\", "");
                 responseMessage = responseMessage.substring(1, responseMessage.length() - 1);
-                System.out.println(responseMessage);
                 GetHotelsBySearchQueryResponseDto response = JsonReader.readHotelsBySearchQueryResponseDtoFromJson(responseMessage);
                 return response.getHotels();
             }
@@ -259,8 +254,6 @@ public class OffersService {
             String responseMessage = (String) rabbitTemplate.convertSendAndReceive("transports.requests.getTransportsBetweenMultipleLocations", "transports.getTransportsBetweenMultipleLocations", transportMessageJson);
 
             if(responseMessage != null) {
-
-                System.out.println("Transports message: " + responseMessage);
 
                 TransportsBasedOnSearchQueryResponse transportDtoResponse = JsonReader.readTransportsBasedOnSearchQueryResponseFromJson(responseMessage);
                 return transportDtoResponse.getTransportPairs();

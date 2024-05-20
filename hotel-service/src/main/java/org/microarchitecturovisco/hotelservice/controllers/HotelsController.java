@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RestController()
 @RequestMapping("/hotels")
@@ -37,11 +38,13 @@ public class HotelsController {
     @RabbitListener(queues = "hotels.requests.hotelsBySearchQuery")
     public String consumeGetHotelsRequest(String requestDtoJson) {
 
+        Logger logger = Logger.getLogger("getHotelsBySearchQuery");
+        logger.info("Request: " + requestDtoJson);
+
         GetHotelsBySearchQueryRequestDto requestDto = JsonReader.readGetHotelsBySearchQueryRequestFromJson(requestDtoJson);
         GetHotelsBySearchQueryResponseDto responseDto = hotelsService.GetHotelsBySearchQuery(requestDto);
 
-        System.out.println("Send hotels response size " + responseDto.getHotels().size());
-
+        logger.info("Response hotels size: " + responseDto.getHotels().size());
 
         return JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto);
     }
@@ -49,31 +52,40 @@ public class HotelsController {
     @RabbitListener(queues = "hotels.requests.getHotelDetails")
     public String consumeGetHotelDetails(String requestDtoJson) {
 
+        Logger logger = Logger.getLogger("getHotelDetails");
+
         GetHotelDetailsRequestDto requestDto = JsonReader.readGetHotelDetailsRequestFromJson(requestDtoJson);
         GetHotelDetailsResponseDto responseDto = hotelsService.getHotelDetails(requestDto);
 
+        logger.info("Response for hotel: " + responseDto.getHotelId() + " " + responseDto.getHotelName());
 
         return JsonConverter.convertGetHotelDetailsResponseDto(responseDto);
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CHECK_AVAILABILITY_REQ)
-    public String consumeMessageCheckHotelAvailability(CheckHotelAvailabilityRequest request) {
-        System.out.println("Message received from queue: " + request);
+    public String consumeMessageCheckHotelAvailability(String request) {
+
+        Logger logger = Logger.getLogger("checkHotelAvailability");
+        logger.info("Request: " + request);
+
+        CheckHotelAvailabilityRequest availabilityRequest = JsonReader.readDtoFromJson(request, CheckHotelAvailabilityRequest.class);
 
         CheckHotelAvailabilityQueryRequestDto query = CheckHotelAvailabilityQueryRequestDto.builder()
-                .dateFrom(request.getHotelTimeFrom())
-                .dateTo(request.getHotelTimeTo())
-                .adults(request.getAdultsQuantity())
-                .childrenUnderThree(request.getChildrenUnder3Quantity())
-                .childrenUnderTen(request.getChildrenUnder10Quantity())
-                .childrenUnderEighteen(request.getChildrenUnder18Quantity())
-                .hotelId(request.getHotelId())
-                .roomReservationsIds(request.getRoomReservationsIds())
+                .dateFrom(availabilityRequest.getHotelTimeFrom())
+                .dateTo(availabilityRequest.getHotelTimeTo())
+                .adults(availabilityRequest.getAdultsQuantity())
+                .childrenUnderThree(availabilityRequest.getChildrenUnder3Quantity())
+                .childrenUnderTen(availabilityRequest.getChildrenUnder10Quantity())
+                .childrenUnderEighteen(availabilityRequest.getChildrenUnder18Quantity())
+                .hotelId(availabilityRequest.getHotelId())
+                .roomReservationsIds(availabilityRequest.getRoomReservationsIds())
+
                 .build();
 
         boolean hotelAvailable = hotelsService.CheckHotelAvailability(query);
-
+        
         return String.valueOf(hotelAvailable) ;
+
     }
 
     @RabbitListener(queues = "#{handleCreateHotelReservationQueue.name}")

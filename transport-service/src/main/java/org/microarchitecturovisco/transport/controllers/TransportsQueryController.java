@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RestController()
 @RequestMapping("/transports")
@@ -69,39 +70,51 @@ public class TransportsQueryController {
 
     @RabbitListener(queues = "transports.requests.getTransportsBySearchQuery")
     public String consumeGetTransportsRequest(String requestDtoJson) {
-        long startTime = System.currentTimeMillis();
+
+        Logger logger = Logger.getLogger("getTransportsBySearchQuery");
+        logger.info("Request: " + requestDtoJson);
 
         GetTransportsBySearchQueryRequestDto requestDto = JsonReader.readGetTransportsBySearchQueryRequestFromJson(requestDtoJson);
 
         GetTransportsBySearchQueryResponseDto responseDto = transportsQueryService.getTransportsBySearchQuery(requestDto);
 
-        long endTime = System.currentTimeMillis();
-        System.out.println("Send transports response size " + responseDto.getTransportDtoList().size());
-        System.out.println("Service call took " + (endTime - startTime) + " ms");
+        logger.info("Response size: " + responseDto.getTransportDtoList().size());
 
         return JsonConverter.convertGetTransportsBySearchQueryResponseDto(responseDto);
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBetweenLocations")
     public String getTransportsBetweenLocations(String requestDtoJson) {
+        Logger logger = Logger.getLogger("getTransportsBetweenLocations");
+        logger.info("Request: " + requestDtoJson);
+
         GetTransportsBetweenLocationsRequestDto requestDto = JsonReader.readGetTransportsBetweenLocationsRequestDtoFromJson(requestDtoJson);
 
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenLocations(requestDto);
+
+        logger.info("Response size: " + responseDto.getTransportPairs().size());
 
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 
     @RabbitListener(queues = "transports.requests.getTransportsBetweenMultipleLocations")
     public String getTransportsBetweenMultipleLocations(String requestDtoJson) {
+        Logger logger = Logger.getLogger("getTransportsBetweenMultipleLocations");
+        logger.info("Request: " + requestDtoJson);
+
         GetTransportsBetweenMultipleLocationsRequestDto requestDto = JsonReader.readDtoFromJson(requestDtoJson, GetTransportsBetweenMultipleLocationsRequestDto.class);
 
         GetTransportsBetweenLocationsResponseDto responseDto = transportsQueryService.getTransportsBetweenMultipleLocations(requestDto);
+
+        logger.info("Response size: " + responseDto.getTransportPairs().size());
+
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 
     @RabbitListener(queues = "#{handleCreateTransportReservationQueue.name}")
     public void consumeMessageCreateTransportReservation(ReservationRequest request) {
-        System.out.println("Message received from queue: " + request);
+        Logger logger = Logger.getLogger("createTransportReservation");
+        logger.info("Request: " + request);
 
         int numberOfTransportsInReservation = request.getTransportReservationsIds().size();
 
