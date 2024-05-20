@@ -13,8 +13,8 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.domain.model.LocationReservationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
+import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
-import org.microarchitecturovisco.reservationservice.queues.config.ReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
+    public static final int PAYMENT_TIMEOUT_SECONDS = 15;
     public static Logger logger = Logger.getLogger(ReservationService.class.getName());
 
     private final ReservationRepository reservationRepository;
@@ -82,7 +82,6 @@ public class ReservationService {
 
         UUID reservationId = UUID.randomUUID();
         reservationRequest.setId(reservationId);
-
         createReservationFromRequest(reservationRequest);
 
         bookHotelsSaga.createHotelReservation(reservationRequest);
@@ -94,7 +93,7 @@ public class ReservationService {
         //  (reservationId będzie gdzieś z góry)
 
         Runnable paymentTimeoutRunnable = () -> {
-            paymentTimeout(reservationId);
+            paymentTimeout(reservationRequest);
         };
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -110,8 +109,8 @@ public class ReservationService {
     }
 
     private void checkTransportAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
-        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-//        boolean transportIsAvailable = true; // debug only
+//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
     }
@@ -121,17 +120,21 @@ public class ReservationService {
         System.out.println("reservationCreated: " + reservationRequest.getId());
     }
 
-    public void paymentTimeout(UUID reservationId) {
-        ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationId + " !");
-
-        ReservationDeleteRequest reservationDeleteRequest = new ReservationDeleteRequest(reservationId);
+    public void paymentTimeout(ReservationRequest reservationRequest) {
+        ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationRequest.getId() + " !");
 
         // todo: dodać rollback do rezerwacji transportu
 
 
 
         // todo: dodać rollback do rezerwacji hotelu
-        bookHotelsSaga.deleteHotelReservation(reservationDeleteRequest);
+
+        HotelReservationDeleteRequest hotelReservationDeleteRequest = HotelReservationDeleteRequest.builder()
+                .hotelId(reservationRequest.getHotelId())
+                .reservationId(reservationRequest.getId())
+                .roomIds(reservationRequest.getRoomReservationsIds())
+                .build();
+        bookHotelsSaga.deleteHotelReservation(hotelReservationDeleteRequest);
 
 
         // todo: dodać rollback usuwania obiektu rezerwacji
