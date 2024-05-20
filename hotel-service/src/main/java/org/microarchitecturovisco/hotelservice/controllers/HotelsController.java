@@ -7,7 +7,6 @@ import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHo
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
-import org.microarchitecturovisco.hotelservice.model.dto.request.CheckHotelAvailabilityQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.CheckHotelAvailabilityResponseDto;
@@ -82,7 +81,7 @@ public class HotelsController {
         return responseJson;
     }
 
-    @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CREATE_RESERVATION_REQ)
+    @RabbitListener(queues = "#{handleCreateHotelReservationQueue.name}")
     public void consumeMessageCreateHotelReservation(String requestJson) {
         System.out.println("Message received from queue: " + requestJson);
 
@@ -96,10 +95,10 @@ public class HotelsController {
             UUID roomId = request.getRoomIds().get(i);
 
             RoomReservationDto roomReservation = new RoomReservationDto();
-            roomReservation.setReservationId(createHotelReservationRequest.getId());
-            roomReservation.setDateFrom(createHotelReservationRequest.getHotelTimeFrom());
-            roomReservation.setDateTo(createHotelReservationRequest.getHotelTimeTo());
-            roomReservation.setHotelId(createHotelReservationRequest.getHotelId());
+            roomReservation.setReservationId(request.getReservationId());
+            roomReservation.setDateFrom(request.getHotelTimeFrom());
+            roomReservation.setDateTo(request.getHotelTimeTo());
+            roomReservation.setHotelId(request.getHotelId());
             roomReservation.setRoomId(roomId);
 
             roomReservations.add(roomReservation);

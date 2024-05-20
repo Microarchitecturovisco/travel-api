@@ -6,15 +6,12 @@ import org.microarchitecturovisco.reservationservice.domain.dto.requests.CreateH
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.responses.CheckHotelAvailabilityResponseDto;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
+import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesHotelConfig;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
-import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
-import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
