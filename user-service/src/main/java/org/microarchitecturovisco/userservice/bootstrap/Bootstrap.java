@@ -26,7 +26,7 @@ public class Bootstrap implements CommandLineRunner {
     public void run(String... args) {
         Logger logger = Logger.getLogger("Bootstrap | User");
 
-        List<User> users = importUsersFromCSV(resourceLoader.getResource("initData/users.csv"));
+        List<User> users = importUsersFromCSV(resourceLoader.getResource("classpath:initData/users.csv"));
 
         userRepository.saveAll(users);
 
