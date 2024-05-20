@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    public static final int PAYMENT_TIMEOUT_SECONDS = 10;
+    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
 
     public static Logger logger = Logger.getLogger(ReservationService.class.getName());
 
