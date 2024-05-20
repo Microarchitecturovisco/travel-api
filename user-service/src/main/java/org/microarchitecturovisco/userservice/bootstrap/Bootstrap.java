@@ -5,12 +5,11 @@ import org.microarchitecturovisco.userservice.domain.User;
 import org.microarchitecturovisco.userservice.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,13 +20,13 @@ import java.util.logging.Logger;
 public class Bootstrap implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final ResourceLoader resourceLoader;
 
     @Override
     public void run(String... args) {
         Logger logger = Logger.getLogger("Bootstrap | User");
 
-        File userCsvFile = loadCSVInitFile("initData/users.csv");
-        List<User> users = importUsersFromCSV(userCsvFile.getPath());
+        List<User> users = importUsersFromCSV(resourceLoader.getResource("initData/users.csv"));
 
         userRepository.saveAll(users);
 
@@ -43,10 +42,10 @@ public class Bootstrap implements CommandLineRunner {
         }
     }
 
-    private List<User> importUsersFromCSV(String csvFilePath) {
+    private List<User> importUsersFromCSV(Resource resource) {
         List<User> users = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             br.readLine(); // Skip header line
 

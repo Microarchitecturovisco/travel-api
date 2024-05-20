@@ -1,27 +1,29 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util;
 
+import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.hotel.HotelCsvReader;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.room.RoomCapacityCalculator;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomDto;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 @Component
+@RequiredArgsConstructor
 public class RoomParser {
 
-    public void importRooms(String csvFilePath, List<HotelDto> hotelDtos) {
+    private final HotelCsvReader hotelCsvReader;
+
+    public void importRooms(Resource resource, List<HotelDto> hotelDtos) {
         Logger logger = Logger.getLogger("Bootstrap | Rooms");
         RoomCapacityCalculator capacityCalculator = new RoomCapacityCalculator();
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             br.readLine(); // Skip header line
             while ((line = br.readLine()) != null) {
@@ -66,10 +68,9 @@ public class RoomParser {
         }
     }
 
-    private static Optional<HotelDto> searchForHotel(List<HotelDto> hotelDtos, int hotelId) throws FileNotFoundException {
-        HotelCsvReader hotelCsvReader = new HotelCsvReader();
+    private Optional<HotelDto> searchForHotel(List<HotelDto> hotelDtos, int hotelId) throws FileNotFoundException {
         // Retrieve hotel name from hotels.csv based on hotelId
-        String hotelName = HotelCsvReader.getHotelNameById(hotelId);
+        String hotelName = hotelCsvReader.getHotelNameById(hotelId);
 
         // Check if the hotel exists in the provided list
         Optional<HotelDto> hotelOpt = hotelDtos.stream()

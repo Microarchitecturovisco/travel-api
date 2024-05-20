@@ -1,29 +1,31 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util;
 
+import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.catering.CateringPriceCalculator;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.catering.CateringTypeMapper;
 import org.microarchitecturovisco.hotelservice.bootstrap.util.hotel.HotelCsvReader;
 import org.microarchitecturovisco.hotelservice.model.domain.CateringType;
 import org.microarchitecturovisco.hotelservice.model.dto.CateringOptionDto;
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
 @Component
+@RequiredArgsConstructor
 public class CateringOptionParser {
 
-    public List<CateringOptionDto> importCateringOptions(String csvFilePath, List<HotelDto> hotels) {
+    private final HotelCsvReader hotelCsvReader;
+
+    public List<CateringOptionDto> importCateringOptions(Resource resource, List<HotelDto> hotels) {
         Logger logger = Logger.getLogger("Bootstrap | CateringOptions");
         List<CateringOptionDto> cateringOptions = new ArrayList<>();
         CateringPriceCalculator cateringPriceCalculator = new CateringPriceCalculator();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             br.readLine(); // Skip header line
 
@@ -62,7 +64,7 @@ public class CateringOptionParser {
                 cateringOption.setHotelId(hotelOpt.get().getHotelId());
                 HotelDto hotelDto = hotels.stream().filter(hotel -> {
                     try {
-                        return Objects.equals(hotel.getName(), HotelCsvReader.getHotelNameById(hotelId));
+                        return Objects.equals(hotel.getName(), hotelCsvReader.getHotelNameById(hotelId));
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }
@@ -79,10 +81,9 @@ public class CateringOptionParser {
         return null;
     }
 
-    private static Optional<HotelDto> searchForHotel(List<HotelDto> hotelDtos, int hotelId) throws FileNotFoundException {
-        HotelCsvReader hotelCsvReader = new HotelCsvReader();
+    private Optional<HotelDto> searchForHotel(List<HotelDto> hotelDtos, int hotelId) throws FileNotFoundException {
         // Retrieve hotel name from hotels.csv based on hotelId
-        String hotelName = HotelCsvReader.getHotelNameById(hotelId);
+        String hotelName = hotelCsvReader.getHotelNameById(hotelId);
 
         // Check if the hotel exists in the provided list
         Optional<HotelDto> hotelOpt = hotelDtos.stream()

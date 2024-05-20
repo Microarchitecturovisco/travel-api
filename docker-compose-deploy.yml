@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+  discovery:
+    image: mcarchvsc-discovery
+    hostname: discovery
+    ports:
+      - "8010:8010"
+    depends_on:
+      - rabbitmq
+    networks:
+      - backend
+
+  gateway:
+    image: mcarchvsc-gateway
+    ports:
+      - "8082:8082"
+    depends_on:
+      - rabbitmq
+      - discovery
+    networks:
+      - backend
+
+
+  # custom services
+  hotel:
+    image: mcarchvsc-hotel
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+    networks:
+      - backend
+
+  offer-provider:
+    image: mcarchvsc-offer-provider
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+    networks:
+      - backend
+
+  payment:
+    image: mcarchvsc-payment
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+    networks:
+      - backend
+
+  reservation:
+    image: mcarchvsc-reservation
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+    networks:
+      - backend
+
+  transport:
+    image: mcarchvsc-transport
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+    networks:
+      - backend
+
+  user:
+    image: mcarchvsc-user
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+    networks:
+      - backend
+
+networks:
+  backend:

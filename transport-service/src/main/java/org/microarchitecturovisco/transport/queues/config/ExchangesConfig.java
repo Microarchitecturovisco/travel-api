@@ -26,7 +26,7 @@ public class ExchangesConfig {
     // get transports between locations
     @Bean
     public Queue getTransportsBetweenLocationsQueue() {
-        return new Queue("transports.requests.getTransportsBetweenLocations");
+        return new Queue("transports.requests.getTransportsBetweenLocations", false);
     }
 
     @Bean
@@ -45,7 +45,7 @@ public class ExchangesConfig {
     // get transports between multiple locations
     @Bean
     public Queue getTransportsBetweenMultipleLocationsQueue() {
-        return new Queue("transports.requests.getTransportsBetweenMultipleLocations");
+        return new Queue("transports.requests.getTransportsBetweenMultipleLocations", false);
     }
 
     @Bean
