@@ -30,18 +30,18 @@ public class QueuesHotelConfig {
     }
 
 
-    public static final String EXCHANGE_HOTEL_FANOUT = "hotels.createReservation.exchange";
+    public static final String EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION = "hotels.createReservation.exchange";
 
-    @Bean(name="fanoutExchangeHotel")
-    public FanoutExchange fanoutExchange() {
-        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT);
+    @Bean(name="fanoutExchangeHotelCreateReservation")
+    public FanoutExchange fanoutExchangeHotelCreateReservation() {
+        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION);
     }
 
 
     public static final String EXCHANGE_HOTEL_FANOUT_DELETE_RESERVATION = "hotels.deleteReservation.exchange";
 
-    @Bean(name="fanoutExchangeDeleteReservation")
-    public FanoutExchange fanoutExchangeDeleteReservation() {
+    @Bean(name="fanoutExchangeHotelDeleteReservation")
+    public FanoutExchange fanoutExchangeHotelDeleteReservation() {
         return new FanoutExchange(EXCHANGE_HOTEL_FANOUT_DELETE_RESERVATION);
     }
 

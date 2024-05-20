@@ -23,7 +23,7 @@ public class BookHotelsSaga {
     }
     public void createHotelReservation(ReservationRequest reservationRequest) {
         rabbitTemplate.convertAndSend(
-                QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT,
+                QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION,
                 "", // Routing key is ignored for FanoutExchange
                 reservationRequest
         );
