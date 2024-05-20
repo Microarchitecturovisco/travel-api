@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.reservationservice.queues.config;
+package org.microarchitecturovisco.reservationservice.queues.config.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -18,10 +17,8 @@ public class CheckTransportAvailabilityRequest implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
 
-    private TransportType transportType;
-
-    private List<UUID> departureLocationIds;
-    private List<UUID> arrivalLocationIds;
+    private UUID transportReservationsIdFrom;
+    private UUID transportReservationsIdArrival;
 
     private Integer adults;
     private Integer childrenUnderThree;

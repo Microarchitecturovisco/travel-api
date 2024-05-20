@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.reservationservice.queues.config;
+package org.microarchitecturovisco.reservationservice.queues.config.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

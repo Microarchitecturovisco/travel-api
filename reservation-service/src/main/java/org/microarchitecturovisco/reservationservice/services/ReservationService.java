@@ -14,8 +14,8 @@ import org.microarchitecturovisco.reservationservice.domain.model.LocationReserv
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
-import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
-import org.microarchitecturovisco.reservationservice.queues.config.TransportReservationDeleteRequest;
+import org.microarchitecturovisco.reservationservice.queues.config.requests.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.queues.config.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
-
 
 //    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
     public static final int PAYMENT_TIMEOUT_SECONDS = 10; // debug only
@@ -114,8 +113,8 @@ public class ReservationService {
     }
 
     private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
-//        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-        boolean hotelIsAvailable = true; // debug only
+        boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
+//        boolean hotelIsAvailable = true; // debug only
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
     }

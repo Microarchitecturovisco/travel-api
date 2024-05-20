@@ -2,30 +2,24 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
-import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
+import org.microarchitecturovisco.transport.model.dto.request.CheckTransportAvailabilityRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
-import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDepartures;
-import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
-import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
-import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
+import org.microarchitecturovisco.transport.model.dto.response.*;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
-import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -257,5 +251,51 @@ public class TransportsQueryService {
                 .stream()
                 .mapToInt(TransportReservation::getNumberOfSeats)
                 .sum();
+    }
+
+
+    public CheckAvailableTransportsDto getAvailableTransports(CheckTransportAvailabilityRequestDto requestDto) {
+        // Retrieve all transports for the given dates
+        List<Transport> transports = transportRepository.findByDepartureDateGreaterThanEqualAndDepartureDateLessThanEqual(
+                requestDto.getDateFrom(), requestDto.getDateTo());
+
+        // Filter out transports based on available capacity and the number of people
+        List<Transport> availableTransports = transports.stream()
+                .filter(transport -> isTransportAvailable(transport, requestDto))
+                .collect(Collectors.toList());
+
+        return buildAvailableTransportsDto(availableTransports);
+    }
+
+    private boolean isTransportAvailable(Transport transport, CheckTransportAvailabilityRequestDto requestDto) {
+        int totalPassengers = requestDto.getAdults() +
+                requestDto.getChildrenUnderThree() +
+                requestDto.getChildrenUnderTen() +
+                requestDto.getChildrenUnderEighteen();
+
+        int remainingCapacity = transport.getCapacity() - totalPassengers;
+
+        // Check if there are enough available seats
+        return remainingCapacity >= 0;
+    }
+
+    private CheckAvailableTransportsDto buildAvailableTransportsDto(List<Transport> availableTransports) {
+        // You can create a DTO class to represent available transports and return it here
+        // For simplicity, let's assume CheckAvailableTransportsDto has a list of TransportDto objects
+        List<TransportDto> transportDtos = availableTransports.stream()
+                .map(this::mapToTransportDto)
+                .collect(Collectors.toList());
+
+        return CheckAvailableTransportsDto.builder()
+                .transports(transportDtos)
+                .build();
+    }
+
+    private TransportDto mapToTransportDto(Transport transport) {
+        // Map Transport entity to TransportDto if needed
+        return TransportDto.builder()
+                .idTransport(transport.getId())
+                .departureDate(transport.getDepartureDate())
+                .build();
     }
 }

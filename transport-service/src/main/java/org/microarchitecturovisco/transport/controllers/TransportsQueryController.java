@@ -104,12 +104,8 @@ public class TransportsQueryController {
     @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ)
     public String consumeMessageFromQueueCheckTransportAvailability(String requestDtoJson) {
         System.out.println("Message received from queue requestDtoJson: " + requestDtoJson);
-// todo fix  - json conversion causes error
         CheckTransportAvailabilityRequestDto request = JsonReader.readDtoFromJson(requestDtoJson, CheckTransportAvailabilityRequestDto.class);
-
-
         System.out.println("Message received from queue: " + request);
-
 
         // todo change this method for more detailed query and based on date, transport id, etc
 

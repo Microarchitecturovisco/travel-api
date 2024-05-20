@@ -5,7 +5,7 @@ import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.domain.model.PurchaseRequestBody;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
-import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.queues.config.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.PostMapping;

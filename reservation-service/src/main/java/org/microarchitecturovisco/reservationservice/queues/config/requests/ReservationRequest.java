@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.reservationservice.queues.config;
+package org.microarchitecturovisco.reservationservice.queues.config.requests;
 
 import lombok.*;
 
@@ -26,8 +26,9 @@ public class ReservationRequest implements Serializable {
 
     private int childrenUnder18Quantity;
 
-    private List<UUID> departureLocationIdsByPlane;
-    private List<UUID> departureLocationIdsByBus;
+    private TransportType transportType;
+
+    private List<UUID> departureLocationIds;
     private List<UUID> arrivalLocationIds;
 
     private float price;
