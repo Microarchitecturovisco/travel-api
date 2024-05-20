@@ -125,10 +125,7 @@ public class HotelsService {
         // Step 1: Extract information from the request DTO
         LocalDateTime dateFrom = requestDto.getDateFrom();
         LocalDateTime dateTo = requestDto.getDateTo();
-        int numberOfGuests = requestDto.getAdults()
-                + requestDto.getChildrenUnderEighteen()
-                + requestDto.getChildrenUnderTen()
-                + requestDto.getChildrenUnderThree();
+
         UUID hotelId = requestDto.getHotelId();
         List<UUID> roomIds = requestDto.getRoomReservationsIds();
 
@@ -143,20 +140,15 @@ public class HotelsService {
         // Step 3: Filter rooms by room IDs
         List<Room> specificRooms = hotel.getRooms().stream()
                 .filter(room -> roomIds.contains(room.getId()))
-                .collect(Collectors.toList());
+                .toList();
 
-        // Step 4: Filter rooms by guest capacity
-        List<Room> roomsWithSufficientCapacity = specificRooms.stream()
-                .filter(room -> room.getGuestCapacity() >= numberOfGuests)
-                .collect(Collectors.toList());
 
-        // Step 5: Filter rooms by availability
-        List<Room> availableRooms = roomsWithSufficientCapacity.stream()
-                .filter(room -> isRoomAvailable(room, dateFrom, dateTo))
-                .collect(Collectors.toList());
+        // Step 4: check availability of all rooms
+        for (Room specificRoom :specificRooms) {
+            if (!isRoomAvailable(specificRoom, dateFrom, dateTo)) { return false;}
+        }
 
-        // Step 6: Determine availability
-        return !availableRooms.isEmpty();
+        return true;
     }
 
     private boolean isRoomAvailable(Room room, LocalDateTime dateFrom, LocalDateTime dateTo) {

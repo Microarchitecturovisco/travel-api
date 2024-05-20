@@ -107,7 +107,6 @@ public class HotelEventProjector {
                 .dateTo(event.getDateTo())
                 .room(room)
                 .build();
-
         room.getRoomReservations().add(roomReservation);
         roomReservationRepository.save(roomReservation);
         roomRepository.save(room);
@@ -116,6 +115,11 @@ public class HotelEventProjector {
     }
     private void apply(RoomReservationDeletedEvent event) {
         UUID roomReservationId = event.getIdRoomReservation();
+        List<HotelEvent> roomReservationIds = eventStore.findAll().stream().filter(e -> e instanceof RoomReservationCreatedEvent).toList();
+
+        List<HotelEvent> roomReservationIds2 = roomReservationIds.stream().filter(e -> ((RoomReservationCreatedEvent) e).getIdRoomReservation().equals(roomReservationId)).toList();
+        List<UUID> roomReservationIds3 = roomReservationIds2.stream().map(HotelEvent::getId).toList();
+
 
         Room room = roomRepository.findById(event.getIdRoom()).orElseThrow(RuntimeException::new);
         List<RoomReservation> roomReservations = room.getRoomReservations();
@@ -123,9 +127,9 @@ public class HotelEventProjector {
         Iterator<RoomReservation> iterator = roomReservations.iterator();
         while (iterator.hasNext()) {
             RoomReservation roomReservation = iterator.next();
-            if (roomReservation.getId().equals(roomReservationId)) {
+            if (roomReservationIds3.contains(roomReservation.getId())) {
                 iterator.remove();
-                roomReservationRepository.deleteById(roomReservationId);  // Explicitly remove from RoomReservation repository
+                roomReservationRepository.deleteById(roomReservation.getId());  // Explicitly remove from RoomReservation repository
                 roomRepository.save(room);
                 break;
             }

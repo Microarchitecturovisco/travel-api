@@ -19,14 +19,12 @@ public class GetHotelsBySearchQueryRequestDto implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
 
+    private List<UUID> arrivalLocationIds;
+
     private Integer adults;
     private Integer childrenUnderThree;
     private Integer childrenUnderTen;
     private Integer childrenUnderEighteen;
 
-    private UUID hotelId;
 
-    private List<UUID> roomReservationsIds;
-
-    private List<UUID> arrivalLocationIds;
 }
