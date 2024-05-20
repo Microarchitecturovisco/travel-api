@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RestController()
 @RequestMapping("/hotels")
@@ -37,11 +38,13 @@ public class HotelsController {
     @RabbitListener(queues = "hotels.requests.hotelsBySearchQuery")
     public String consumeGetHotelsRequest(String requestDtoJson) {
 
+        Logger logger = Logger.getLogger("getHotelsBySearchQuery");
+        logger.info("Request: " + requestDtoJson);
+
         GetHotelsBySearchQueryRequestDto requestDto = JsonReader.readGetHotelsBySearchQueryRequestFromJson(requestDtoJson);
         GetHotelsBySearchQueryResponseDto responseDto = hotelsService.GetHotelsBySearchQuery(requestDto);
 
-        System.out.println("Send hotels response size " + responseDto.getHotels().size());
-
+        logger.info("Response hotels size: " + responseDto.getHotels().size());
 
         return JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto);
     }
@@ -49,16 +52,24 @@ public class HotelsController {
     @RabbitListener(queues = "hotels.requests.getHotelDetails")
     public String consumeGetHotelDetails(String requestDtoJson) {
 
+        Logger logger = Logger.getLogger("getHotelDetails");
+
         GetHotelDetailsRequestDto requestDto = JsonReader.readGetHotelDetailsRequestFromJson(requestDtoJson);
         GetHotelDetailsResponseDto responseDto = hotelsService.getHotelDetails(requestDto);
 
+        logger.info("Response for hotel: " + responseDto.getHotelId() + " " + responseDto.getHotelName());
 
         return JsonConverter.convertGetHotelDetailsResponseDto(responseDto);
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CHECK_AVAILABILITY_REQ)
-    public String consumeMessageCheckHotelAvailability(CheckHotelAvailabilityRequest request) {
-        System.out.println("Message received from queue: " + request);
+    public String consumeMessageCheckHotelAvailability(String request) {
+
+        Logger logger = Logger.getLogger("checkHotelAvailability");
+        logger.info("Request: " + request);
+
+        CheckHotelAvailabilityRequest availabilityRequest = JsonReader.readDtoFromJson(request, CheckHotelAvailabilityRequest.class);
+
 
         CheckHotelAvailabilityQueryRequestDto query = CheckHotelAvailabilityQueryRequestDto.builder()
                 .dateFrom(request.getHotelTimeFrom())

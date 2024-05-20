@@ -29,6 +29,6 @@ public class GetOfferDetailsResponseDto {
 
     private List<CateringOptionDto> cateringOptions;
 
-    private TransportDto departure;
-    private List<TransportDto> possibleDepartures;
+    private List<TransportDto> departure;
+    private List<List<TransportDto>> possibleDepartures;
 }

@@ -69,8 +69,6 @@ public class OffersService {
                 kids,
                 teens);
 
-        System.out.println("Available transports: " + availableTransports);
-
         List<HotelDto> availableHotels = getAvailableHotelsBasedOnSearchQuery(
                 dateFromString,
                 dateToString,
@@ -79,8 +77,6 @@ public class OffersService {
                 infants,
                 kids,
                 teens);
-
-        System.out.println("Available hotels: " + availableHotels);
 
         Pair<LocalDateTime, LocalDateTime> tripDates = parseDates(dateFromString, dateToString);
 
@@ -139,7 +135,7 @@ public class OffersService {
         final float LAST_MINUTE_DISCOUNT_FACTOR = 0.7f;
         final float HIGH_PRICE_FACTOR = 1.2f;
 
-        float adultHotelPrice = (pricePerAdultPerRoomPerDay + cateringPrice);
+        float adultHotelPrice = (pricePerAdultPerRoomPerDay / 10 + cateringPrice);
 
         float priceForAdultsPerDayPerRoom = adults * adultHotelPrice;
         float priceForInfantPerDayPerRoom = infants * adultHotelPrice * INFANT_DISCOUNT_FACTOR;
@@ -212,7 +208,6 @@ public class OffersService {
             if(responseMessageB != null) {
                 String responseMessage = (new String(responseMessageB)).replace("\\", "");
                 responseMessage = responseMessage.substring(1, responseMessage.length() - 1);
-                System.out.println(responseMessage);
                 GetHotelsBySearchQueryResponseDto response = JsonReader.readHotelsBySearchQueryResponseDtoFromJson(responseMessage);
                 return response.getHotels();
             }
@@ -259,8 +254,6 @@ public class OffersService {
             String responseMessage = (String) rabbitTemplate.convertSendAndReceive("transports.requests.getTransportsBetweenMultipleLocations", "transports.getTransportsBetweenMultipleLocations", transportMessageJson);
 
             if(responseMessage != null) {
-
-                System.out.println("Transports message: " + responseMessage);
 
                 TransportsBasedOnSearchQueryResponse transportDtoResponse = JsonReader.readTransportsBasedOnSearchQueryResponseFromJson(responseMessage);
                 return transportDtoResponse.getTransportPairs();
@@ -317,16 +310,24 @@ public class OffersService {
                 Logger logger = Logger.getLogger("Offer Provider");
                 logger.info("Offer details" + idHotel + ": Received hotel details");
 
-                List<TransportDto> transportsToHotel = getFilteredTransportsFromTransportModule(
+                List<List<TransportDto>> transports = getFilteredTransportsFromTransportModule(
                         departureBuses, departurePlanes,
                         List.of(hotelResponseDto.getLocation().getIdLocation()),
                         dates.getFirst(), dates.getSecond(),
                         adults, infants, kids, teens
-                ).stream()
+                ).stream().sorted(Comparator.comparing(pair -> pair.getFirst().getPricePerAdult())).toList();
+
+                List<TransportDto> transportsToHotel = transports
+                        .stream()
                         .filter(list -> list.size() > 1)
                         .map(List::getFirst)
-                        .sorted(Comparator.comparing(TransportDto::getPricePerAdult))
                         .toList();
+                List<TransportDto> transportsFromHotel = transports
+                        .stream()
+                        .filter(list -> list.size() > 1)
+                        .map(List::getLast)
+                        .toList();
+
                 logger.info("Offer details " + idHotel + ": Received transports to hotel");
 
                 List<List<RoomResponseDto>> roomConfigs = hotelResponseDto
@@ -349,12 +350,12 @@ public class OffersService {
                                 hotelResponseDto.getRoomsConfigurations().stream().sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult)).toList().getFirst().getPricePerAdult(),
                                 catering.isEmpty() ? 0.0f : catering.getFirst().getPrice(),
                                 (int) ChronoUnit.DAYS.between(dates.getFirst(), LocalDateTime.now()),
-                                transportsToHotel.getFirst().getPricePerAdult())
+                                transportsToHotel.getFirst().getPricePerAdult() + transportsFromHotel.getFirst().getPricePerAdult())
                         )
                         .roomConfiguration(roomConfigs.getFirst())
                         .possibleRoomConfigurations(roomConfigs.subList(1, roomConfigs.size()))
-                        .departure(transportsToHotel.getFirst())
-                        .possibleDepartures(transportsToHotel.subList(1, transportsToHotel.size()))
+                        .departure(List.of(transportsToHotel.getFirst(), transportsFromHotel.getLast()))
+                        .possibleDepartures(List.of(transportsToHotel.subList(1, transportsToHotel.size()), transportsFromHotel.subList(1, transportsFromHotel.size())))
                         .imageUrls(hotelResponseDto.getPhotos())
                         .cateringOptions(catering)
                         .build();

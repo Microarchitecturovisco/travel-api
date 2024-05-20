@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +34,9 @@ public class OffersController {
 
     ) {
 
+        Logger logger = Logger.getLogger("getOffersBasedOnSearchQuery");
+        logger.info("Request for arrivals: " + arrivals);
+
         departureBuses = departureBuses != null ? departureBuses : new ArrayList<>();
         departurePlane = departurePlane != null ? departurePlane : new ArrayList<>();
 
@@ -41,7 +45,7 @@ public class OffersController {
         List<UUID> arrivalsWithUUIDs = arrivals.stream().map(UUID::fromString).toList();
 
 
-        return offersService.getOffersBasedOnSearchQuery(departureBusesWithUUIDs,
+        List<OfferDto> offerDtos = offersService.getOffersBasedOnSearchQuery(departureBusesWithUUIDs,
                 departurePlanesWithUUIDs,
                 arrivalsWithUUIDs,
                 dateFrom,
@@ -50,6 +54,9 @@ public class OffersController {
                 infants,
                 kids,
                 teens);
+
+        logger.info("Response size: " + offerDtos.size());
+        return offerDtos;
     }
 
     @GetMapping("/{idHotel}")
@@ -64,11 +71,17 @@ public class OffersController {
             @RequestParam(name = "kids") Integer kids,
             @RequestParam(name = "teens") Integer teens
     ) {
+        Logger logger = Logger.getLogger("getOfferDetails");
+        logger.info("Request for hotel ID: " + idHotel);
+
         departureBuses = departureBuses != null ? departureBuses : new ArrayList<>();
         departurePlanes = departurePlanes != null ? departurePlanes : new ArrayList<>();
 
-        return offersService.getOfferDetails(
+        GetOfferDetailsResponseDto responseDto = offersService.getOfferDetails(
                 idHotel, dateFrom, dateTo, departureBuses, departurePlanes, adults, infants, kids, teens
         );
+        logger.info("Response: " + responseDto);
+
+        return responseDto;
     }
 }

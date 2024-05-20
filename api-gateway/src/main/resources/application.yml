@@ -8,6 +8,13 @@ eureka:
   instance:
     prefer-ip-address: true
 
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
 spring:
   application:
     name: api-gateway
@@ -15,16 +22,23 @@ spring:
     gateway:
       globalcors:
         cors-configurations:
-          "[/**]":
+          '[/**]':
             allowed-origins:
-              - "*"
-            allowed-methods:
-              - "*"
-          "/**":
+              - '*'
             allowed-origin-patterns:
-              - "*"
+              - '*'
             allowed-methods:
-              - "*"
+              - '*'
+          '/**':
+            allowed-origin-patterns:
+              - '*'
+            allowed-origins:
+              - '*'
+            allowed-headers:
+              - '*'
+            allowed-methods:
+              - '*'
+        add-to-simple-url-handler-mapping: true
       routes:
         - id: hotel-service
           uri: lb://hotel-service
@@ -54,11 +68,16 @@ spring:
           uri: lb://reservation-service
           predicates:
             - Path=/reservations/**
-          filters:
-            - RemoveRequestHeader=Cookie
+          metadata:
+            cors:
+              allowedOrigins: '*'
+              allowedMethods: '*'
+              allowedHeaders: '*'
         - id: payment-service
           uri: lb://payment-service
           predicates:
             - Path=/payments/**
           filters:
             - RemoveRequestHeader=Cookie
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
