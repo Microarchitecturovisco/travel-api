@@ -310,16 +310,24 @@ public class OffersService {
                 Logger logger = Logger.getLogger("Offer Provider");
                 logger.info("Offer details" + idHotel + ": Received hotel details");
 
-                List<TransportDto> transportsToHotel = getFilteredTransportsFromTransportModule(
+                List<List<TransportDto>> transports = getFilteredTransportsFromTransportModule(
                         departureBuses, departurePlanes,
                         List.of(hotelResponseDto.getLocation().getIdLocation()),
                         dates.getFirst(), dates.getSecond(),
                         adults, infants, kids, teens
-                ).stream()
+                ).stream().sorted(Comparator.comparing(pair -> pair.getFirst().getPricePerAdult())).toList();
+
+                List<TransportDto> transportsToHotel = transports
+                        .stream()
                         .filter(list -> list.size() > 1)
                         .map(List::getFirst)
-                        .sorted(Comparator.comparing(TransportDto::getPricePerAdult))
                         .toList();
+                List<TransportDto> transportsFromHotel = transports
+                        .stream()
+                        .filter(list -> list.size() > 1)
+                        .map(List::getLast)
+                        .toList();
+
                 logger.info("Offer details " + idHotel + ": Received transports to hotel");
 
                 List<List<RoomResponseDto>> roomConfigs = hotelResponseDto
@@ -342,12 +350,12 @@ public class OffersService {
                                 hotelResponseDto.getRoomsConfigurations().stream().sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult)).toList().getFirst().getPricePerAdult(),
                                 catering.isEmpty() ? 0.0f : catering.getFirst().getPrice(),
                                 (int) ChronoUnit.DAYS.between(dates.getFirst(), LocalDateTime.now()),
-                                transportsToHotel.getFirst().getPricePerAdult())
+                                transportsToHotel.getFirst().getPricePerAdult() + transportsFromHotel.getFirst().getPricePerAdult())
                         )
                         .roomConfiguration(roomConfigs.getFirst())
                         .possibleRoomConfigurations(roomConfigs.subList(1, roomConfigs.size()))
-                        .departure(transportsToHotel.getFirst())
-                        .possibleDepartures(transportsToHotel.subList(1, transportsToHotel.size()))
+                        .departure(List.of(transportsToHotel.getFirst(), transportsFromHotel.getLast()))
+                        .possibleDepartures(List.of(transportsToHotel.subList(1, transportsToHotel.size()), transportsFromHotel.subList(1, transportsFromHotel.size())))
                         .imageUrls(hotelResponseDto.getPhotos())
                         .cateringOptions(catering)
                         .build();
