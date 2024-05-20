@@ -5,25 +5,25 @@ services:
     image: rabbitmq:3.13-management
     hostname: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "18424:5672"
+      - "18446:15672"
     networks:
       - backend
 
   discovery:
-    image: mcarchvsc-discovery
+    image: rsww_184249-discovery
     hostname: discovery
     ports:
-      - "8010:8010"
+      - "18451:8010"
     depends_on:
       - rabbitmq
     networks:
       - backend
 
   gateway:
-    image: mcarchvsc-gateway
+    image: rsww_184249-gateway
     ports:
-      - "8082:8082"
+      - "18469:8082"
     depends_on:
       - rabbitmq
       - discovery
@@ -33,7 +33,7 @@ services:
 
   # custom services
   hotel:
-    image: mcarchvsc-hotel
+    image: rsww_184249-hotel
     depends_on:
       - rabbitmq
       - discovery
@@ -42,7 +42,7 @@ services:
       - backend
 
   offer-provider:
-    image: mcarchvsc-offer-provider
+    image: rsww_184249-offer-provider
     depends_on:
       - rabbitmq
       - discovery
@@ -51,7 +51,7 @@ services:
       - backend
 
   payment:
-    image: mcarchvsc-payment
+    image: rsww_184249-payment
     depends_on:
       - rabbitmq
       - discovery
@@ -60,7 +60,7 @@ services:
       - backend
 
   reservation:
-    image: mcarchvsc-reservation
+    image: rsww_184249-reservation
     depends_on:
       - rabbitmq
       - discovery
@@ -69,7 +69,7 @@ services:
       - backend
 
   transport:
-    image: mcarchvsc-transport
+    image: rsww_184249-transport
     depends_on:
       - rabbitmq
       - discovery
@@ -78,7 +78,7 @@ services:
       - backend
 
   user:
-    image: mcarchvsc-user
+    image: rsww_184249-user
     depends_on:
       - rabbitmq
       - discovery

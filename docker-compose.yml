@@ -1,5 +1,5 @@
 version: "3.9"
-name: mcarchvsc
+name: rsww_184249
 
 services:
   rabbitmq:
