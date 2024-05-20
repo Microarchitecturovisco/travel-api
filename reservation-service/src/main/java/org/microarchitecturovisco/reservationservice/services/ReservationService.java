@@ -14,6 +14,7 @@ import org.microarchitecturovisco.reservationservice.domain.model.LocationReserv
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
+import org.microarchitecturovisco.reservationservice.queues.config.ReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
@@ -63,7 +64,7 @@ public class ReservationService {
                 .adultsQuantity(adultsQuantity)
                 .price(price)
                 .paid(false)
-                .hotelId(hotelId.toString())
+                .hotelId(hotelId)
                 .roomReservationsIds(roomReservationsIds)
                 .transportReservationsIds(transportReservationsIds)
                 .userId(userId)
@@ -88,20 +89,12 @@ public class ReservationService {
 
         bookTransportsSaga.createTransportReservation(reservationRequest);
 
-        // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
-        //  (co skutkuje cofnięciem poprzednich operacji);
-        //  do aplikacji klienckiej zwracany jest status 2xx oraz idReservation tego zamówienia
-        //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
-
-        // todo: dodać rollback do rezerwacji hotelu
-        // todo: dodać rollback do rezerwacji transportu
-
         // todo:
         //  Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności
         //  (reservationId będzie gdzieś z góry)
 
         Runnable paymentTimeoutRunnable = () -> {
-            paymentTimeout(reservationId.toString());
+            paymentTimeout(reservationId);
         };
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -128,8 +121,21 @@ public class ReservationService {
         System.out.println("reservationCreated: " + reservationRequest.getId());
     }
 
-    public void paymentTimeout(String reservationId) {
+    public void paymentTimeout(UUID reservationId) {
         ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationId + " !");
+
+        ReservationDeleteRequest reservationDeleteRequest = new ReservationDeleteRequest(reservationId);
+
+        // todo: dodać rollback do rezerwacji transportu
+
+
+
+        // todo: dodać rollback do rezerwacji hotelu
+        bookHotelsSaga.deleteHotelReservation(reservationDeleteRequest);
+
+
+        // todo: dodać rollback usuwania obiektu rezerwacji
+
 
     }
 
@@ -165,7 +171,7 @@ public class ReservationService {
                 .build();
     }
 
-    private HotelInfo getHotelInformation(String hotelId) {
+    private HotelInfo getHotelInformation(UUID hotelId) {
         return HotelInfo.builder().hotelPrice(1500.0f).name("Hotel testowy").roomTypes(Map.of("Pokój dwuosobowy", 1)).build();
     }
 

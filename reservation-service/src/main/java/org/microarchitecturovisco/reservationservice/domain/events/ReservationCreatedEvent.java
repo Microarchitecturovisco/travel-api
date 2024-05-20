@@ -2,13 +2,9 @@ package org.microarchitecturovisco.reservationservice.domain.events;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +24,7 @@ public class ReservationCreatedEvent extends ReservationEvent {
     private int adultsQuantity;
     private float price;
     private boolean paid;
-    private String hotelId;
+    private UUID hotelId;
     @ElementCollection
     private List<UUID> roomReservationsIds;
     @ElementCollection

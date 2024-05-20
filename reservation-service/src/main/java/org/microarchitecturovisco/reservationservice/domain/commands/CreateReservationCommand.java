@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +28,7 @@ public class CreateReservationCommand {
     private int adultsQuantity;
     private float price;
     private boolean paid;
-    private String hotelId;
+    private UUID hotelId;
     @ElementCollection
     private List<UUID> roomReservationsIds;
     @ElementCollection
