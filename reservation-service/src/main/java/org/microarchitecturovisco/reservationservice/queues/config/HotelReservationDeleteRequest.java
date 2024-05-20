@@ -6,12 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservationDeleteRequest implements Serializable {
-    private UUID id;
+public class HotelReservationDeleteRequest implements Serializable {
+    private UUID reservationId;
+    private UUID hotelId;
+    private List<UUID> roomIds;
 }
