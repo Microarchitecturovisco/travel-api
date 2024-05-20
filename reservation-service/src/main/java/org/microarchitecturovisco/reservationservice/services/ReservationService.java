@@ -91,18 +91,6 @@ public class ReservationService {
 
         bookTransportsSaga.createTransportReservation(reservationRequest);
 
-        // todo: Rozpoczyna się odliczanie do przedawnienia się rezerwacji
-        //  (co skutkuje cofnięciem poprzednich operacji);
-        //  do aplikacji klienckiej zwracany jest status 2xx oraz idReservation tego zamówienia
-        //  dodać pole Timestamp stworzenia rezerwacji do klasy Reservation
-
-        // todo: dodać rollback do rezerwacji hotelu
-        // todo: dodać rollback do rezerwacji transportu
-
-        // todo:
-        //  Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności
-        //  (reservationId będzie gdzieś z góry)
-
         Runnable paymentTimeoutRunnable = () -> {
             paymentTimeout(reservationRequest);
         };

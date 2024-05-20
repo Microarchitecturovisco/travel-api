@@ -20,10 +20,7 @@ public class CheckTransportAvailabilityRequest implements Serializable {
     private UUID transportReservationsIdFrom;
     private UUID transportReservationsIdArrival;
 
-    private Integer adults;
-    private Integer childrenUnderThree;
-    private Integer childrenUnderTen;
-    private Integer childrenUnderEighteen;
+    private int numberOfGuests;
 }
 
 

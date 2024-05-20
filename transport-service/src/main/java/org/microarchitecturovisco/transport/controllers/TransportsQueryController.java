@@ -13,6 +13,7 @@ import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetwe
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
+import org.microarchitecturovisco.transport.model.dto.response.CheckTransportAvailabilityResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
@@ -107,13 +108,17 @@ public class TransportsQueryController {
         CheckTransportAvailabilityRequestDto request = JsonReader.readDtoFromJson(requestDtoJson, CheckTransportAvailabilityRequestDto.class);
         System.out.println("Message received from queue: " + request);
 
-        // todo change this method for more detailed query and based on date, transport id, etc
+        // todo implement method for more detailed query and based on date, transport id, etc
 
-//        CheckAvailableTransportsDto transports = transportsQueryService.getAvailableTransports(request);
+        CheckTransportAvailabilityResponseDto response = CheckTransportAvailabilityResponseDto.builder()
+                .ifAvailable(true) // todo adjust
+                .build();
 
-//        boolean resposne = !transports.getTransports().isEmpty();
-        boolean resposne = true;
-        return String.valueOf(resposne);
+        System.out.println("Response to convert:" + response );
+        String responseJson = JsonConverter.convertToJsonWithLocalDateTime(response);
+        System.out.println("Response after conversion:" + responseJson );
+
+        return responseJson;
     }
 
 

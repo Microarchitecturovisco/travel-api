@@ -29,8 +29,6 @@ public class BookHotelsSaga {
 
         String reservationRequestJson = JsonConverter.convert(availabilityRequest);
 
-        System.out.println("reservationRequestJson: " + reservationRequestJson);
-
         try {
             byte[] responseMessageB = (byte[]) rabbitTemplate.convertSendAndReceive(
                     QueuesHotelConfig.EXCHANGE_HOTEL,

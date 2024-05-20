@@ -254,48 +254,5 @@ public class TransportsQueryService {
     }
 
 
-    public CheckAvailableTransportsDto getAvailableTransports(CheckTransportAvailabilityRequestDto requestDto) {
-        // Retrieve all transports for the given dates
-        List<Transport> transports = transportRepository.findByDepartureDateGreaterThanEqualAndDepartureDateLessThanEqual(
-                requestDto.getDateFrom(), requestDto.getDateTo());
 
-        // Filter out transports based on available capacity and the number of people
-        List<Transport> availableTransports = transports.stream()
-                .filter(transport -> isTransportAvailable(transport, requestDto))
-                .collect(Collectors.toList());
-
-        return buildAvailableTransportsDto(availableTransports);
-    }
-
-    private boolean isTransportAvailable(Transport transport, CheckTransportAvailabilityRequestDto requestDto) {
-        int totalPassengers = requestDto.getAdults() +
-                requestDto.getChildrenUnderThree() +
-                requestDto.getChildrenUnderTen() +
-                requestDto.getChildrenUnderEighteen();
-
-        int remainingCapacity = transport.getCapacity() - totalPassengers;
-
-        // Check if there are enough available seats
-        return remainingCapacity >= 0;
-    }
-
-    private CheckAvailableTransportsDto buildAvailableTransportsDto(List<Transport> availableTransports) {
-        // You can create a DTO class to represent available transports and return it here
-        // For simplicity, let's assume CheckAvailableTransportsDto has a list of TransportDto objects
-        List<TransportDto> transportDtos = availableTransports.stream()
-                .map(this::mapToTransportDto)
-                .collect(Collectors.toList());
-
-        return CheckAvailableTransportsDto.builder()
-                .transports(transportDtos)
-                .build();
-    }
-
-    private TransportDto mapToTransportDto(Transport transport) {
-        // Map Transport entity to TransportDto if needed
-        return TransportDto.builder()
-                .idTransport(transport.getId())
-                .departureDate(transport.getDepartureDate())
-                .build();
-    }
 }
