@@ -2,6 +2,7 @@ package org.microarchitecturovisco.hotelservice.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.microarchitecturovisco.hotelservice.controllers.reservations.CheckHotelAvailabilityRequest;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
@@ -34,6 +35,16 @@ public class JsonReader {
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         try {
             return mapper.readValue(json, CreateRoomReservationCommand.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Json reader failed");
+        }
+    }
+
+    public static CheckHotelAvailabilityRequest readCheckHotelAvailabilityRequestCommand(String json) {
+        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        try {
+            return mapper.readValue(json, CheckHotelAvailabilityRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new RuntimeException("Json reader failed");

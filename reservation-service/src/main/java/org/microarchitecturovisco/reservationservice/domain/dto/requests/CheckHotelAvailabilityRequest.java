@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.hotelservice.controllers.reservations;
+package org.microarchitecturovisco.reservationservice.domain.dto.requests;
 
 import lombok.*;
 

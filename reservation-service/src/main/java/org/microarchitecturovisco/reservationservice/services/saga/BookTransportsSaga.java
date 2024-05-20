@@ -2,9 +2,9 @@ package org.microarchitecturovisco.reservationservice.services.saga;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.queues.config.*;
-import org.microarchitecturovisco.reservationservice.queues.config.requests.CheckTransportAvailabilityRequest;
-import org.microarchitecturovisco.reservationservice.queues.config.requests.ReservationRequest;
-import org.microarchitecturovisco.reservationservice.queues.config.requests.TransportReservationDeleteRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.CheckTransportAvailabilityRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;

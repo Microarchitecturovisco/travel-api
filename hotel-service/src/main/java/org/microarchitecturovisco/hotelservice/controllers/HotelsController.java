@@ -4,22 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CheckHotelAvailabilityRequest;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CreateHotelReservationRequest;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
-import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
+import org.microarchitecturovisco.hotelservice.model.dto.response.CheckHotelAvailabilityResponseDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySearchQueryResponseDto;
 import org.microarchitecturovisco.hotelservice.queues.config.QueuesConfig;
 import org.microarchitecturovisco.hotelservice.services.HotelsCommandService;
 import org.microarchitecturovisco.hotelservice.services.HotelsService;
+import org.microarchitecturovisco.hotelservice.utils.JsonConverter;
 import org.microarchitecturovisco.hotelservice.utils.JsonReader;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.microarchitecturovisco.hotelservice.utils.JsonConverter;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,22 +55,22 @@ public class HotelsController {
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CHECK_AVAILABILITY_REQ)
-    public String consumeMessageCheckHotelAvailability(CheckHotelAvailabilityRequest request) {
-        System.out.println("Message received from queue: " + request);
+    public String consumeMessageCheckHotelAvailability(String requestJson) {
+        System.out.println("Message received from queue: " + requestJson);
+        CheckHotelAvailabilityRequest request = JsonReader.readCheckHotelAvailabilityRequestCommand(requestJson);
+        System.out.println("Converted message received from queue: " + request);
 
-        GetHotelsBySearchQueryRequestDto query = GetHotelsBySearchQueryRequestDto.builder()
-                .dateFrom(request.getHotelTimeFrom())
-                .dateTo(request.getHotelTimeTo())
-                .arrivalLocationIds(request.getArrivalLocationIds())
-                .adults(request.getAdultsQuantity())
-                .childrenUnderThree(request.getChildrenUnder3Quantity())
-                .childrenUnderTen(request.getChildrenUnder10Quantity())
-                .childrenUnderEighteen(request.getChildrenUnder18Quantity())
-                .build();
+        // todo: here logic (RSWW-102)
 
-        GetHotelsBySearchQueryResponseDto hotels = hotelsService.GetHotelsBySearchQuery(query);
+        CheckHotelAvailabilityResponseDto response = CheckHotelAvailabilityResponseDto.builder()
+                        .ifAvailable(true) // todo adjust
+                        .build();
 
-        return Boolean.toString(!hotels.getHotels().isEmpty());
+        System.out.println("Response to convert:" +response );
+        String responseJson = JsonConverter.ConvertToJson(response);
+        System.out.println("Response after conversion:" +responseJson );
+
+        return responseJson;
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CREATE_RESERVATION_REQ)
@@ -94,7 +93,6 @@ public class HotelsController {
 
             roomReservations.add(roomReservation);
         }
-
 
         for (RoomReservationDto roomReservation : roomReservations){
             hotelsCommandService.createReservation(CreateRoomReservationCommand.builder()

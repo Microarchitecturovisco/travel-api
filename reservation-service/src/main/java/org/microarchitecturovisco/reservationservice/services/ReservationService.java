@@ -14,8 +14,8 @@ import org.microarchitecturovisco.reservationservice.domain.model.LocationReserv
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
-import org.microarchitecturovisco.reservationservice.queues.config.requests.ReservationRequest;
-import org.microarchitecturovisco.reservationservice.queues.config.requests.TransportReservationDeleteRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
@@ -127,7 +127,12 @@ public class ReservationService {
     }
 
     public void createReservationFromRequest(ReservationRequest reservationRequest) {
-        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
+        String reservationRequestJson = JsonConverter.convert(reservationRequest);
+
+        System.out.println("reservationRequestJson: " + reservationRequestJson);
+
+        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequestJson);
+
         System.out.println("reservationCreated: " + reservationRequest.getId());
     }
 
