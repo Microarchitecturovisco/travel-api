@@ -14,17 +14,17 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetHotelsBySearchQueryRequestDto implements Serializable {
+public class CheckHotelAvailabilityQueryRequestDto implements Serializable {
 
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
-
-    private List<UUID> arrivalLocationIds;
 
     private Integer adults;
     private Integer childrenUnderThree;
     private Integer childrenUnderTen;
     private Integer childrenUnderEighteen;
 
+    private UUID hotelId;
 
+    private List<UUID> roomReservationsIds;
 }

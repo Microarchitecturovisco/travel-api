@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.UUID;
+
 @Configuration
 public class QueuesConfig {
     public static final String EXCHANGE_HOTEL = "hotels.requests.checkAvailabilityByQuery.exchange";
@@ -28,25 +30,46 @@ public class QueuesConfig {
         return BindingBuilder.bind(handleReservationQueue).to(handleReservationExchange).with(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ);
     }
 
-    public static final String QUEUE_HOTEL_CREATE_RESERVATION_REQ = "hotels.events.createHotelReservation.queue";
-    public static final String EXCHANGE_HOTEL_FANOUT = "hotels.createReservation.exchange";
+    public static final String QUEUE_HOTEL_CREATE_RESERVATION_REQ_PREFIX = "hotels.events.createHotelReservation.queue.";
+    public static final String EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION = "hotels.createReservation.exchange";
 
-    @Bean
-    @Qualifier("fanoutExchange")
-    public FanoutExchange fanoutExchange() {
-        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT);
+    @Bean(name="fanoutExchangeCreateHotelReservation")
+    public FanoutExchange fanoutExchangeCreateHotelReservation() {
+        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION);
     }
 
-    @Bean
-    @Qualifier("handleCreateHotelReservationQueue")
+    @Bean(name="handleCreateHotelReservationQueue")
     public Queue handleCreateHotelReservationQueue() {
-        return new Queue(QUEUE_HOTEL_CREATE_RESERVATION_REQ, false, false, true);
+        String uniqueQueueName = QUEUE_HOTEL_CREATE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
+        return new Queue(uniqueQueueName, false, false, true);
     }
 
     @Bean
     public Binding handleCreateHotelReservationBinding(
-            @Qualifier("fanoutExchange") FanoutExchange fanoutExchange,
+            @Qualifier("fanoutExchangeCreateHotelReservation") FanoutExchange fanoutExchangeCreateHotelReservation,
             @Qualifier("handleCreateHotelReservationQueue") Queue handleCreateHotelReservationQueue) {
-        return BindingBuilder.bind(handleCreateHotelReservationQueue).to(fanoutExchange);
+        return BindingBuilder.bind(handleCreateHotelReservationQueue).to(fanoutExchangeCreateHotelReservation);
+    }
+
+
+    public static final String QUEUE_HOTEL_DELETE_RESERVATION_REQ_PREFIX = "hotels.events.deleteHotelReservation.queue.";
+    public static final String EXCHANGE_HOTEL_FANOUT_DELETE_RESERVATION = "hotels.deleteReservation.exchange";
+
+    @Bean(name="fanoutExchangeDeleteHotelReservation")
+    public FanoutExchange fanoutExchangeDeleteHotelReservation() {
+        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT_DELETE_RESERVATION);
+    }
+
+    @Bean(name="handleDeleteHotelReservationQueue")
+    public Queue handleDeleteHotelReservationQueue() {
+        String uniqueQueueName = QUEUE_HOTEL_DELETE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
+        return new Queue(uniqueQueueName, false, false, true);
+    }
+
+    @Bean
+    public Binding handleDeleteHotelReservationBinding(
+            @Qualifier("fanoutExchangeDeleteHotelReservation") FanoutExchange fanoutExchangeDeleteHotelReservation,
+            @Qualifier("handleDeleteHotelReservationQueue") Queue handleDeleteHotelReservationQueue) {
+        return BindingBuilder.bind(handleDeleteHotelReservationQueue).to(fanoutExchangeDeleteHotelReservation);
     }
 }

@@ -18,4 +18,6 @@ public class CheckHotelAvailabilityRequest implements Serializable {
     private int amountOfQuests;
 
     private UUID hotelId;
+
+    private List<UUID> roomReservationsIds;
 }

@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ReservationCreatedEvent extends ReservationEvent {
+public class ReservationDeletedEvent extends ReservationEvent {
     private UUID idReservation;
     private LocalDateTime hotelTimeFrom;
     private LocalDateTime hotelTimeTo;

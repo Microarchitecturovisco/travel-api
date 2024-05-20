@@ -2,6 +2,7 @@ package org.microarchitecturovisco.reservationservice.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.CreateReservationCommand;
+import org.microarchitecturovisco.reservationservice.domain.commands.DeleteReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
@@ -13,6 +14,7 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.domain.model.LocationReservationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
+import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
@@ -38,8 +40,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class ReservationService {
 
-//    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
-    public static final int PAYMENT_TIMEOUT_SECONDS = 10; // debug only
+    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
 
     public static Logger logger = Logger.getLogger(ReservationService.class.getName());
 
@@ -66,7 +67,7 @@ public class ReservationService {
                 .adultsQuantity(adultsQuantity)
                 .price(price)
                 .paid(false)
-                .hotelId(hotelId.toString())
+                .hotelId(hotelId)
                 .roomReservationsIds(roomReservationsIds)
                 .transportReservationsIds(transportReservationsIds)
                 .userId(userId)
@@ -74,6 +75,29 @@ public class ReservationService {
         reservationAggregate.handleCreateReservationCommand(command);
         return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
+
+    private void deleteReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
+                                                          int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
+                                                          float price, UUID hotelId, List<UUID> roomReservationsIds,
+                                                          List<UUID> transportReservationsIds, UUID userId, UUID reservationId) {
+
+            DeleteReservationCommand command = DeleteReservationCommand.builder()
+                    .id(reservationId)
+                    .hotelTimeFrom(hotelTimeFrom)
+                    .hotelTimeTo(hotelTimeTo)
+                    .infantsQuantity(infantsQuantity)
+                    .kidsQuantity(kidsQuantity)
+                    .teensQuantity(teensQuantity)
+                    .adultsQuantity(adultsQuantity)
+                    .price(price)
+                    .paid(false)
+                    .hotelId(hotelId)
+                    .roomReservationsIds(roomReservationsIds)
+                    .transportReservationsIds(transportReservationsIds)
+                    .userId(userId)
+                    .build();
+            reservationAggregate.handleDeleteReservationCommand(command);
+        }
 
 
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
@@ -84,7 +108,6 @@ public class ReservationService {
 
         UUID reservationId = UUID.randomUUID();
         reservationRequest.setId(reservationId);
-
         createReservationFromRequest(reservationRequest);
 
         bookHotelsSaga.createHotelReservation(reservationRequest);
@@ -108,8 +131,8 @@ public class ReservationService {
     }
 
     private void checkTransportAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
-        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-//        boolean transportIsAvailable = true; // debug only
+//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+        boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
     }
@@ -128,16 +151,32 @@ public class ReservationService {
         ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationRequest.getId() + " !");
 
         // Delete reservation in Transport service
-        TransportReservationDeleteRequest transportReservationDeleteRequest = TransportReservationDeleteRequest.builder()
-                .transportReservationsIds(reservationRequest.getTransportReservationsIds())
-                .reservationId(reservationRequest.getId())
-                .build();
-        bookTransportsSaga.deleteTransportReservation(transportReservationDeleteRequest);
+
 
 
         // Delete reservation in Hotel service
+        HotelReservationDeleteRequest hotelReservationDeleteRequest = HotelReservationDeleteRequest.builder()
+                .hotelId(reservationRequest.getHotelId())
+                .reservationId(reservationRequest.getId())
+                .roomIds(reservationRequest.getRoomReservationsIds())
+                .build();
+        bookHotelsSaga.deleteHotelReservation(hotelReservationDeleteRequest);
 
         // Delete reservation from the ReservationRepository in Reservation service
+        deleteReservation(
+                reservationRequest.getHotelTimeFrom(),
+                reservationRequest.getHotelTimeTo(),
+                reservationRequest.getChildrenUnder3Quantity(),
+                reservationRequest.getChildrenUnder10Quantity(),
+                reservationRequest.getChildrenUnder18Quantity(),
+                reservationRequest.getAdultsQuantity(),
+                reservationRequest.getPrice(),
+                reservationRequest.getHotelId(),
+                reservationRequest.getRoomReservationsIds(),
+                reservationRequest.getTransportReservationsIds(),
+                reservationRequest.getUserId(),
+                reservationRequest.getId()
+        );
 
     }
 
@@ -173,7 +212,7 @@ public class ReservationService {
                 .build();
     }
 
-    private HotelInfo getHotelInformation(String hotelId) {
+    private HotelInfo getHotelInformation(UUID hotelId) {
         return HotelInfo.builder().hotelPrice(1500.0f).name("Hotel testowy").roomTypes(Map.of("Pokój dwuosobowy", 1)).build();
     }
 

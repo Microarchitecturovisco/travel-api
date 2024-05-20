@@ -10,6 +10,7 @@ import org.microarchitecturovisco.hotelservice.repositories.RoomReservationRepos
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +37,9 @@ public class HotelEventProjector {
             }
             if (hotelEvent instanceof RoomReservationCreatedEvent){
                 apply((RoomReservationCreatedEvent) hotelEvent);
+            }
+            if (hotelEvent instanceof RoomReservationDeletedEvent){
+                apply((RoomReservationDeletedEvent) hotelEvent);
             }
         }
     }
@@ -103,12 +107,33 @@ public class HotelEventProjector {
                 .dateTo(event.getDateTo())
                 .room(room)
                 .build();
-
         room.getRoomReservations().add(roomReservation);
         roomReservationRepository.save(roomReservation);
         roomRepository.save(room);
 
 
+    }
+    private void apply(RoomReservationDeletedEvent event) {
+        UUID roomReservationId = event.getIdRoomReservation();
+        List<HotelEvent> roomReservationIds = eventStore.findAll().stream().filter(e -> e instanceof RoomReservationCreatedEvent).toList();
+
+        List<HotelEvent> roomReservationIds2 = roomReservationIds.stream().filter(e -> ((RoomReservationCreatedEvent) e).getIdRoomReservation().equals(roomReservationId)).toList();
+        List<UUID> roomReservationIds3 = roomReservationIds2.stream().map(HotelEvent::getId).toList();
+
+
+        Room room = roomRepository.findById(event.getIdRoom()).orElseThrow(RuntimeException::new);
+        List<RoomReservation> roomReservations = room.getRoomReservations();
+
+        Iterator<RoomReservation> iterator = roomReservations.iterator();
+        while (iterator.hasNext()) {
+            RoomReservation roomReservation = iterator.next();
+            if (roomReservationIds3.contains(roomReservation.getId())) {
+                iterator.remove();
+                roomReservationRepository.deleteById(roomReservation.getId());  // Explicitly remove from RoomReservation repository
+                roomRepository.save(room);
+                break;
+            }
+        }
     }
 
 }

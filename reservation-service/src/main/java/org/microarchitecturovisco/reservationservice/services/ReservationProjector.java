@@ -3,6 +3,7 @@ package org.microarchitecturovisco.reservationservice.services;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.events.ReservationCreatedEvent;
+import org.microarchitecturovisco.reservationservice.domain.events.ReservationDeletedEvent;
 import org.microarchitecturovisco.reservationservice.domain.events.ReservationEvent;
 import org.microarchitecturovisco.reservationservice.domain.events.ReservationUpdateEvent;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
@@ -22,6 +23,9 @@ public class ReservationProjector {
             }
             if(event instanceof ReservationUpdateEvent) {
                 apply((ReservationUpdateEvent) event);
+            }
+            if(event instanceof ReservationDeletedEvent) {
+                apply((ReservationDeletedEvent) event);
             }
         }
     }
@@ -50,6 +54,11 @@ public class ReservationProjector {
         reservation.setPaid(event.getPaid());
 
         reservationRepository.save(reservation);
+    }
+
+    public void apply(ReservationDeletedEvent event) {
+        Reservation reservation = reservationRepository.findById(event.getIdReservation()).orElseThrow(RuntimeException::new);
+        reservationRepository.deleteById(reservation.getId());
     }
 
 

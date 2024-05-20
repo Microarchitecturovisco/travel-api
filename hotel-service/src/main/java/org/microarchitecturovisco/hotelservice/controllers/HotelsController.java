@@ -3,8 +3,11 @@ package org.microarchitecturovisco.hotelservice.controllers;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CheckHotelAvailabilityRequest;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CreateHotelReservationRequest;
+import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHotelReservationRequest;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
+import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
+import org.microarchitecturovisco.hotelservice.model.dto.request.CheckHotelAvailabilityQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.CheckHotelAvailabilityResponseDto;
@@ -23,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RestController()
 @RequestMapping("/hotels")
@@ -35,11 +39,13 @@ public class HotelsController {
     @RabbitListener(queues = "hotels.requests.hotelsBySearchQuery")
     public String consumeGetHotelsRequest(String requestDtoJson) {
 
+        Logger logger = Logger.getLogger("getHotelsBySearchQuery");
+        logger.info("Request: " + requestDtoJson);
+
         GetHotelsBySearchQueryRequestDto requestDto = JsonReader.readGetHotelsBySearchQueryRequestFromJson(requestDtoJson);
         GetHotelsBySearchQueryResponseDto responseDto = hotelsService.GetHotelsBySearchQuery(requestDto);
 
-        System.out.println("Send hotels response size " + responseDto.getHotels().size());
-
+        logger.info("Response hotels size: " + responseDto.getHotels().size());
 
         return JsonConverter.convertGetHotelsBySearchQueryResponseDto(responseDto);
     }
@@ -47,9 +53,12 @@ public class HotelsController {
     @RabbitListener(queues = "hotels.requests.getHotelDetails")
     public String consumeGetHotelDetails(String requestDtoJson) {
 
+        Logger logger = Logger.getLogger("getHotelDetails");
+
         GetHotelDetailsRequestDto requestDto = JsonReader.readGetHotelDetailsRequestFromJson(requestDtoJson);
         GetHotelDetailsResponseDto responseDto = hotelsService.getHotelDetails(requestDto);
 
+        logger.info("Response for hotel: " + responseDto.getHotelId() + " " + responseDto.getHotelName());
 
         return JsonConverter.convertGetHotelDetailsResponseDto(responseDto);
     }
@@ -87,10 +96,10 @@ public class HotelsController {
             UUID roomId = request.getRoomIds().get(i);
 
             RoomReservationDto roomReservation = new RoomReservationDto();
-            roomReservation.setReservationId(request.getReservationId());
-            roomReservation.setDateFrom(request.getHotelTimeFrom());
-            roomReservation.setDateTo(request.getHotelTimeTo());
-            roomReservation.setHotelId(request.getHotelId());
+            roomReservation.setReservationId(createHotelReservationRequest.getId());
+            roomReservation.setDateFrom(createHotelReservationRequest.getHotelTimeFrom());
+            roomReservation.setDateTo(createHotelReservationRequest.getHotelTimeTo());
+            roomReservation.setHotelId(createHotelReservationRequest.getHotelId());
             roomReservation.setRoomId(roomId);
 
             roomReservations.add(roomReservation);
@@ -106,6 +115,29 @@ public class HotelsController {
             );
             System.out.println("roomReservation: " + roomReservation);
         }
+    }
+
+    @RabbitListener(queues = "#{handleDeleteHotelReservationQueue.name}")
+    public void consumeMessageDeleteHotelReservation(DeleteHotelReservationRequest request) {
+        System.out.println("Message received from queue DeleteHotelReservationRequest: " + request);
+
+        // TODO: delete the reservation using fields in request:
+        //    private UUID reservationId;
+        //    private UUID hotelId;
+        //    private List<UUID> roomIds;
+
+        for (UUID roomId : request.getRoomIds()){
+            DeleteRoomReservationCommand command = DeleteRoomReservationCommand.builder()
+                    .commandTimeStamp(LocalDateTime.now())
+                    .reservationId(request.getReservationId())
+                    .roomId(roomId)
+                    .hotelId(request.getHotelId())
+                    .build();
+
+            hotelsCommandService.deleteReservation(command);
+        }
+
+
     }
 }
 
