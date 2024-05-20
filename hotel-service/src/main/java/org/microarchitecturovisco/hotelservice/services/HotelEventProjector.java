@@ -129,7 +129,7 @@ public class HotelEventProjector {
             RoomReservation roomReservation = iterator.next();
             if (roomReservationIds3.contains(roomReservation.getId())) {
                 iterator.remove();
-                roomReservationRepository.deleteById(roomReservation.getId());  // Explicitly remove from RoomReservation repository
+                roomReservationRepository.deleteById(roomReservation.getId());
                 roomRepository.save(room);
                 break;
             }

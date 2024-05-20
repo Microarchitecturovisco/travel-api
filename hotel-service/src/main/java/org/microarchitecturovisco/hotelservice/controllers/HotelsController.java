@@ -117,13 +117,11 @@ public class HotelsController {
     }
 
     @RabbitListener(queues = "#{handleDeleteHotelReservationQueue.name}")
-    public void consumeMessageDeleteHotelReservation(DeleteHotelReservationRequest request) {
-        System.out.println("Message received from queue DeleteHotelReservationRequest: " + request);
+    public void consumeMessageDeleteHotelReservation(String requestJson) {
 
-        // TODO: delete the reservation using fields in request:
-        //    private UUID reservationId;
-        //    private UUID hotelId;
-        //    private List<UUID> roomIds;
+        DeleteHotelReservationRequest request = JsonReader.readDeleteHotelReservationRequestCommand(requestJson);
+
+        System.out.println("Message received DeleteHotelReservationRequest: " + request);
 
         for (UUID roomId : request.getRoomIds()){
             DeleteRoomReservationCommand command = DeleteRoomReservationCommand.builder()
@@ -135,8 +133,7 @@ public class HotelsController {
 
             hotelsCommandService.deleteReservation(command);
         }
-
-
     }
+
 }
 

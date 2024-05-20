@@ -140,7 +140,7 @@ public class Bootstrap implements CommandLineRunner {
             TransportReservationDto reservationDto = TransportReservationDto.builder()
                     .numberOfSeats(occupiedSeats)
                     .idTransport(transportDto.getIdTransport())
-                    .idTransportReservation(transportReservationId)
+                    .reservationId(transportReservationId)
                     .build();
 
             numberOfReservationsToMake -= occupiedSeats;

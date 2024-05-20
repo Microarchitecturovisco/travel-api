@@ -74,10 +74,14 @@ public class BookHotelsSaga {
     }
 
     public void deleteHotelReservation(HotelReservationDeleteRequest hotelReservationDeleteRequest) {
+        String requestJson = JsonConverter.convert(hotelReservationDeleteRequest);
+
+        System.out.println("deleteHotelReservation: " + requestJson);
+
         rabbitTemplate.convertAndSend(
                 QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT_DELETE_RESERVATION,
                 "", // Routing key is ignored for FanoutExchange
-                hotelReservationDeleteRequest
+                requestJson
         );
     }
 

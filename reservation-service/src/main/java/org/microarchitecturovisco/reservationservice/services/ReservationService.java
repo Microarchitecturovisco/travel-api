@@ -17,7 +17,6 @@ import org.microarchitecturovisco.reservationservice.domain.model.TransportReser
 import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
-import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;

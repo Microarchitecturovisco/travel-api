@@ -2,6 +2,7 @@ package org.microarchitecturovisco.hotelservice.controllers.reservations;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 @ToString
 @Getter
 @Setter
-public class DeleteHotelReservationRequest {
+public class DeleteHotelReservationRequest implements Serializable {
     private UUID reservationId;
     private UUID hotelId;
     private List<UUID> roomIds;
