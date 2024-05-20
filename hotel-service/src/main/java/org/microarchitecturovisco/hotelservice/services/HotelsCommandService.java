@@ -1,16 +1,12 @@
 package org.microarchitecturovisco.hotelservice.services;
 
 import lombok.RequiredArgsConstructor;
-
-
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateHotelCommand;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
+import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.CateringOptionDto;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomDto;
-import org.microarchitecturovisco.hotelservice.model.events.CateringOptionCreatedEvent;
-import org.microarchitecturovisco.hotelservice.model.events.HotelCreatedEvent;
-import org.microarchitecturovisco.hotelservice.model.events.RoomCreatedEvent;
-import org.microarchitecturovisco.hotelservice.model.events.RoomReservationCreatedEvent;
+import org.microarchitecturovisco.hotelservice.model.events.*;
 import org.microarchitecturovisco.hotelservice.repositories.HotelEventStore;
 import org.springframework.stereotype.Service;
 
@@ -62,9 +58,23 @@ public class HotelsCommandService {
                 .idHotel(command.getHotelId())
                 .idRoom(command.getRoomId())
                 .build();
-        reservationCreatedEvent.setId(UUID.randomUUID());
+        reservationCreatedEvent.setId(command.getRoomReservationDto().getReservationId());
         hotelEventStore.save(reservationCreatedEvent);
         hotelEventProjector.project(List.of(reservationCreatedEvent));
+    }
+
+    public void deleteReservation(DeleteRoomReservationCommand command){
+        RoomReservationDeletedEvent reservationDeletedEvent =  RoomReservationDeletedEvent.builder()
+                .eventTimeStamp(command.getCommandTimeStamp())
+                .idRoomReservation(command.getReservationId())
+                .idHotel(command.getHotelId())
+                .idRoom(command.getRoomId())
+                .build();
+
+        reservationDeletedEvent.setId(UUID.randomUUID());
+
+        hotelEventStore.save(reservationDeletedEvent);
+        hotelEventProjector.project(List.of(reservationDeletedEvent));
     }
 
 }

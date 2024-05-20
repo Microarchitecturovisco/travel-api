@@ -1,10 +1,8 @@
 package org.microarchitecturovisco.hotelservice.bootstrap.util;
 
 import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
-import org.microarchitecturovisco.hotelservice.model.dto.LocationDto;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomDto;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -13,7 +11,6 @@ import java.time.Month;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;

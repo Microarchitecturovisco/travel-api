@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +35,9 @@ public class HotelEventProjector {
             }
             if (hotelEvent instanceof RoomReservationCreatedEvent){
                 apply((RoomReservationCreatedEvent) hotelEvent);
+            }
+            if (hotelEvent instanceof RoomReservationDeletedEvent){
+                apply((RoomReservationDeletedEvent) hotelEvent);
             }
         }
     }
@@ -109,6 +111,10 @@ public class HotelEventProjector {
         roomRepository.save(room);
 
 
+    }
+
+    private void apply(RoomReservationDeletedEvent event){
+        roomReservationRepository.deleteById(event.getIdRoomReservation());
     }
 
 }

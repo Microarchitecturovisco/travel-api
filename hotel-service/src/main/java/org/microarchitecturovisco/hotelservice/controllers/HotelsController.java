@@ -5,6 +5,7 @@ import org.microarchitecturovisco.hotelservice.controllers.reservations.CheckHot
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CreateHotelReservationRequest;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHotelReservationRequest;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
+import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
@@ -76,6 +77,7 @@ public class HotelsController {
     @RabbitListener(queues = "#{handleCreateHotelReservationQueue.name}")
     public void consumeMessageCreateHotelReservation(CreateHotelReservationRequest createHotelReservationRequest) {
         System.out.println("Message received from queue createHotelReservationRequest: " + createHotelReservationRequest);
+        System.out.println("Reservation id: " + createHotelReservationRequest.getId());
 
         int numberOfRoomsInReservation = createHotelReservationRequest.getRoomReservationsIds().size();
 
@@ -85,7 +87,7 @@ public class HotelsController {
             UUID roomId = createHotelReservationRequest.getRoomReservationsIds().get(i);
 
             RoomReservationDto roomReservation = new RoomReservationDto();
-            roomReservation.setReservationId(createHotelReservationRequest.getReservationId());
+            roomReservation.setReservationId(createHotelReservationRequest.getId());
             roomReservation.setDateFrom(createHotelReservationRequest.getHotelTimeFrom());
             roomReservation.setDateTo(createHotelReservationRequest.getHotelTimeTo());
             roomReservation.setHotelId(createHotelReservationRequest.getHotelId());
@@ -114,6 +116,17 @@ public class HotelsController {
         //    private UUID reservationId;
         //    private UUID hotelId;
         //    private List<UUID> roomIds;
+
+        for (UUID roomId : request.getRoomIds()){
+            DeleteRoomReservationCommand command = DeleteRoomReservationCommand.builder()
+                    .commandTimeStamp(LocalDateTime.now())
+                    .reservationId(request.getReservationId())
+                    .roomId(roomId)
+                    .hotelId(request.getHotelId())
+                    .build();
+
+            hotelsCommandService.deleteReservation(command);
+        }
 
 
     }
