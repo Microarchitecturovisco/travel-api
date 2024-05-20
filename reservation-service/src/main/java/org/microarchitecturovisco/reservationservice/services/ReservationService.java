@@ -148,18 +148,19 @@ public class ReservationService {
     public void paymentTimeout(ReservationRequest reservationRequest) {
         ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationRequest.getId() + " !");
 
-        // todo: dodać rollback do rezerwacji transportu
+        // Delete reservation in Transport service
 
 
 
-        // todo: dodać rollback do rezerwacji hotelu
-
+        // Delete reservation in Hotel service
         HotelReservationDeleteRequest hotelReservationDeleteRequest = HotelReservationDeleteRequest.builder()
                 .hotelId(reservationRequest.getHotelId())
                 .reservationId(reservationRequest.getId())
                 .roomIds(reservationRequest.getRoomReservationsIds())
                 .build();
         bookHotelsSaga.deleteHotelReservation(hotelReservationDeleteRequest);
+
+        // Delete reservation from the ReservationRepository in Reservation service
         deleteReservation(
                 reservationRequest.getHotelTimeFrom(),
                 reservationRequest.getHotelTimeTo(),
@@ -174,9 +175,6 @@ public class ReservationService {
                 reservationRequest.getUserId(),
                 reservationRequest.getId()
         );
-
-        // todo: dodać rollback usuwania obiektu rezerwacji
-
 
     }
 
