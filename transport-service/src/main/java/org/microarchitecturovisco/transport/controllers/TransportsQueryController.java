@@ -2,16 +2,12 @@ package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.controllers.reservations.DeleteTransportReservationRequest;
-import org.microarchitecturovisco.transport.controllers.reservations.ReservationRequest;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.DeleteTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
-import org.microarchitecturovisco.transport.model.dto.request.CheckTransportAvailabilityRequestDto;
-import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
-import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
-import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
+import org.microarchitecturovisco.transport.model.dto.request.*;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.CheckTransportAvailabilityResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
@@ -108,10 +104,15 @@ public class TransportsQueryController {
         CheckTransportAvailabilityRequestDto request = JsonReader.readDtoFromJson(requestDtoJson, CheckTransportAvailabilityRequestDto.class);
         System.out.println("Message received from queue: " + request);
 
+//        GetTransportsBySearchQueryRequestDto requestDto = GetTransportsBySearchQueryRequestDto.builder()
+//
+//                .build();
+
         // todo implement method for more detailed query and based on date, transport id, etc
+//        GetTransportsBySearchQueryResponseDto responseDto = transportsQueryService.getTransportsBySearchQuery(requestDto);
 
         CheckTransportAvailabilityResponseDto response = CheckTransportAvailabilityResponseDto.builder()
-                .ifAvailable(true) // todo adjust
+                .ifAvailable(true)
                 .build();
 
         System.out.println("Response to convert:" + response );
@@ -123,43 +124,42 @@ public class TransportsQueryController {
 
 
     @RabbitListener(queues = "#{handleCreateTransportReservationQueue.name}")
-    public void consumeMessageCreateTransportReservation(ReservationRequest request) {
-        System.out.println("Message received from queue: " + request);
+    public void consumeMessageCreateTransportReservation(String requestDtoJson) {
+        System.out.println("Message received from create reservation requestDtoJson: " + requestDtoJson);
 
-        int numberOfTransportsInReservation = request.getTransportReservationsIds().size();
+        CreateTransportReservationRequest request = JsonReader.readDtoFromJson(requestDtoJson, CreateTransportReservationRequest.class);
+        System.out.println("Message received from queue request: " + request);
 
-        for (int i = 0; i < numberOfTransportsInReservation; i++) {
-            UUID idTransport = request.getTransportReservationsIds().get(i);
-
-            int occupiedSeats = request.getAdultsQuantity() +
-                    request.getChildrenUnder3Quantity() +
-                    request.getChildrenUnder10Quantity() +
-                    request.getChildrenUnder18Quantity();
+        for (UUID idTransport: request.getTransportIds()) {
 
             TransportReservationDto reservationDto = TransportReservationDto.builder()
-                    .numberOfSeats(occupiedSeats)
+                    .numberOfSeats(request.getAmountOfQuests())
                     .idTransport(idTransport)
-                    .idTransportReservation(request.getId())
+                    .reservationId(request.getReservationId())
                     .build();
 
-            transportCommandService.createReservation(CreateTransportReservationCommand.builder()
-                    .uuid(reservationDto.getIdTransportReservation())
+            CreateTransportReservationCommand command = CreateTransportReservationCommand.builder()
+                    .uuid(UUID.randomUUID())
                     .commandTimeStamp(LocalDateTime.now())
                     .transportReservationDto(reservationDto)
-                    .build()
-            );
+                    .build();
+
+            transportCommandService.createReservation(command);
+            System.out.println("reservationDto: " + reservationDto);
         }
     }
 
     @RabbitListener(queues = "#{handleDeleteTransportReservationQueue.name}")
-    public void consumeMessageDeleteTransportReservation(DeleteTransportReservationRequest request) {
-        System.out.println("Message received from queue consumeMessageDeleteTransportReservation: " + request);
+    public void consumeMessageDeleteTransportReservation(String requestJson) {
+        System.out.println("Message received from queue consumeMessageDeleteTransportReservation: " + requestJson);
+
+        DeleteTransportReservationRequest request = JsonReader.readDtoFromJson(requestJson, DeleteTransportReservationRequest.class);
 
         for (UUID transportId : request.getTransportReservationsIds()){
             DeleteTransportReservationCommand command = DeleteTransportReservationCommand.builder()
                     .commandTimeStamp(LocalDateTime.now())
                     .reservationId(request.getId())
-                    .transportReservationsId(transportId)
+                    .transportId(transportId)
                     .build();
 
             transportCommandService.deleteReservation(command);

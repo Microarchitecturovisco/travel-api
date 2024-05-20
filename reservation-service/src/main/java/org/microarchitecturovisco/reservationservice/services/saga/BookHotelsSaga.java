@@ -2,6 +2,7 @@ package org.microarchitecturovisco.reservationservice.services.saga;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.CheckHotelAvailabilityRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.CreateHotelReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.responses.CheckHotelAvailabilityResponseDto;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
@@ -52,10 +53,22 @@ public class BookHotelsSaga {
         }
     }
     public void createHotelReservation(ReservationRequest reservationRequest) {
+        CreateHotelReservationRequest request = CreateHotelReservationRequest.builder()
+                                            .hotelTimeFrom(reservationRequest.getHotelTimeFrom())
+                                            .hotelTimeTo(reservationRequest.getHotelTimeTo())
+                                            .hotelId(reservationRequest.getHotelId())
+                                            .reservationId(reservationRequest.getId())
+                                            .roomIds(reservationRequest.getRoomReservationsIds())
+                                            .build();
+
+        String requestJson = JsonConverter.convert(request);
+
+        System.out.println("createHotelReservation: " + requestJson);
+
         rabbitTemplate.convertAndSend(
                 QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT,
                 "", // Routing key is ignored for FanoutExchange
-                reservationRequest
+                requestJson
         );
     }
 }

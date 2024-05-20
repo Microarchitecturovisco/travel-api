@@ -10,6 +10,6 @@ import java.util.UUID;
 @Builder
 public class DeleteTransportReservationCommand {
     private UUID reservationId;
-    private UUID transportReservationsId;
+    private UUID transportId;
     private LocalDateTime commandTimeStamp;
 }

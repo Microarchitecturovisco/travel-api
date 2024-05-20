@@ -74,15 +74,17 @@ public class HotelsController {
     }
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CREATE_RESERVATION_REQ)
-    public void consumeMessageCreateHotelReservation(CreateHotelReservationRequest request) {
-        System.out.println("Message received from queue: " + request);
+    public void consumeMessageCreateHotelReservation(String requestJson) {
+        System.out.println("Message received from queue: " + requestJson);
 
-        int numberOfRoomsInReservation = request.getRoomReservationsIds().size();
+        CreateHotelReservationRequest request = JsonReader.readCreateHotelReservationRequestCommand(requestJson);
+
+        int numberOfRoomsInReservation = request.getRoomIds().size();
 
         List<RoomReservationDto> roomReservations = new ArrayList<>();
 
         for (int i = 0; i < numberOfRoomsInReservation; i++) {
-            UUID roomId = request.getRoomReservationsIds().get(i);
+            UUID roomId = request.getRoomIds().get(i);
 
             RoomReservationDto roomReservation = new RoomReservationDto();
             roomReservation.setReservationId(request.getReservationId());
@@ -102,6 +104,7 @@ public class HotelsController {
                     .commandTimeStamp(LocalDateTime.now())
                     .build()
             );
+            System.out.println("roomReservation: " + roomReservation);
         }
     }
 }

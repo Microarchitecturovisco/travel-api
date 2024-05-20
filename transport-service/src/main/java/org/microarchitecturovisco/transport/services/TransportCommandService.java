@@ -34,10 +34,12 @@ public class TransportCommandService {
         TransportReservationCreatedEvent transportReservationCreatedEvent = TransportReservationCreatedEvent.builder()
                 .id(command.getUuid())
                 .eventTimeStamp(command.getCommandTimeStamp())
-                .idTransportReservation(command.getTransportReservationDto().getIdTransportReservation())
+                .reservationId(command.getTransportReservationDto().getReservationId())
                 .numberOfSeats(command.getTransportReservationDto().getNumberOfSeats())
                 .idTransport(command.getTransportReservationDto().getIdTransport())
                 .build();
+
+        System.out.println("transportReservationCreatedEvent: " + transportReservationCreatedEvent);
 
         transportEventStore.save(transportReservationCreatedEvent);
         eventSourcingHandler.project(List.of(transportReservationCreatedEvent));
@@ -45,12 +47,11 @@ public class TransportCommandService {
 
     public void deleteReservation(DeleteTransportReservationCommand command) {
         TransportReservationDeletedEvent reservationDeletedEvent =  TransportReservationDeletedEvent.builder()
+                .id(UUID.randomUUID())
                 .eventTimeStamp(command.getCommandTimeStamp())
                 .reservationId(command.getReservationId())
-                .transportId(command.getTransportReservationsId())
+                .transportId(command.getTransportId())
                 .build();
-
-        reservationDeletedEvent.setId(UUID.randomUUID());
 
         transportEventStore.save(reservationDeletedEvent);
         eventSourcingHandler.project(List.of(reservationDeletedEvent));

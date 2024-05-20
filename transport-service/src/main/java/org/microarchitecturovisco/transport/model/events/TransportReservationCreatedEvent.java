@@ -14,7 +14,7 @@ import java.util.UUID;
 @SuperBuilder
 public class TransportReservationCreatedEvent extends TransportEvent {
 
-    private UUID idTransportReservation;
+    private UUID reservationId;
     private int numberOfSeats;
 
 }

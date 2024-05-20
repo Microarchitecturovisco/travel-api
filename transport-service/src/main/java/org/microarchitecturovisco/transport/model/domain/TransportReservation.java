@@ -23,4 +23,6 @@ public class TransportReservation {
 
     @NotNull
     private int numberOfSeats;
+
+    private UUID mainReservationId;
 }
