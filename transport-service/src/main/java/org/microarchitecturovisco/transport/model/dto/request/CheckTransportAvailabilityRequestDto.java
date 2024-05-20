@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.transport.controllers.reservations;
+package org.microarchitecturovisco.transport.model.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CheckTransportAvailabilityRequest implements Serializable {
+public class CheckTransportAvailabilityRequestDto implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
 

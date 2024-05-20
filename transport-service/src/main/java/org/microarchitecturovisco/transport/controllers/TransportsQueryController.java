@@ -1,20 +1,22 @@
 package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.transport.controllers.reservations.DeleteTransportReservationRequest;
 import org.microarchitecturovisco.transport.controllers.reservations.ReservationRequest;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
-import org.microarchitecturovisco.transport.controllers.reservations.CheckTransportAvailabilityRequest;
+import org.microarchitecturovisco.transport.model.cqrs.commands.DeleteTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
+import org.microarchitecturovisco.transport.model.dto.request.CheckTransportAvailabilityRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
-import org.microarchitecturovisco.transport.queues.config.QueuesConfig;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
+import org.microarchitecturovisco.transport.queues.config.QueuesConfig;
 import org.microarchitecturovisco.transport.services.TransportCommandService;
 import org.microarchitecturovisco.transport.services.TransportsQueryService;
 import org.microarchitecturovisco.transport.utils.json.JsonConverter;
@@ -99,6 +101,22 @@ public class TransportsQueryController {
         return JsonConverter.convertGetTransportsBetweenLocationsResponseDto(responseDto);
     }
 
+    @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ)
+    public String consumeMessageFromQueueCheckTransportAvailability(String requestDtoJson) {
+        System.out.println("Message received from queue requestDtoJson: " + requestDtoJson);
+// todo fix  - json conversion causes error
+        CheckTransportAvailabilityRequestDto request = JsonReader.readDtoFromJson(requestDtoJson, CheckTransportAvailabilityRequestDto.class);
+
+
+        System.out.println("Message received from queue: " + request);
+
+
+        // todo change this method for more detailed query and based on date, transport id, etc
+
+        return "SUCCESS";
+    }
+
+
     @RabbitListener(queues = "#{handleCreateTransportReservationQueue.name}")
     public void consumeMessageCreateTransportReservation(ReservationRequest request) {
         System.out.println("Message received from queue: " + request);
@@ -127,32 +145,19 @@ public class TransportsQueryController {
             );
         }
     }
-    
-    @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_BOOK_REQ)
-    public String consumeMessageFromQueue(CheckTransportAvailabilityRequest request) {
-        System.out.println("Message received from queue: " + request);
 
-        GetTransportsBySearchQueryRequestDto searchQuery = GetTransportsBySearchQueryRequestDto.builder()
-                .uuid(UUID.randomUUID())
-                .dateFrom(request.getHotelTimeFrom())
-                .dateTo(request.getHotelTimeTo())
-                .departureLocationIdsByPlane(request.getDepartureLocationIdsByPlane())
-                .departureLocationIdsByBus(request.getDepartureLocationIdsByBus())
-                .arrivalLocationIds(request.getArrivalLocationIds())
-                .adults(request.getAdultsQuantity())
-                .childrenUnderThree(request.getChildrenUnder3Quantity())
-                .childrenUnderTen(request.getChildrenUnder10Quantity())
-                .childrenUnderEighteen(request.getChildrenUnder18Quantity())
-                .build();
-        GetTransportsBySearchQueryResponseDto transports = transportsQueryService.getTransportsBySearchQuery(searchQuery);
+    @RabbitListener(queues = "#{handleDeleteTransportReservationQueue.name}")
+    public void consumeMessageDeleteTransportReservation(DeleteTransportReservationRequest request) {
+        System.out.println("Message received from queue consumeMessageDeleteTransportReservation: " + request);
 
-        System.out.println("TRANSPORTS: " + transports.toString());
+        for (UUID transportId : request.getTransportReservationsIds()){
+            DeleteTransportReservationCommand command = DeleteTransportReservationCommand.builder()
+                    .commandTimeStamp(LocalDateTime.now())
+                    .reservationId(request.getId())
+                    .transportReservationsId(transportId)
+                    .build();
 
-        if(transports.getTransportDtoList().size()>0){
-            return Boolean.toString(true);
-        }
-        else{
-            return Boolean.toString(false);
+            transportCommandService.deleteReservation(command);
         }
     }
 }

@@ -1,10 +1,9 @@
-package org.microarchitecturovisco.transport.controllers.reservations;
+package org.microarchitecturovisco.reservationservice.queues.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.microarchitecturovisco.transport.model.domain.TransportType;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -29,3 +28,5 @@ public class CheckTransportAvailabilityRequest implements Serializable {
     private Integer childrenUnderTen;
     private Integer childrenUnderEighteen;
 }
+
+

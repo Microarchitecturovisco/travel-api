@@ -8,6 +8,7 @@ import org.microarchitecturovisco.transport.model.domain.TransportReservation;
 import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
 import org.microarchitecturovisco.transport.model.events.TransportEvent;
 import org.microarchitecturovisco.transport.model.events.TransportReservationCreatedEvent;
+import org.microarchitecturovisco.transport.model.events.TransportReservationDeletedEvent;
 import org.microarchitecturovisco.transport.repositories.*;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,9 @@ public class TransportEventSourcingHandler {
             }
             if (transportEvent instanceof TransportReservationCreatedEvent) {
                 apply((TransportReservationCreatedEvent) transportEvent);
+            }
+            if (transportEvent instanceof TransportReservationDeletedEvent) {
+                apply((TransportReservationDeletedEvent) transportEvent);
             }
         }
     }
@@ -79,5 +83,10 @@ public class TransportEventSourcingHandler {
 
         transportReservationRepository.save(transportReservation);
         transportRepository.save(transport);
+    }
+
+    private void apply(TransportReservationDeletedEvent event) {
+        // todo: delete transport reservation here
+        System.out.println("TransportReservationDeletedEvent @@@@@@@ todo");
     }
 }

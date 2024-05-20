@@ -9,15 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class QueuesTransportConfig {
 
     public static final String EXCHANGE_TRANSPORT = "transports.requests.checkAvailabilityByQuery.exchange";
-    public static final String QUEUE_TRANSPORT_BOOK_REQ = "transports.requests.checkAvailabilityByQuery.queue";
-    public static final String ROUTING_KEY_TRANSPORT_BOOK_REQ = "transports.requests.checkAvailabilityByQuery.routingKey";
-
-    public static final String EXCHANGE_TRANSPORT_FANOUT = "transports.createReservation.exchange";
-
-    @Bean(name="fanoutExchangeTransport")
-    public FanoutExchange fanoutExchange() {
-        return new FanoutExchange(EXCHANGE_TRANSPORT_FANOUT);
-    }
+    public static final String QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ = "transports.requests.checkAvailabilityByQuery.queue";
+    public static final String ROUTING_KEY_TRANSPORT_CHECK_AVAILABILITY_REQ = "transports.requests.checkAvailabilityByQuery.routingKey";
 
 
     @Bean(name="handleTransportReservationExchange")
@@ -25,14 +18,23 @@ public class QueuesTransportConfig {
         return new TopicExchange(EXCHANGE_TRANSPORT);
     }
 
-    @Bean
+    @Bean(name="handleTransportReservationQueue")
     public Queue handleTransportReservationQueue() {
-        return new Queue(QUEUE_TRANSPORT_BOOK_REQ, false, false, true);
+        return new Queue(QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ, false);
     }
-    
+
     @Bean
-    public Binding handleTransportReservationRequestBinding(@Qualifier("handleTransportReservationExchange") TopicExchange handleTransportReservationExchange, Queue handleTransportReservationQueue) {
-        return BindingBuilder.bind(handleTransportReservationQueue).to(handleTransportReservationExchange).with(ROUTING_KEY_TRANSPORT_BOOK_REQ);
+    public Binding handleTransportReservationRequestBinding(
+            @Qualifier("handleTransportReservationExchange") TopicExchange handleTransportReservationExchange,
+            @Qualifier("handleTransportReservationQueue") Queue handleTransportReservationQueue) {
+        return BindingBuilder.bind(handleTransportReservationQueue).to(handleTransportReservationExchange).with(ROUTING_KEY_TRANSPORT_CHECK_AVAILABILITY_REQ);
+    }
+
+    public static final String EXCHANGE_TRANSPORT_FANOUT = "transports.createReservation.exchange";
+
+    @Bean(name="fanoutExchangeTransport")
+    public FanoutExchange fanoutExchangeTransport() {
+        return new FanoutExchange(EXCHANGE_TRANSPORT_FANOUT);
     }
 
     public static final String EXCHANGE_TRANSPORT_FANOUT_DELETE_RESERVATION = "transports.deleteReservation.exchange";
