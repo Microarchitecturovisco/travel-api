@@ -101,8 +101,7 @@ public class ReservationService {
         //  (reservationId będzie gdzieś z góry)
 
         Runnable paymentTimeoutRunnable = () -> {
-
-        paymentTimeout(reservationRequest);
+            paymentTimeout(reservationRequest);
         };
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -132,13 +131,17 @@ public class ReservationService {
     public void paymentTimeout(ReservationRequest reservationRequest) {
         ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationRequest.getId() + " !");
 
-        // todo: dodać rollback do rezerwacji transportu
+        // Delete reservation in Transport service
+        TransportReservationDeleteRequest transportReservationDeleteRequest = TransportReservationDeleteRequest.builder()
+                .transportId(reservationRequest.getHotelId())
+                .reservationId(reservationRequest.getId())
+                .build();
+        bookHotelsSaga.deleteTransportReservation(transportReservationDeleteRequest);
 
 
+        // Delete reservation in Hotel service
 
-        // todo: dodać rollback do rezerwacji hotelu
-
-        // todo: dodać rollback usuwania obiektu rezerwacji
+        // Delete reservation from the ReservationRepository in Reservation service
 
     }
 

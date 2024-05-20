@@ -34,4 +34,11 @@ public class QueuesTransportConfig {
     public Binding handleTransportReservationRequestBinding(@Qualifier("handleTransportReservationExchange") TopicExchange handleTransportReservationExchange, Queue handleTransportReservationQueue) {
         return BindingBuilder.bind(handleTransportReservationQueue).to(handleTransportReservationExchange).with(ROUTING_KEY_TRANSPORT_BOOK_REQ);
     }
+
+    public static final String EXCHANGE_TRANSPORT_FANOUT_DELETE_RESERVATION = "transports.deleteReservation.exchange";
+
+    @Bean(name="fanoutExchangeTransportDeleteReservation")
+    public FanoutExchange fanoutExchangeTransportDeleteReservation() {
+        return new FanoutExchange(EXCHANGE_TRANSPORT_FANOUT_DELETE_RESERVATION);
+    }
 }
