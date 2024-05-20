@@ -109,7 +109,11 @@ public class TransportsQueryController {
 
         // todo change this method for more detailed query and based on date, transport id, etc
 
-        return "SUCCESS";
+//        CheckAvailableTransportsDto transports = transportsQueryService.getAvailableTransports(request);
+
+//        boolean resposne = !transports.getTransports().isEmpty();
+        boolean resposne = true;
+        return String.valueOf(resposne);
     }
 
 
