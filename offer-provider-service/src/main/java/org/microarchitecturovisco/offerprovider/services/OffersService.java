@@ -354,7 +354,7 @@ public class OffersService {
                         )
                         .roomConfiguration(roomConfigs.getFirst())
                         .possibleRoomConfigurations(roomConfigs.subList(1, roomConfigs.size()))
-                        .departure(List.of(transportsToHotel.getFirst(), transportsFromHotel.getLast()))
+                        .departure(List.of(transportsToHotel.getFirst(), transportsFromHotel.getFirst()))
                         .possibleDepartures(List.of(transportsToHotel.subList(1, transportsToHotel.size()), transportsFromHotel.subList(1, transportsFromHotel.size())))
                         .imageUrls(hotelResponseDto.getPhotos())
                         .cateringOptions(catering)
