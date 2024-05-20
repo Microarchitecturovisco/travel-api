@@ -135,7 +135,7 @@ public class OffersService {
         final float LAST_MINUTE_DISCOUNT_FACTOR = 0.7f;
         final float HIGH_PRICE_FACTOR = 1.2f;
 
-        float adultHotelPrice = (pricePerAdultPerRoomPerDay + cateringPrice);
+        float adultHotelPrice = (pricePerAdultPerRoomPerDay / 10 + cateringPrice);
 
         float priceForAdultsPerDayPerRoom = adults * adultHotelPrice;
         float priceForInfantPerDayPerRoom = infants * adultHotelPrice * INFANT_DISCOUNT_FACTOR;
