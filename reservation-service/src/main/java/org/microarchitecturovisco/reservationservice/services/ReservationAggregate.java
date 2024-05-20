@@ -2,9 +2,11 @@ package org.microarchitecturovisco.reservationservice.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.CreateReservationCommand;
+import org.microarchitecturovisco.reservationservice.domain.commands.DeleteReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.events.ReservationCreatedEvent;
+import org.microarchitecturovisco.reservationservice.domain.events.ReservationDeletedEvent;
 import org.microarchitecturovisco.reservationservice.domain.events.ReservationEvent;
 import org.microarchitecturovisco.reservationservice.domain.events.ReservationUpdateEvent;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationEventStore;
@@ -25,6 +27,27 @@ public class ReservationAggregate {
 
     public List<ReservationEvent> handleCreateReservationCommand(CreateReservationCommand command) {
         ReservationCreatedEvent event = ReservationCreatedEvent.builder()
+                .idReservation(command.getId())
+                .hotelTimeFrom(command.getHotelTimeFrom())
+                .hotelTimeTo(command.getHotelTimeTo())
+                .infantsQuantity(command.getInfantsQuantity())
+                .kidsQuantity(command.getKidsQuantity())
+                .teensQuantity(command.getTeensQuantity())
+                .adultsQuantity(command.getAdultsQuantity())
+                .price(command.getPrice())
+                .paid(command.isPaid())
+                .hotelId(command.getHotelId())
+                .roomReservationsIds(command.getRoomReservationsIds())
+                .transportReservationsIds(command.getTransportReservationsIds())
+                .userId(command.getUserId())
+                .build();
+        reservationEventStore.save(event);
+        reservationProjector.project(List.of(event));
+        return List.of(event);
+    }
+
+    public List<ReservationEvent> handleDeleteReservationCommand(DeleteReservationCommand command) {
+        ReservationDeletedEvent event = ReservationDeletedEvent.builder()
                 .idReservation(command.getId())
                 .hotelTimeFrom(command.getHotelTimeFrom())
                 .hotelTimeTo(command.getHotelTimeTo())

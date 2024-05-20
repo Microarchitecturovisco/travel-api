@@ -121,5 +121,45 @@ public class HotelsService {
                 .build();
     }
 
+    public boolean CheckHotelAvailability(CheckHotelAvailabilityQueryRequestDto requestDto) {
+        // Step 1: Extract information from the request DTO
+        LocalDateTime dateFrom = requestDto.getDateFrom();
+        LocalDateTime dateTo = requestDto.getDateTo();
+
+        UUID hotelId = requestDto.getHotelId();
+        List<UUID> roomIds = requestDto.getRoomReservationsIds();
+
+        // Step 2: Retrieve the hotel from the repository
+        Optional<Hotel> hotelOpt = hotelRepository.findById(hotelId);
+        if (hotelOpt.isEmpty()) {
+            return false;
+        }
+
+        Hotel hotel = hotelOpt.get();
+
+        // Step 3: Filter rooms by room IDs
+        List<Room> specificRooms = hotel.getRooms().stream()
+                .filter(room -> roomIds.contains(room.getId()))
+                .toList();
+
+
+        // Step 4: check availability of all rooms
+        for (Room specificRoom :specificRooms) {
+            if (!isRoomAvailable(specificRoom, dateFrom, dateTo)) { return false;}
+        }
+
+        return true;
+    }
+
+    private boolean isRoomAvailable(Room room, LocalDateTime dateFrom, LocalDateTime dateTo) {
+        for (RoomReservation reservation : room.getRoomReservations()) {
+            if (reservation.getDateFrom().isBefore(dateTo) && reservation.getDateTo().isAfter(dateFrom)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }
 

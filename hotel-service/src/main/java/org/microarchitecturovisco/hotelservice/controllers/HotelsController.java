@@ -3,9 +3,11 @@ package org.microarchitecturovisco.hotelservice.controllers;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CheckHotelAvailabilityRequest;
 import org.microarchitecturovisco.hotelservice.controllers.reservations.CreateHotelReservationRequest;
+import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHotelReservationRequest;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
-import org.microarchitecturovisco.hotelservice.model.dto.HotelDto;
+import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
+import org.microarchitecturovisco.hotelservice.model.dto.request.CheckHotelAvailabilityQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
@@ -13,13 +15,12 @@ import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySea
 import org.microarchitecturovisco.hotelservice.queues.config.QueuesConfig;
 import org.microarchitecturovisco.hotelservice.services.HotelsCommandService;
 import org.microarchitecturovisco.hotelservice.services.HotelsService;
+import org.microarchitecturovisco.hotelservice.utils.JsonConverter;
 import org.microarchitecturovisco.hotelservice.utils.JsonReader;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.microarchitecturovisco.hotelservice.utils.JsonConverter;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,39 +70,41 @@ public class HotelsController {
 
         CheckHotelAvailabilityRequest availabilityRequest = JsonReader.readDtoFromJson(request, CheckHotelAvailabilityRequest.class);
 
-        GetHotelsBySearchQueryRequestDto query = GetHotelsBySearchQueryRequestDto.builder()
+        CheckHotelAvailabilityQueryRequestDto query = CheckHotelAvailabilityQueryRequestDto.builder()
                 .dateFrom(availabilityRequest.getHotelTimeFrom())
                 .dateTo(availabilityRequest.getHotelTimeTo())
-                .arrivalLocationIds(availabilityRequest.getArrivalLocationIds())
                 .adults(availabilityRequest.getAdultsQuantity())
                 .childrenUnderThree(availabilityRequest.getChildrenUnder3Quantity())
                 .childrenUnderTen(availabilityRequest.getChildrenUnder10Quantity())
                 .childrenUnderEighteen(availabilityRequest.getChildrenUnder18Quantity())
+                .hotelId(availabilityRequest.getHotelId())
+                .roomReservationsIds(availabilityRequest.getRoomReservationsIds())
+
                 .build();
 
-        GetHotelsBySearchQueryResponseDto hotels = hotelsService.GetHotelsBySearchQuery(query);
+        boolean hotelAvailable = hotelsService.CheckHotelAvailability(query);
+        
+        return String.valueOf(hotelAvailable) ;
 
-        logger.info("Response size: " + hotels.getHotels().size());
-
-        return Boolean.toString(!hotels.getHotels().isEmpty());
     }
 
-    @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CREATE_RESERVATION_REQ)
-    public void consumeMessageCreateHotelReservation(CreateHotelReservationRequest request) {
-        System.out.println("Message received from queue: " + request);
+    @RabbitListener(queues = "#{handleCreateHotelReservationQueue.name}")
+    public void consumeMessageCreateHotelReservation(CreateHotelReservationRequest createHotelReservationRequest) {
+        System.out.println("Message received from queue createHotelReservationRequest: " + createHotelReservationRequest);
+        System.out.println("Reservation id: " + createHotelReservationRequest.getId());
 
-        int numberOfRoomsInReservation = request.getRoomReservationsIds().size();
+        int numberOfRoomsInReservation = createHotelReservationRequest.getRoomReservationsIds().size();
 
         List<RoomReservationDto> roomReservations = new ArrayList<>();
 
         for (int i = 0; i < numberOfRoomsInReservation; i++) {
-            UUID roomId = request.getRoomReservationsIds().get(i);
+            UUID roomId = createHotelReservationRequest.getRoomReservationsIds().get(i);
 
             RoomReservationDto roomReservation = new RoomReservationDto();
-            roomReservation.setReservationId(request.getReservationId());
-            roomReservation.setDateFrom(request.getHotelTimeFrom());
-            roomReservation.setDateTo(request.getHotelTimeTo());
-            roomReservation.setHotelId(request.getHotelId());
+            roomReservation.setReservationId(createHotelReservationRequest.getId());
+            roomReservation.setDateFrom(createHotelReservationRequest.getHotelTimeFrom());
+            roomReservation.setDateTo(createHotelReservationRequest.getHotelTimeTo());
+            roomReservation.setHotelId(createHotelReservationRequest.getHotelId());
             roomReservation.setRoomId(roomId);
 
             roomReservations.add(roomReservation);
@@ -117,6 +120,29 @@ public class HotelsController {
                     .build()
             );
         }
+    }
+
+    @RabbitListener(queues = "#{handleDeleteHotelReservationQueue.name}")
+    public void consumeMessageDeleteHotelReservation(DeleteHotelReservationRequest request) {
+        System.out.println("Message received from queue DeleteHotelReservationRequest: " + request);
+
+        // TODO: delete the reservation using fields in request:
+        //    private UUID reservationId;
+        //    private UUID hotelId;
+        //    private List<UUID> roomIds;
+
+        for (UUID roomId : request.getRoomIds()){
+            DeleteRoomReservationCommand command = DeleteRoomReservationCommand.builder()
+                    .commandTimeStamp(LocalDateTime.now())
+                    .reservationId(request.getReservationId())
+                    .roomId(roomId)
+                    .hotelId(request.getHotelId())
+                    .build();
+
+            hotelsCommandService.deleteReservation(command);
+        }
+
+
     }
 }
 
