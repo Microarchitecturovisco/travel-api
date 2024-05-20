@@ -24,7 +24,7 @@ public class CheckHotelAvailabilityRequest {
 
     private int childrenUnder18Quantity;
 
-    private List<UUID> departureLocationIdsByPlane;
-    private List<UUID> departureLocationIdsByBus;
-    private List<UUID> arrivalLocationIds;
+    private UUID hotelId;
+
+    private List<UUID> roomReservationsIds;
 }

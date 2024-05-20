@@ -10,7 +10,9 @@ import org.microarchitecturovisco.hotelservice.repositories.RoomReservationRepos
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -112,9 +114,22 @@ public class HotelEventProjector {
 
 
     }
+    private void apply(RoomReservationDeletedEvent event) {
+        UUID roomReservationId = event.getIdRoomReservation();
 
-    private void apply(RoomReservationDeletedEvent event){
-        roomReservationRepository.deleteById(event.getIdRoomReservation());
+        Room room = roomRepository.findById(event.getIdRoom()).orElseThrow(RuntimeException::new);
+        List<RoomReservation> roomReservations = room.getRoomReservations();
+
+        Iterator<RoomReservation> iterator = roomReservations.iterator();
+        while (iterator.hasNext()) {
+            RoomReservation roomReservation = iterator.next();
+            if (roomReservation.getId().equals(roomReservationId)) {
+                iterator.remove();
+                roomReservationRepository.deleteById(roomReservationId);  // Explicitly remove from RoomReservation repository
+                roomRepository.save(room);
+                break;
+            }
+        }
     }
 
 }

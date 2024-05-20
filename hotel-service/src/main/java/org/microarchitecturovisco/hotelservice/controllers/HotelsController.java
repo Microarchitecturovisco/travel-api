@@ -7,6 +7,7 @@ import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHo
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
+import org.microarchitecturovisco.hotelservice.model.dto.request.CheckHotelAvailabilityQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
@@ -59,19 +60,20 @@ public class HotelsController {
     public String consumeMessageCheckHotelAvailability(CheckHotelAvailabilityRequest request) {
         System.out.println("Message received from queue: " + request);
 
-        GetHotelsBySearchQueryRequestDto query = GetHotelsBySearchQueryRequestDto.builder()
+        CheckHotelAvailabilityQueryRequestDto query = CheckHotelAvailabilityQueryRequestDto.builder()
                 .dateFrom(request.getHotelTimeFrom())
                 .dateTo(request.getHotelTimeTo())
-                .arrivalLocationIds(request.getArrivalLocationIds())
                 .adults(request.getAdultsQuantity())
                 .childrenUnderThree(request.getChildrenUnder3Quantity())
                 .childrenUnderTen(request.getChildrenUnder10Quantity())
                 .childrenUnderEighteen(request.getChildrenUnder18Quantity())
+                .hotelId(request.getHotelId())
+                .roomReservationsIds(request.getRoomReservationsIds())
                 .build();
 
-        GetHotelsBySearchQueryResponseDto hotels = hotelsService.GetHotelsBySearchQuery(query);
+        boolean hotelAvailable = hotelsService.CheckHotelAvailability(query);
 
-        return Boolean.toString(!hotels.getHotels().isEmpty());
+        return String.valueOf(hotelAvailable) ;
     }
 
     @RabbitListener(queues = "#{handleCreateHotelReservationQueue.name}")

@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetHotelsBySearchQueryRequestDto implements Serializable {
+public class CheckHotelAvailabilityQueryRequestDto implements Serializable {
 
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
@@ -27,6 +27,4 @@ public class GetHotelsBySearchQueryRequestDto implements Serializable {
     private UUID hotelId;
 
     private List<UUID> roomReservationsIds;
-
-    private List<UUID> arrivalLocationIds;
 }

@@ -121,5 +121,53 @@ public class HotelsService {
                 .build();
     }
 
+    public boolean CheckHotelAvailability(CheckHotelAvailabilityQueryRequestDto requestDto) {
+        // Step 1: Extract information from the request DTO
+        LocalDateTime dateFrom = requestDto.getDateFrom();
+        LocalDateTime dateTo = requestDto.getDateTo();
+        int numberOfGuests = requestDto.getAdults()
+                + requestDto.getChildrenUnderEighteen()
+                + requestDto.getChildrenUnderTen()
+                + requestDto.getChildrenUnderThree();
+        UUID hotelId = requestDto.getHotelId();
+        List<UUID> roomIds = requestDto.getRoomReservationsIds();
+
+        // Step 2: Retrieve the hotel from the repository
+        Optional<Hotel> hotelOpt = hotelRepository.findById(hotelId);
+        if (hotelOpt.isEmpty()) {
+            return false;
+        }
+
+        Hotel hotel = hotelOpt.get();
+
+        // Step 3: Filter rooms by room IDs
+        List<Room> specificRooms = hotel.getRooms().stream()
+                .filter(room -> roomIds.contains(room.getId()))
+                .collect(Collectors.toList());
+
+        // Step 4: Filter rooms by guest capacity
+        List<Room> roomsWithSufficientCapacity = specificRooms.stream()
+                .filter(room -> room.getGuestCapacity() >= numberOfGuests)
+                .collect(Collectors.toList());
+
+        // Step 5: Filter rooms by availability
+        List<Room> availableRooms = roomsWithSufficientCapacity.stream()
+                .filter(room -> isRoomAvailable(room, dateFrom, dateTo))
+                .collect(Collectors.toList());
+
+        // Step 6: Determine availability
+        return !availableRooms.isEmpty();
+    }
+
+    private boolean isRoomAvailable(Room room, LocalDateTime dateFrom, LocalDateTime dateTo) {
+        for (RoomReservation reservation : room.getRoomReservations()) {
+            if (reservation.getDateFrom().isBefore(dateTo) && reservation.getDateTo().isAfter(dateFrom)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }
 
