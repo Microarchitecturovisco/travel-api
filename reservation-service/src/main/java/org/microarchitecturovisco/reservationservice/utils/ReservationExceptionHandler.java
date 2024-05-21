@@ -1,5 +1,6 @@
 package org.microarchitecturovisco.reservationservice.utils;
 
+import org.microarchitecturovisco.reservationservice.domain.exceptions.PurchaseFailedException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationNotFoundAfterPaymentException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class ReservationExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(ReservationNotFoundAfterPaymentException.class)
+    @ExceptionHandler({
+            ReservationNotFoundAfterPaymentException.class,
+            PurchaseFailedException.class
+    })
     protected ResponseEntity handleInternalServerError(RuntimeException ex, WebRequest request) {
         return handleExceptionInternal(ex, ResponseEntity.internalServerError().body(ex.getMessage()), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 

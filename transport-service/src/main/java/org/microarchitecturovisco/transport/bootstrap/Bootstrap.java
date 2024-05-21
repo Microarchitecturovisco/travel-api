@@ -59,7 +59,7 @@ public class Bootstrap implements CommandLineRunner {
         int randomSeed = 12345678;
         Random random = new Random(randomSeed);
 
-        int numberOfDays = 10;
+        int numberOfDays = 60;
 
         // generate transport for each course and every day of two months
         for (int day = 0; day < numberOfDays; day++) {
@@ -123,7 +123,7 @@ public class Bootstrap implements CommandLineRunner {
     }
 
     private void createReservationsForTransport(Random random, TransportCourseDto planeCourse, int capacity, TransportDto transportDto) {
-        int numberOfReservationsToMake = random.nextInt(0, 10) > 6 ? capacity : (int) (capacity * 0.8);
+        int numberOfReservationsToMake = random.nextInt(0, 10) > 7 ? capacity : (int) (capacity * 0.6);
 
         while (numberOfReservationsToMake > 0) {
             int occupiedSeats = random.nextInt(1, 8);

@@ -10,6 +10,8 @@ import org.microarchitecturovisco.paymentservice.utils.JsonReader;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.logging.Logger;
+
 @RestController
 @RequiredArgsConstructor
 public class PaymentController {
@@ -18,9 +20,15 @@ public class PaymentController {
 
     @RabbitListener(queues = "payments.requests.handle")
     public String consumePaymentRequest(String paymentRequestJson) {
+        Logger logger = Logger.getLogger("Payment request");
+
+        logger.info("Request: " + paymentRequestJson);
+
         HandlePaymentRequestDto requestDto = JsonReader.handlePaymentRequestDtoFromJson(paymentRequestJson);
 
         HandlePaymentResponseDto responseDto = paymentService.verifyTransaction(requestDto);
+
+        logger.info("Response: " + responseDto);
 
         return JsonConverter.convertHandlePaymentResponseDto(responseDto);
     }
