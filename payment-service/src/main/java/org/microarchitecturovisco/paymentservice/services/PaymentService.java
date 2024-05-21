@@ -11,6 +11,7 @@ public class PaymentService {
         boolean transactionApproved = Long.parseLong(requestDto.getCardNumber()) % 2 == 0;
 
         return HandlePaymentResponseDto.builder()
+                .reservationId(requestDto.getIdReservation())
                 .transactionApproved(transactionApproved)
                 .build();
     }
