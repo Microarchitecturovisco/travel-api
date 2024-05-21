@@ -18,7 +18,7 @@ public class Room {
     @Id
     private UUID id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name="hotel_id")
     private Hotel hotel;
 

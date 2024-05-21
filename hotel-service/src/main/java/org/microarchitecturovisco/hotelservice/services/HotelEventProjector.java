@@ -106,6 +106,7 @@ public class HotelEventProjector {
                 .dateFrom(event.getDateFrom())
                 .dateTo(event.getDateTo())
                 .room(room)
+                .mainReservationId(event.getIdRoomReservation())
                 .build();
         room.getRoomReservations().add(roomReservation);
         roomReservationRepository.save(roomReservation);
@@ -114,25 +115,23 @@ public class HotelEventProjector {
 
     }
     private void apply(RoomReservationDeletedEvent event) {
-        UUID roomReservationId = event.getIdRoomReservation();
-        List<HotelEvent> roomReservationIds = eventStore.findAll().stream().filter(e -> e instanceof RoomReservationCreatedEvent).toList();
+        UUID roomId = event.getIdRoom();
+        UUID reservationId = event.getIdRoomReservation();
 
-        List<HotelEvent> roomReservationIds2 = roomReservationIds.stream().filter(e -> ((RoomReservationCreatedEvent) e).getIdRoomReservation().equals(roomReservationId)).toList();
-        List<UUID> roomReservationIds3 = roomReservationIds2.stream().map(HotelEvent::getId).toList();
-
-
-        Room room = roomRepository.findById(event.getIdRoom()).orElseThrow(RuntimeException::new);
-        List<RoomReservation> roomReservations = room.getRoomReservations();
-
-        Iterator<RoomReservation> iterator = roomReservations.iterator();
-        while (iterator.hasNext()) {
-            RoomReservation roomReservation = iterator.next();
-            if (roomReservationIds3.contains(roomReservation.getId())) {
-                iterator.remove();
-                roomReservationRepository.deleteById(roomReservation.getId());
-                roomRepository.save(room);
-                break;
+        // Find the room
+        Room room = roomRepository.findById(roomId).orElse(null);
+        if (room != null) {
+            List<RoomReservation> roomReservations = room.getRoomReservations();
+            Iterator<RoomReservation> iterator = roomReservations.iterator();
+            while (iterator.hasNext()) {
+                RoomReservation reservation = iterator.next();
+                if (reservation.getMainReservationId().equals(reservationId)) {
+                    iterator.remove();
+                    roomReservationRepository.delete(reservation);
+                    break;  // Exit the loop after deleting the reservation
+                }
             }
+            roomRepository.save(room);  // Save the room to persist changes
         }
     }
 
