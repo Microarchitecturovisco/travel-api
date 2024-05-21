@@ -21,7 +21,7 @@ public class QueuesReservationConfig {
     @Bean(name="handleCreateTransportReservationQueue")
     public Queue handleCreateTransportReservationQueue() {
         String uniqueQueueName = QUEUE_TRANSPORT_CREATE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
-        return new Queue(uniqueQueueName, false);
+        return new Queue(uniqueQueueName, false, false, true);
     }
 
     @Bean
