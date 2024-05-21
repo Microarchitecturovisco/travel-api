@@ -10,6 +10,7 @@ import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseD
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
+import org.microarchitecturovisco.reservationservice.domain.exceptions.PurchaseFailedException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationNotFoundAfterPaymentException;
 import org.microarchitecturovisco.reservationservice.domain.model.LocationReservationResponse;
@@ -198,10 +199,12 @@ public class ReservationService {
 
     public ReservationConfirmationResponse purchaseReservation(String reservationId, String cardNumber) {
         boolean successfulPayment = false;
+        String failedPaymentMessage = "";
         try {
             successfulPayment = processPaymentWithPaymentModule(reservationId, cardNumber);
         } catch (PaymentProcessException e) {
             logger.warning("Exception thrown in payment process:" + e.getMessage());
+            failedPaymentMessage = e.getMessage();
         }
 
         // ROLLBACK here
@@ -234,6 +237,8 @@ public class ReservationService {
                 // Delete reservation from the ReservationRepository in Reservation service
                 rollbackForReservationObject(reservationRequest);
             }
+
+            throw new PurchaseFailedException(failedPaymentMessage);
         }
 
         reservationAggregate.handleReservationUpdateCommand(UpdateReservationCommand.builder().reservationId(UUID.fromString(reservationId)).paid(true).build());
