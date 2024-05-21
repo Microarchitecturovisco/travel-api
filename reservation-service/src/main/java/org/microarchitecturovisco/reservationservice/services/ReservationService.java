@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -205,7 +206,34 @@ public class ReservationService {
 
         // ROLLBACK here
         if(!successfulPayment) {
-            throw new RuntimeException(); //temporary
+            Optional<Reservation> reservationOptional = reservationRepository.findById(UUID.fromString(reservationId));
+
+            if (reservationOptional.isPresent()) {
+                // If the reservation is present, get its value and build ReservationRequest
+                Reservation reservation = reservationOptional.get();
+                ReservationRequest reservationRequest = ReservationRequest.builder()
+                        .id(reservation.getId())
+                        .hotelTimeFrom(reservation.getHotelTimeFrom())
+                        .hotelTimeTo(reservation.getHotelTimeTo())
+                        .adultsQuantity(reservation.getAdultsQuantity())
+                        .childrenUnder18Quantity(reservation.getChildrenUnder18Quantity())
+                        .childrenUnder10Quantity(reservation.getChildrenUnder10Quantity())
+                        .childrenUnder3Quantity(reservation.getChildrenUnder3Quantity())
+                        .transportReservationsIds(reservation.getTransportReservationsIds())
+                        .hotelId(reservation.getHotelId())
+                        .roomReservationsIds(reservation.getRoomReservationsIds())
+                        .userId(reservation.getUserId())
+                        .build();
+                
+                // Delete reservation in Transport service
+                rollbackForTransportReservation(reservationRequest);
+
+                // Delete reservation in Hotel service
+                rollbackForHotelReservation(reservationRequest);
+
+                // Delete reservation from the ReservationRepository in Reservation service
+                rollbackForReservationObject(reservationRequest);
+            }
         }
 
         reservationAggregate.handleReservationUpdateCommand(UpdateReservationCommand.builder().reservationId(UUID.fromString(reservationId)).paid(true).build());
