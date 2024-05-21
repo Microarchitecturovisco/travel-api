@@ -284,8 +284,6 @@ public class ReservationService {
 
             if(responseMessage != null) {
 
-                System.out.println("Transports message: " + responseMessage);
-
                 PaymentResponseDto paymentResponseDto = JsonReader.readDtoFromJson(responseMessage, PaymentResponseDto.class);
                 if(!paymentResponseDto.getReservationId().equals(reservationId)) {
                     throw new PaymentProcessException("Requested payment id is different than returned from payment module");
