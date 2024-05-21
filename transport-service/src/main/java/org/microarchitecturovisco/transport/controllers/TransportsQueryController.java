@@ -127,7 +127,7 @@ public class TransportsQueryController {
             CheckTransportAvailabilityResponseDto response = CheckTransportAvailabilityResponseDto.builder()
                     .ifAvailable(false)
                     .build();
-            System.out.println("Transport ifAvailable:" + response.isIfAvailable());
+            System.out.println("Transport available:" + response.isIfAvailable());
             String responseJson = JsonConverter.convertToJsonWithLocalDateTime(response);
             return responseJson;
         }
@@ -141,7 +141,7 @@ public class TransportsQueryController {
                 .ifAvailable(ifAvailable)
                 .build();
 
-        System.out.println("Transport ifAvailable:" + response.isIfAvailable());
+        System.out.println("Transport available:" + response.isIfAvailable());
         String responseJson = JsonConverter.convertToJsonWithLocalDateTime(response);
 
         return responseJson;

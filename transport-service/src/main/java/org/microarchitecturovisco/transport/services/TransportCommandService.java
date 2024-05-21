@@ -39,7 +39,6 @@ public class TransportCommandService {
                 .idTransport(command.getTransportReservationDto().getIdTransport())
                 .build();
 
-//        System.out.println("transportReservationCreatedEvent: " + transportReservationCreatedEvent);
 
         transportEventStore.save(transportReservationCreatedEvent);
         eventSourcingHandler.project(List.of(transportReservationCreatedEvent));
@@ -52,6 +51,8 @@ public class TransportCommandService {
                 .reservationId(command.getReservationId())
                 .idTransport(command.getTransportId())
                 .build();
+
+        System.out.println("TransportReservationDeletedEvent: " + reservationDeletedEvent);
 
         transportEventStore.save(reservationDeletedEvent);
         eventSourcingHandler.project(List.of(reservationDeletedEvent));

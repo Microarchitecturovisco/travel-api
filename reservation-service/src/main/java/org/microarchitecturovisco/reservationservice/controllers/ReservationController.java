@@ -57,6 +57,6 @@ public class ReservationController {
                 reservationRequest.getUserId(),
                 reservationRequest.getId()
         );
-        System.out.println("Reservation created successfully: " + reservation.getId());
+        System.out.println("Reservation in Reservation module created successfully: " + reservation.getId());
     }
 }
