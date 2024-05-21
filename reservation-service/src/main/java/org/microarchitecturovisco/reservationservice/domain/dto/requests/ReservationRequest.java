@@ -26,11 +26,6 @@ public class ReservationRequest implements Serializable {
 
     private int childrenUnder18Quantity;
 
-    private TransportType transportType;
-
-    private List<UUID> departureLocationIds;
-    private List<UUID> arrivalLocationIds;
-
     private float price;
     private UUID hotelId;
     private List<UUID> roomReservationsIds;
