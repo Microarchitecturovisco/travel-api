@@ -7,6 +7,7 @@ import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReser
 import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseDto;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
@@ -150,18 +151,34 @@ public class ReservationService {
         ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationRequest.getId() + " !");
 
         // Delete reservation in Transport service
-
-
+        rollbackForTransportReservation(reservationRequest);
 
         // Delete reservation in Hotel service
+        rollbackForHotelReservation(reservationRequest);
+
+        // Delete reservation from the ReservationRepository in Reservation service
+        rollbackForReservationObject(reservationRequest);
+
+    }
+
+    private void rollbackForTransportReservation(ReservationRequest reservationRequest) {
+        TransportReservationDeleteRequest transportReservationDeleteRequest = TransportReservationDeleteRequest.builder()
+                .transportReservationsIds(reservationRequest.getTransportReservationsIds())
+                .reservationId(reservationRequest.getId())
+                .build();
+        bookTransportsSaga.deleteTransportReservation(transportReservationDeleteRequest);
+    }
+
+    private void rollbackForHotelReservation(ReservationRequest reservationRequest) {
         HotelReservationDeleteRequest hotelReservationDeleteRequest = HotelReservationDeleteRequest.builder()
                 .hotelId(reservationRequest.getHotelId())
                 .reservationId(reservationRequest.getId())
                 .roomIds(reservationRequest.getRoomReservationsIds())
                 .build();
         bookHotelsSaga.deleteHotelReservation(hotelReservationDeleteRequest);
+    }
 
-        // Delete reservation from the ReservationRepository in Reservation service
+    private void rollbackForReservationObject(ReservationRequest reservationRequest) {
         deleteReservation(
                 reservationRequest.getHotelTimeFrom(),
                 reservationRequest.getHotelTimeTo(),
@@ -176,7 +193,6 @@ public class ReservationService {
                 reservationRequest.getUserId(),
                 reservationRequest.getId()
         );
-
     }
 
     public ReservationConfirmationResponse purchaseReservation(String reservationId, String cardNumber) {
