@@ -20,7 +20,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
@@ -40,7 +39,7 @@ public class Bootstrap implements CommandLineRunner {
     private final ResourceLoader resourceLoader;
 
     @Override
-    public void run(String... args) throws IOException {
+    public void run(String... args) {
         Logger logger = Logger.getLogger("Bootstrap | Transports");
 
         Resource hotelCsvResource = resourceLoader.getResource("classpath:initData/hotels.csv");
@@ -65,7 +64,7 @@ public class Bootstrap implements CommandLineRunner {
         // generate transport for each course and every day of two months
         for (int day = 0; day < numberOfDays; day++) {
             for (TransportCourseDto planeCourse : planeCourses) {
-                int capacity = random.nextInt(10, 15);
+                int capacity = random.nextInt(8, 15);
 
                 LocalDateTime departureDate = bootstrapBeginDay.plusDays(day);
 
@@ -90,11 +89,11 @@ public class Bootstrap implements CommandLineRunner {
                         .build()
                 );
 
-//                createReservationsForTransport(random, planeCourse, capacity, transportDto);
+                createReservationsForTransport(random, planeCourse, capacity, transportDto);
             }
 
             for (TransportCourseDto busCourse : busCourses) {
-                int capacity = random.nextInt(10, 15);
+                int capacity = random.nextInt(8, 15);
                 LocalDateTime departureDate = bootstrapBeginDay.plusDays(day);
 
                 UUID transportId = UUID.nameUUIDFromBytes((
