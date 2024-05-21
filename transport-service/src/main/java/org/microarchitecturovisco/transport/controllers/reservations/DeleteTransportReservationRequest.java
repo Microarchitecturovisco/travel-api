@@ -14,6 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteTransportReservationRequest implements Serializable {
-    private UUID id;
+    private UUID reservationId;
     private List<UUID> transportReservationsIds;
 }

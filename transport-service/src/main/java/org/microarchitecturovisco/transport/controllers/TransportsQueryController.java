@@ -137,9 +137,8 @@ public class TransportsQueryController {
 
     @RabbitListener(queues = "#{handleCreateTransportReservationQueue.name}")
     public void consumeMessageCreateTransportReservation(String requestDtoJson) {
-        System.out.println("Message received from create reservation requestDtoJson: " + requestDtoJson);
-
         CreateTransportReservationRequest request = JsonReader.readDtoFromJson(requestDtoJson, CreateTransportReservationRequest.class);
+
         System.out.println("Message received from queue request: " + request);
 
         for (UUID idTransport: request.getTransportIds()) {
@@ -163,14 +162,14 @@ public class TransportsQueryController {
 
     @RabbitListener(queues = "#{handleDeleteTransportReservationQueue.name}")
     public void consumeMessageDeleteTransportReservation(String requestJson) {
-        System.out.println("Message received from queue consumeMessageDeleteTransportReservation: " + requestJson);
-
         DeleteTransportReservationRequest request = JsonReader.readDtoFromJson(requestJson, DeleteTransportReservationRequest.class);
+
+        System.out.println("Message received from queue consumeMessageDeleteTransportReservation: " + request);
 
         for (UUID transportId : request.getTransportReservationsIds()){
             DeleteTransportReservationCommand command = DeleteTransportReservationCommand.builder()
                     .commandTimeStamp(LocalDateTime.now())
-                    .reservationId(request.getId())
+                    .reservationId(request.getReservationId())
                     .transportId(transportId)
                     .build();
 

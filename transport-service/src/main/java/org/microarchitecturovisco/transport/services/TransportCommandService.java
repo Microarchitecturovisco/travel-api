@@ -50,7 +50,7 @@ public class TransportCommandService {
                 .id(UUID.randomUUID())
                 .eventTimeStamp(command.getCommandTimeStamp())
                 .reservationId(command.getReservationId())
-                .transportId(command.getTransportId())
+                .idTransport(command.getTransportId())
                 .build();
 
         transportEventStore.save(reservationDeletedEvent);

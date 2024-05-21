@@ -76,7 +76,7 @@ public class TransportEventSourcingHandler {
     }
 
     private void apply(TransportReservationCreatedEvent event) {
-        System.out.println("TransportReservationCreatedEvent: " + event);
+        System.out.println("TransportReservationCreatedEvent: " + event.toString());
 
         Transport transport = transportRepository.findById(event.getIdTransport()).orElseThrow(RuntimeException::new);
 
@@ -94,7 +94,7 @@ public class TransportEventSourcingHandler {
 
     private void apply(TransportReservationDeletedEvent event) {
 
-        UUID transportId = event.getTransportId();
+        UUID transportId = event.getIdTransport();
         UUID reservationId = event.getReservationId();
 
         // Find the transport
@@ -104,7 +104,7 @@ public class TransportEventSourcingHandler {
             List<TransportReservation> transportReservations = transport.getTransportReservations();
             for (TransportReservation reservation : transportReservations) {
                 if (reservation.getMainReservationId().equals(reservationId)) {
-                    transportReservationRepository.deleteByMainReservationId(reservationId);
+                    transportReservationRepository.delete(reservation);
                 }
             }
         }

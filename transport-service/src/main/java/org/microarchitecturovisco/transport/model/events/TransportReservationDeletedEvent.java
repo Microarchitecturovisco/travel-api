@@ -17,5 +17,4 @@ import java.util.UUID;
 @SuperBuilder
 public class TransportReservationDeletedEvent extends TransportEvent {
     private UUID reservationId;
-    private UUID transportId;
 }
