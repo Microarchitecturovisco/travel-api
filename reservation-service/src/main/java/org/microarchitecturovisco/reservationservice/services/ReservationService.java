@@ -249,6 +249,8 @@ public class ReservationService {
         HotelInfo hotelInfo = getHotelInformation(reservation.getHotelId());
         TransportReservationResponse transportInfo = getTransportInformation(reservation.getTransportReservationsIds().stream().map(UUID::toString).toList());
 
+        logger.info("Purchased reservation: " + reservation);
+
         return ReservationConfirmationResponse.builder()
                 .hotelName(hotelInfo.getName())
                 .price(reservation.getPrice())
