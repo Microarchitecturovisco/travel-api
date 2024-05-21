@@ -1,8 +1,7 @@
 package org.microarchitecturovisco.reservationservice.domain.events;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Entity;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
@@ -10,6 +9,9 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReservationUpdateEvent extends ReservationEvent {
     private UUID idReservation;
     private Boolean paid;
