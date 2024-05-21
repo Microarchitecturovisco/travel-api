@@ -19,11 +19,6 @@ public class CheckHotelAvailabilityQueryRequestDto implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
 
-    private Integer adults;
-    private Integer childrenUnderThree;
-    private Integer childrenUnderTen;
-    private Integer childrenUnderEighteen;
-
     private UUID hotelId;
 
     private List<UUID> roomReservationsIds;

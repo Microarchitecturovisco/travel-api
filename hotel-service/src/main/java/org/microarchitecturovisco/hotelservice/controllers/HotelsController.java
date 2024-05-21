@@ -7,6 +7,7 @@ import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHo
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
+import org.microarchitecturovisco.hotelservice.model.dto.request.CheckHotelAvailabilityQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.CheckHotelAvailabilityResponseDto;
@@ -68,10 +69,17 @@ public class HotelsController {
         CheckHotelAvailabilityRequest request = JsonReader.readCheckHotelAvailabilityRequestCommand(requestJson);
         System.out.println("Converted message received from queue: " + request);
 
-        // todo: here logic (RSWW-102)
+        CheckHotelAvailabilityQueryRequestDto query = CheckHotelAvailabilityQueryRequestDto.builder()
+                .dateFrom(request.getHotelTimeFrom())
+                .dateTo(request.getHotelTimeTo())
+                .hotelId(request.getHotelId())
+                .roomReservationsIds(request.getRoomReservationsIds())
+                .build();
+
+        boolean availability = hotelsService.CheckHotelAvailability(query);
 
         CheckHotelAvailabilityResponseDto response = CheckHotelAvailabilityResponseDto.builder()
-                        .ifAvailable(true) // todo adjust
+                        .ifAvailable(availability)
                         .build();
 
         System.out.println("Response to convert:" +response );
