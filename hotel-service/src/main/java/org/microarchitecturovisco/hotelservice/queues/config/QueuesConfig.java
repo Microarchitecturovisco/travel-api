@@ -41,7 +41,7 @@ public class QueuesConfig {
     @Bean(name="handleCreateHotelReservationQueue")
     public Queue handleCreateHotelReservationQueue() {
         String uniqueQueueName = QUEUE_HOTEL_CREATE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
-        return new Queue(uniqueQueueName, false, false, true);
+        return new Queue(uniqueQueueName, false);
     }
 
     @Bean
@@ -63,7 +63,7 @@ public class QueuesConfig {
     @Bean(name="handleDeleteHotelReservationQueue")
     public Queue handleDeleteHotelReservationQueue() {
         String uniqueQueueName = QUEUE_HOTEL_DELETE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
-        return new Queue(uniqueQueueName, false, false, true);
+        return new Queue(uniqueQueueName, false);
     }
 
     @Bean

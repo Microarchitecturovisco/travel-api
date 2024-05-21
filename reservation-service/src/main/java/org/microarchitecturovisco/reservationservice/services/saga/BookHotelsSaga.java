@@ -6,7 +6,7 @@ import org.microarchitecturovisco.reservationservice.domain.dto.requests.CreateH
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.responses.CheckHotelAvailabilityResponseDto;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
-import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesHotelConfig;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;

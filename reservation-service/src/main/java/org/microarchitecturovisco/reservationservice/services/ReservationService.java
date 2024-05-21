@@ -15,7 +15,7 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.domain.model.LocationReservationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
-import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
@@ -224,7 +224,7 @@ public class ReservationService {
                         .roomReservationsIds(reservation.getRoomReservationsIds())
                         .userId(reservation.getUserId())
                         .build();
-                
+
                 // Delete reservation in Transport service
                 rollbackForTransportReservation(reservationRequest);
 

@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.controllers.reservations.DeleteTransportReservationRequest;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.DeleteTransportReservationCommand;
+import org.microarchitecturovisco.transport.model.domain.Transport;
+import org.microarchitecturovisco.transport.model.domain.TransportReservation;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
@@ -116,15 +118,26 @@ public class TransportsQueryController {
         CheckTransportAvailabilityRequestDto request = JsonReader.readDtoFromJson(requestDtoJson, CheckTransportAvailabilityRequestDto.class);
         System.out.println("Message received from queue: " + request);
 
-//        GetTransportsBySearchQueryRequestDto requestDto = GetTransportsBySearchQueryRequestDto.builder()
-//
-//                .build();
+        UUID transportReservationsIdFrom = request.getTransportReservationsIdFrom();
+        UUID transportReservationsIdArrival = request.getTransportReservationsIdArrival();
 
-        // todo implement method for more detailed query and based on date, transport id, etc
-//        GetTransportsBySearchQueryResponseDto responseDto = transportsQueryService.getTransportsBySearchQuery(requestDto);
+        Transport transportFrom = transportsQueryService.getTransportById(transportReservationsIdFrom);
+        Transport transportArrival = transportsQueryService.getTransportById(transportReservationsIdArrival);
+
+        if (transportFrom == null || transportArrival == null) {
+            // If either transport is not found, return false
+            CheckTransportAvailabilityResponseDto response = CheckTransportAvailabilityResponseDto.builder()
+                    .ifAvailable(false)
+                    .build();
+        }
+
+        int totalCapacityNeeded = request.getNumberOfGuests();
+
+        boolean ifAvailable = checkCapacity(transportFrom, totalCapacityNeeded) &&
+                checkCapacity(transportArrival, totalCapacityNeeded);
 
         CheckTransportAvailabilityResponseDto response = CheckTransportAvailabilityResponseDto.builder()
-                .ifAvailable(true)
+                .ifAvailable(ifAvailable)
                 .build();
 
         System.out.println("Response to convert:" + response );
@@ -132,6 +145,17 @@ public class TransportsQueryController {
         System.out.println("Response after conversion:" + responseJson );
 
         return responseJson;
+    }
+
+    private boolean checkCapacity(Transport transport, int totalCapacityNeeded) {
+
+        int remainingCapacity = transport.getCapacity();
+
+        for (TransportReservation reservation : transport.getTransportReservations()) {
+            remainingCapacity -= reservation.getNumberOfSeats();
+        }
+
+        return remainingCapacity >= totalCapacityNeeded;
     }
 
 

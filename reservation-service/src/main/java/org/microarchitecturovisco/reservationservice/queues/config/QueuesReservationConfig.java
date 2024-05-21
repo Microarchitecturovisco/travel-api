@@ -22,7 +22,7 @@ public class QueuesReservationConfig {
     @Bean
     public Queue handleReservationCreateQueue() {
         String uniqueQueueName = "reservations.events.createReservation.queue." + UUID.randomUUID();
-        return new Queue(uniqueQueueName, false, false, true);
+        return new Queue(uniqueQueueName, false);
     }
 
     @Bean

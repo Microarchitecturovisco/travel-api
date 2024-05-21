@@ -3,11 +3,13 @@ package org.microarchitecturovisco.transport.services;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
-import org.microarchitecturovisco.transport.model.dto.request.CheckTransportAvailabilityRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
-import org.microarchitecturovisco.transport.model.dto.response.*;
+import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDepartures;
+import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
+import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
+import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
@@ -18,8 +20,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +34,16 @@ public class TransportsQueryService {
     public List<TransportDto> getAllTransports() {
         List<Transport> transports = transportRepository.findAll();
         return TransportMapper.mapList(transports);
+    }
+
+    public Transport getTransportById(UUID transportID) {
+        Optional<Transport> transportOptional = transportRepository.findById(transportID);
+        if (transportOptional.isPresent()) {
+            return transportOptional.get();
+        } else {
+            System.out.println("Transport with ID " + transportID + " not found");
+            return null;
+        }
     }
 
     public List<Location> getAllLocations() {
