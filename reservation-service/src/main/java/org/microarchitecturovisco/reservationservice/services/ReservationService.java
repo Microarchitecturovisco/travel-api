@@ -24,6 +24,7 @@ import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSag
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ import java.util.logging.Logger;
 public class ReservationService {
 
     public static final int PAYMENT_TIMEOUT_SECONDS = 60;
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ReservationService.class);
 
     public static Logger logger = Logger.getLogger(ReservationService.class.getName());
 
@@ -238,6 +240,7 @@ public class ReservationService {
                 rollbackForReservationObject(reservationRequest);
             }
 
+            logger.severe("Payment failed: " + failedPaymentMessage);
             throw new PurchaseFailedException(failedPaymentMessage);
         }
 
@@ -275,8 +278,9 @@ public class ReservationService {
                 .build();
 
         String transportMessageJson = JsonConverter.convert(requestDto);
+        logger.info("Request to payments.requests.handle " + transportMessageJson);
         try {
-            String responseMessage = (String) rabbitTemplate.convertSendAndReceive("payments.requests.handle", "payments.requests.handle", transportMessageJson);
+            String responseMessage = (String) rabbitTemplate.convertSendAndReceive("payments.requests.handle", "payments.handlePayment", transportMessageJson);
 
             if(responseMessage != null) {
 
