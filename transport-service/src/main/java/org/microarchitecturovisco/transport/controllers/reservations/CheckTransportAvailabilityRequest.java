@@ -1,7 +1,12 @@
 package org.microarchitecturovisco.transport.controllers.reservations;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.microarchitecturovisco.transport.model.domain.TransportType;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -10,21 +15,17 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class CheckTransportAvailabilityRequest {
-    private LocalDateTime hotelTimeFrom;
+public class CheckTransportAvailabilityRequest implements Serializable {
+    private LocalDateTime dateFrom;
+    private LocalDateTime dateTo;
 
-    private LocalDateTime hotelTimeTo;
+    private TransportType transportType;
 
-    private int adultsQuantity;
-
-    private int childrenUnder3Quantity;
-
-    private int childrenUnder10Quantity;
-
-    private int childrenUnder18Quantity;
-
-    private List<UUID> departureLocationIdsByPlane;
-    private List<UUID> departureLocationIdsByBus;
+    private List<UUID> departureLocationIds;
     private List<UUID> arrivalLocationIds;
+
+    private Integer adults;
+    private Integer childrenUnderThree;
+    private Integer childrenUnderTen;
+    private Integer childrenUnderEighteen;
 }

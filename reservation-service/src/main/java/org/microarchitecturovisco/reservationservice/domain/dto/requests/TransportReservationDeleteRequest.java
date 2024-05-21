@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.reservationservice.queues.config;
+package org.microarchitecturovisco.reservationservice.domain.dto.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +13,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HotelReservationDeleteRequest implements Serializable {
+public class TransportReservationDeleteRequest implements Serializable {
     private UUID reservationId;
-    private UUID hotelId;
-    private List<UUID> roomIds;
+    private List<UUID> transportReservationsIds;
 }

@@ -7,6 +7,7 @@ import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReser
 import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseDto;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
@@ -14,9 +15,9 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.domain.model.LocationReservationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
-import org.microarchitecturovisco.reservationservice.queues.config.HotelReservationDeleteRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
-import org.microarchitecturovisco.reservationservice.queues.config.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,7 +41,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    public static final int PAYMENT_TIMEOUT_SECONDS = 10;
+    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
 
     public static Logger logger = Logger.getLogger(ReservationService.class.getName());
 
@@ -113,17 +115,13 @@ public class ReservationService {
 
         bookTransportsSaga.createTransportReservation(reservationRequest);
 
-        // todo:
-        //  Tu jest niedokończony kod, który stanowi podstawę pod obsługę płatności
-        //  (reservationId będzie gdzieś z góry)
-
         Runnable paymentTimeoutRunnable = () -> {
             paymentTimeout(reservationRequest);
         };
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-        return null; // reservationId
+        return reservationId;
     }
 
     private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
@@ -134,14 +132,19 @@ public class ReservationService {
     }
 
     private void checkTransportAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
-//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        boolean transportIsAvailable = true; // debug only
+        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+//        boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
     }
 
     public void createReservationFromRequest(ReservationRequest reservationRequest) {
-        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequest);
+        String reservationRequestJson = JsonConverter.convert(reservationRequest);
+
+        System.out.println("reservationRequestJson: " + reservationRequestJson);
+
+        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequestJson);
+
         System.out.println("reservationCreated: " + reservationRequest.getId());
     }
 
@@ -149,18 +152,34 @@ public class ReservationService {
         ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationRequest.getId() + " !");
 
         // Delete reservation in Transport service
-
-
+        rollbackForTransportReservation(reservationRequest);
 
         // Delete reservation in Hotel service
+        rollbackForHotelReservation(reservationRequest);
+
+        // Delete reservation from the ReservationRepository in Reservation service
+        rollbackForReservationObject(reservationRequest);
+
+    }
+
+    private void rollbackForTransportReservation(ReservationRequest reservationRequest) {
+        TransportReservationDeleteRequest transportReservationDeleteRequest = TransportReservationDeleteRequest.builder()
+                .transportReservationsIds(reservationRequest.getTransportReservationsIds())
+                .reservationId(reservationRequest.getId())
+                .build();
+        bookTransportsSaga.deleteTransportReservation(transportReservationDeleteRequest);
+    }
+
+    private void rollbackForHotelReservation(ReservationRequest reservationRequest) {
         HotelReservationDeleteRequest hotelReservationDeleteRequest = HotelReservationDeleteRequest.builder()
                 .hotelId(reservationRequest.getHotelId())
                 .reservationId(reservationRequest.getId())
                 .roomIds(reservationRequest.getRoomReservationsIds())
                 .build();
         bookHotelsSaga.deleteHotelReservation(hotelReservationDeleteRequest);
+    }
 
-        // Delete reservation from the ReservationRepository in Reservation service
+    private void rollbackForReservationObject(ReservationRequest reservationRequest) {
         deleteReservation(
                 reservationRequest.getHotelTimeFrom(),
                 reservationRequest.getHotelTimeTo(),
@@ -175,7 +194,6 @@ public class ReservationService {
                 reservationRequest.getUserId(),
                 reservationRequest.getId()
         );
-
     }
 
     public ReservationConfirmationResponse purchaseReservation(String reservationId, String cardNumber) {
@@ -188,7 +206,34 @@ public class ReservationService {
 
         // ROLLBACK here
         if(!successfulPayment) {
-            throw new RuntimeException(); //temporary
+            Optional<Reservation> reservationOptional = reservationRepository.findById(UUID.fromString(reservationId));
+
+            if (reservationOptional.isPresent()) {
+                // If the reservation is present, get its value and build ReservationRequest
+                Reservation reservation = reservationOptional.get();
+                ReservationRequest reservationRequest = ReservationRequest.builder()
+                        .id(reservation.getId())
+                        .hotelTimeFrom(reservation.getHotelTimeFrom())
+                        .hotelTimeTo(reservation.getHotelTimeTo())
+                        .adultsQuantity(reservation.getAdultsQuantity())
+                        .childrenUnder18Quantity(reservation.getChildrenUnder18Quantity())
+                        .childrenUnder10Quantity(reservation.getChildrenUnder10Quantity())
+                        .childrenUnder3Quantity(reservation.getChildrenUnder3Quantity())
+                        .transportReservationsIds(reservation.getTransportReservationsIds())
+                        .hotelId(reservation.getHotelId())
+                        .roomReservationsIds(reservation.getRoomReservationsIds())
+                        .userId(reservation.getUserId())
+                        .build();
+
+                // Delete reservation in Transport service
+                rollbackForTransportReservation(reservationRequest);
+
+                // Delete reservation in Hotel service
+                rollbackForHotelReservation(reservationRequest);
+
+                // Delete reservation from the ReservationRepository in Reservation service
+                rollbackForReservationObject(reservationRequest);
+            }
         }
 
         reservationAggregate.handleReservationUpdateCommand(UpdateReservationCommand.builder().reservationId(UUID.fromString(reservationId)).paid(true).build());
@@ -224,7 +269,7 @@ public class ReservationService {
                 .cardNumber(cardNumber)
                 .build();
 
-        String transportMessageJson = JsonConverter.convertToJsonWithLocalDateTime(requestDto);
+        String transportMessageJson = JsonConverter.convert(requestDto);
         try {
             String responseMessage = (String) rabbitTemplate.convertSendAndReceive("payments.requests.handle", "payments.requests.handle", transportMessageJson);
 

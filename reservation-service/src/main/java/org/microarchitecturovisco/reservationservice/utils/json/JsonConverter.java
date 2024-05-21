@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class JsonConverter {
-    public static String convertToJsonWithLocalDateTime(Object obj) {
+    public static String convert(Object obj) {
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         String json;
         try {

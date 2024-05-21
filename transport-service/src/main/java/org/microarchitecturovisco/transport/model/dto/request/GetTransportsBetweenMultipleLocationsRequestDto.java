@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetTransportsBetweenMultipleLocationsRequestDto implements Serializable {
-    UUID uuid;
+    private UUID uuid;
 
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;

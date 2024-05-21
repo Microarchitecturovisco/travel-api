@@ -1,9 +1,6 @@
-package org.microarchitecturovisco.hotelservice.controllers.reservations;
+package org.microarchitecturovisco.reservationservice.domain.dto.requests;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -17,6 +14,6 @@ import java.util.UUID;
 public class CheckHotelAvailabilityRequest implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
-    private UUID hotelId;
     private List<UUID> roomReservationsIds;
+    private UUID hotelId;
 }

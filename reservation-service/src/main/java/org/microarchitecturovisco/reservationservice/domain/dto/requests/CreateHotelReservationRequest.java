@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.hotelservice.controllers.reservations;
+package org.microarchitecturovisco.reservationservice.domain.dto.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +14,10 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CheckHotelAvailabilityRequest implements Serializable {
-    private LocalDateTime dateFrom;
-    private LocalDateTime dateTo;
+public class CreateHotelReservationRequest implements Serializable {
+    private UUID reservationId;
     private UUID hotelId;
-    private List<UUID> roomReservationsIds;
+    private LocalDateTime hotelTimeFrom;
+    private LocalDateTime hotelTimeTo;
+    private List<UUID> roomIds;
 }

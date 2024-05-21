@@ -57,8 +57,9 @@ public class HotelsCommandService {
                 .idRoomReservation(command.getRoomReservationDto().getReservationId())
                 .idHotel(command.getHotelId())
                 .idRoom(command.getRoomId())
+                .id(UUID.randomUUID())
                 .build();
-        reservationCreatedEvent.setId(UUID.randomUUID());
+
         hotelEventStore.save(reservationCreatedEvent);
         hotelEventProjector.project(List.of(reservationCreatedEvent));
     }
@@ -69,9 +70,8 @@ public class HotelsCommandService {
                 .idRoomReservation(command.getReservationId())
                 .idHotel(command.getHotelId())
                 .idRoom(command.getRoomId())
+                .id(UUID.randomUUID()) // event id
                 .build();
-
-        reservationDeletedEvent.setId(UUID.randomUUID());
 
         hotelEventStore.save(reservationDeletedEvent);
         hotelEventProjector.project(List.of(reservationDeletedEvent));

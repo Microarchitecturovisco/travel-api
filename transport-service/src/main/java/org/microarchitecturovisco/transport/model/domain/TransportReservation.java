@@ -17,10 +17,12 @@ public class TransportReservation {
     @Id
     private UUID id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name="transport_id", nullable=false)
     private Transport transport;
 
     @NotNull
     private int numberOfSeats;
+
+    private UUID mainReservationId;
 }

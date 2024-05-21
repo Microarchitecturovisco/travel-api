@@ -14,13 +14,9 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CreateHotelReservationRequest {
-    private UUID id;
-
-    private LocalDateTime hotelTimeFrom;
-
-    private LocalDateTime hotelTimeTo;
-
-    private List<UUID> roomReservationsIds;
-
+    private UUID reservationId;
     private UUID hotelId;
+    private LocalDateTime hotelTimeFrom;
+    private LocalDateTime hotelTimeTo;
+    private List<UUID> roomIds;
 }

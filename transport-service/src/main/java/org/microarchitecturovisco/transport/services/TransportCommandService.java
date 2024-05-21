@@ -3,12 +3,15 @@ package org.microarchitecturovisco.transport.services;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
+import org.microarchitecturovisco.transport.model.cqrs.commands.DeleteTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
 import org.microarchitecturovisco.transport.model.events.TransportReservationCreatedEvent;
+import org.microarchitecturovisco.transport.model.events.TransportReservationDeletedEvent;
 import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +34,27 @@ public class TransportCommandService {
         TransportReservationCreatedEvent transportReservationCreatedEvent = TransportReservationCreatedEvent.builder()
                 .id(command.getUuid())
                 .eventTimeStamp(command.getCommandTimeStamp())
-                .idTransportReservation(command.getTransportReservationDto().getIdTransportReservation())
+                .reservationId(command.getTransportReservationDto().getReservationId())
                 .numberOfSeats(command.getTransportReservationDto().getNumberOfSeats())
                 .idTransport(command.getTransportReservationDto().getIdTransport())
                 .build();
 
+//        System.out.println("transportReservationCreatedEvent: " + transportReservationCreatedEvent);
+
         transportEventStore.save(transportReservationCreatedEvent);
         eventSourcingHandler.project(List.of(transportReservationCreatedEvent));
     }
+
+    public void deleteReservation(DeleteTransportReservationCommand command) {
+        TransportReservationDeletedEvent reservationDeletedEvent =  TransportReservationDeletedEvent.builder()
+                .id(UUID.randomUUID())
+                .eventTimeStamp(command.getCommandTimeStamp())
+                .reservationId(command.getReservationId())
+                .idTransport(command.getTransportId())
+                .build();
+
+        transportEventStore.save(reservationDeletedEvent);
+        eventSourcingHandler.project(List.of(reservationDeletedEvent));
+    }
+
 }

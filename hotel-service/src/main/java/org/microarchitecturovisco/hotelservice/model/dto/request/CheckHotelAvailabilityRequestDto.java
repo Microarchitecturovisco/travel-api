@@ -10,13 +10,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Builder
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class CheckHotelAvailabilityQueryRequestDto implements Serializable {
+@NoArgsConstructor
+public class CheckHotelAvailabilityRequestDto implements Serializable {
     private LocalDateTime dateFrom;
     private LocalDateTime dateTo;
+
+    private List<UUID> roomIds;
     private UUID hotelId;
-    private List<UUID> roomReservationsIds;
 }

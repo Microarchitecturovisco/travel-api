@@ -8,11 +8,16 @@ import org.microarchitecturovisco.transport.model.domain.TransportReservation;
 import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
 import org.microarchitecturovisco.transport.model.events.TransportEvent;
 import org.microarchitecturovisco.transport.model.events.TransportReservationCreatedEvent;
-import org.microarchitecturovisco.transport.repositories.*;
+import org.microarchitecturovisco.transport.model.events.TransportReservationDeletedEvent;
+import org.microarchitecturovisco.transport.repositories.LocationRepository;
+import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
+import org.microarchitecturovisco.transport.repositories.TransportRepository;
+import org.microarchitecturovisco.transport.repositories.TransportReservationRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,9 @@ public class TransportEventSourcingHandler {
             }
             if (transportEvent instanceof TransportReservationCreatedEvent) {
                 apply((TransportReservationCreatedEvent) transportEvent);
+            }
+            if (transportEvent instanceof TransportReservationDeletedEvent) {
+                apply((TransportReservationDeletedEvent) transportEvent);
             }
         }
     }
@@ -68,16 +76,38 @@ public class TransportEventSourcingHandler {
     }
 
     private void apply(TransportReservationCreatedEvent event) {
+//        System.out.println("TransportReservationCreatedEvent: " + event.toString());
+
         Transport transport = transportRepository.findById(event.getIdTransport()).orElseThrow(RuntimeException::new);
 
         TransportReservation transportReservation = TransportReservation.builder()
-                .id(event.getIdTransportReservation())
+                .id(event.getId())
                 .numberOfSeats(event.getNumberOfSeats())
                 .transport(transport)
+                .mainReservationId(event.getReservationId())
                 .build();
         transport.getTransportReservations().add(transportReservation);
 
         transportReservationRepository.save(transportReservation);
         transportRepository.save(transport);
+    }
+
+    private void apply(TransportReservationDeletedEvent event) {
+
+        UUID transportId = event.getIdTransport();
+        UUID reservationId = event.getReservationId();
+
+        // Find the transport
+        Transport transport = transportRepository.findById(transportId).orElse(null);
+        if (transport != null) {
+            // Delete reservations associated with the transport and given reservation ID
+            List<TransportReservation> transportReservations = transport.getTransportReservations();
+            for (TransportReservation reservation : transportReservations) {
+                if (reservation.getMainReservationId().equals(reservationId)) {
+                    transportReservationRepository.delete(reservation);
+                }
+            }
+        }
+
     }
 }

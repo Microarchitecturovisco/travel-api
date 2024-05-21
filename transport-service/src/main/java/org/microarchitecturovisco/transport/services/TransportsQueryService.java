@@ -2,7 +2,6 @@ package org.microarchitecturovisco.transport.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
-import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
@@ -15,17 +14,14 @@ import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
-import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +34,16 @@ public class TransportsQueryService {
     public List<TransportDto> getAllTransports() {
         List<Transport> transports = transportRepository.findAll();
         return TransportMapper.mapList(transports);
+    }
+
+    public Transport getTransportById(UUID transportID) {
+        Optional<Transport> transportOptional = transportRepository.findById(transportID);
+        if (transportOptional.isPresent()) {
+            return transportOptional.get();
+        } else {
+            System.out.println("Transport with ID " + transportID + " not found");
+            return null;
+        }
     }
 
     public List<Location> getAllLocations() {
@@ -258,4 +264,7 @@ public class TransportsQueryService {
                 .mapToInt(TransportReservation::getNumberOfSeats)
                 .sum();
     }
+
+
+
 }
