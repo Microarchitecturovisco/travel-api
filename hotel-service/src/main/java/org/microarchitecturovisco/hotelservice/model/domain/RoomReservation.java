@@ -23,7 +23,9 @@ public class RoomReservation {
     @NotNull
     private LocalDateTime dateTo;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name="room_id", nullable=false)
     private Room room;
+
+    private UUID mainReservationId;
 }
