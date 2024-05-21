@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -11,11 +12,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckHotelAvailabilityRequest implements Serializable {
-    private LocalDateTime hotelTimeFrom;
-
-    private LocalDateTime hotelTimeTo;
-
-    private int amountOfQuests;
-
+    private LocalDateTime dateFrom;
+    private LocalDateTime dateTo;
+    private List<UUID> roomReservationsIds;
     private UUID hotelId;
 }

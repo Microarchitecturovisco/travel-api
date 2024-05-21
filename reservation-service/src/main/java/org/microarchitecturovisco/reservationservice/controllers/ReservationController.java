@@ -24,10 +24,10 @@ public class ReservationController {
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
         try {
             UUID reservationId = reservationService.bookOrchestration(reservationRequest);
+            return "Reservation with id " + reservationId.toString() + " created successfully!";
         } catch (ReservationFailException exception) {
             return "ReservationFailException exception occurred";
         }
-        return "FULL SUCCESS";
     }
 
     @PostMapping("/purchase")

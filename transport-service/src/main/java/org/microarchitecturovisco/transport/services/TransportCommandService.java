@@ -39,7 +39,7 @@ public class TransportCommandService {
                 .idTransport(command.getTransportReservationDto().getIdTransport())
                 .build();
 
-        System.out.println("transportReservationCreatedEvent: " + transportReservationCreatedEvent);
+//        System.out.println("transportReservationCreatedEvent: " + transportReservationCreatedEvent);
 
         transportEventStore.save(transportReservationCreatedEvent);
         eventSourcingHandler.project(List.of(transportReservationCreatedEvent));

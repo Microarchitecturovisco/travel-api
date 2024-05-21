@@ -76,7 +76,7 @@ public class TransportEventSourcingHandler {
     }
 
     private void apply(TransportReservationCreatedEvent event) {
-        System.out.println("TransportReservationCreatedEvent: " + event.toString());
+//        System.out.println("TransportReservationCreatedEvent: " + event.toString());
 
         Transport transport = transportRepository.findById(event.getIdTransport()).orElseThrow(RuntimeException::new);
 

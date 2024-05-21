@@ -15,9 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckHotelAvailabilityRequest implements Serializable {
-    private LocalDateTime hotelTimeFrom;
-    private LocalDateTime hotelTimeTo;
-    private int amountOfQuests;
+    private LocalDateTime dateFrom;
+    private LocalDateTime dateTo;
     private UUID hotelId;
     private List<UUID> roomReservationsIds;
 }

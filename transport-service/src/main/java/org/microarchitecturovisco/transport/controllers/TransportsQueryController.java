@@ -114,9 +114,8 @@ public class TransportsQueryController {
 
     @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ)
     public String consumeMessageFromQueueCheckTransportAvailability(String requestDtoJson) {
-        System.out.println("Message received from queue requestDtoJson: " + requestDtoJson);
         CheckTransportAvailabilityRequestDto request = JsonReader.readDtoFromJson(requestDtoJson, CheckTransportAvailabilityRequestDto.class);
-        System.out.println("Message received from queue: " + request);
+        System.out.println("Checking transport availability: " + request);
 
         UUID transportReservationsIdFrom = request.getTransportReservationsIdFrom();
         UUID transportReservationsIdArrival = request.getTransportReservationsIdArrival();
@@ -125,10 +124,12 @@ public class TransportsQueryController {
         Transport transportArrival = transportsQueryService.getTransportById(transportReservationsIdArrival);
 
         if (transportFrom == null || transportArrival == null) {
-            // If either transport is not found, return false
             CheckTransportAvailabilityResponseDto response = CheckTransportAvailabilityResponseDto.builder()
                     .ifAvailable(false)
                     .build();
+            System.out.println("Transport ifAvailable:" + response.isIfAvailable());
+            String responseJson = JsonConverter.convertToJsonWithLocalDateTime(response);
+            return responseJson;
         }
 
         int totalCapacityNeeded = request.getNumberOfGuests();
@@ -140,9 +141,8 @@ public class TransportsQueryController {
                 .ifAvailable(ifAvailable)
                 .build();
 
-        System.out.println("Response to convert:" + response );
+        System.out.println("Transport ifAvailable:" + response.isIfAvailable());
         String responseJson = JsonConverter.convertToJsonWithLocalDateTime(response);
-        System.out.println("Response after conversion:" + responseJson );
 
         return responseJson;
     }
@@ -163,7 +163,7 @@ public class TransportsQueryController {
     public void consumeMessageCreateTransportReservation(String requestDtoJson) {
         CreateTransportReservationRequest request = JsonReader.readDtoFromJson(requestDtoJson, CreateTransportReservationRequest.class);
 
-        System.out.println("Message received from queue request: " + request);
+        System.out.println("Creating transport reservations: " + request);
 
         for (UUID idTransport: request.getTransportIds()) {
 
@@ -180,7 +180,6 @@ public class TransportsQueryController {
                     .build();
 
             transportCommandService.createReservation(command);
-            System.out.println("reservationDto: " + reservationDto);
         }
     }
 
@@ -188,7 +187,7 @@ public class TransportsQueryController {
     public void consumeMessageDeleteTransportReservation(String requestJson) {
         DeleteTransportReservationRequest request = JsonReader.readDtoFromJson(requestJson, DeleteTransportReservationRequest.class);
 
-        System.out.println("Message received from queue consumeMessageDeleteTransportReservation: " + request);
+        System.out.println("Deleting transport reservations: " + request);
 
         for (UUID transportId : request.getTransportReservationsIds()){
             DeleteTransportReservationCommand command = DeleteTransportReservationCommand.builder()

@@ -43,7 +43,7 @@ public class QueuesReservationConfig {
     @Bean(name="handleDeleteTransportReservationQueue")
     public Queue handleDeleteTransportReservationQueue() {
         String uniqueQueueName = QUEUE_TRANSPORT_DELETE_RESERVATION_REQ_PREFIX + UUID.randomUUID();
-        return new Queue(uniqueQueueName, false);
+        return new Queue(uniqueQueueName, false, false, true);
     }
 
     @Bean

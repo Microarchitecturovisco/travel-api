@@ -65,13 +65,12 @@ public class HotelsController {
 
     @RabbitListener(queues = QueuesConfig.QUEUE_HOTEL_CHECK_AVAILABILITY_REQ)
     public String consumeMessageCheckHotelAvailability(String requestJson) {
-        System.out.println("Message received from queue: " + requestJson);
         CheckHotelAvailabilityRequest request = JsonReader.readCheckHotelAvailabilityRequestCommand(requestJson);
-        System.out.println("Converted message received from queue: " + request);
+        System.out.println("Checking hotel availability: " + request);
 
         CheckHotelAvailabilityQueryRequestDto query = CheckHotelAvailabilityQueryRequestDto.builder()
-                .dateFrom(request.getHotelTimeFrom())
-                .dateTo(request.getHotelTimeTo())
+                .dateFrom(request.getDateFrom())
+                .dateTo(request.getDateTo())
                 .hotelId(request.getHotelId())
                 .roomReservationsIds(request.getRoomReservationsIds())
                 .build();
@@ -82,18 +81,16 @@ public class HotelsController {
                         .ifAvailable(availability)
                         .build();
 
-        System.out.println("Response to convert:" +response );
+        System.out.println("Hotel ifAvailable:" + response.isIfAvailable());
         String responseJson = JsonConverter.ConvertToJson(response);
-        System.out.println("Response after conversion:" +responseJson );
 
         return responseJson;
     }
 
     @RabbitListener(queues = "#{handleCreateHotelReservationQueue.name}")
     public void consumeMessageCreateHotelReservation(String requestJson) {
-        System.out.println("Message received from queue: " + requestJson);
-
         CreateHotelReservationRequest request = JsonReader.readCreateHotelReservationRequestCommand(requestJson);
+        System.out.println("Creating hotel reservations: " + request);
 
         int numberOfRoomsInReservation = request.getRoomIds().size();
 
@@ -120,7 +117,6 @@ public class HotelsController {
                     .commandTimeStamp(LocalDateTime.now())
                     .build()
             );
-            System.out.println("roomReservation: " + roomReservation);
         }
     }
 
@@ -128,8 +124,7 @@ public class HotelsController {
     public void consumeMessageDeleteHotelReservation(String requestJson) {
 
         DeleteHotelReservationRequest request = JsonReader.readDeleteHotelReservationRequestCommand(requestJson);
-
-        System.out.println("Message received DeleteHotelReservationRequest: " + request);
+        System.out.println("Deleting hotel reservations: " + request);
 
         for (UUID roomId : request.getRoomIds()){
             DeleteRoomReservationCommand command = DeleteRoomReservationCommand.builder()

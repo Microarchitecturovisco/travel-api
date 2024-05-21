@@ -19,17 +19,16 @@ public class BookHotelsSaga {
     private final RabbitTemplate rabbitTemplate;
 
     public boolean checkIfHotelIsAvailable(ReservationRequest reservationRequest) throws ReservationFailException {
-        int amountOfQuests = reservationRequest.getAdultsQuantity() + reservationRequest.getChildrenUnder18Quantity()
-                + reservationRequest.getChildrenUnder10Quantity() + reservationRequest.getChildrenUnder3Quantity();
-
         CheckHotelAvailabilityRequest availabilityRequest = CheckHotelAvailabilityRequest.builder()
-                .hotelTimeFrom(reservationRequest.getHotelTimeFrom())
-                .hotelTimeTo(reservationRequest.getHotelTimeTo())
-                .amountOfQuests(amountOfQuests)
+                .dateFrom(reservationRequest.getHotelTimeFrom())
+                .dateTo(reservationRequest.getHotelTimeTo())
+                .roomReservationsIds(reservationRequest.getRoomReservationsIds())
                 .hotelId(reservationRequest.getHotelId())
                 .build();
 
         String reservationRequestJson = JsonConverter.convert(availabilityRequest);
+
+        System.out.println("Checking hotel availability: " + availabilityRequest);
 
         try {
             byte[] responseMessageB = (byte[]) rabbitTemplate.convertSendAndReceive(
@@ -40,7 +39,6 @@ public class BookHotelsSaga {
             if(responseMessageB != null) {
                 String responseMessage = (new String(responseMessageB)).replace("\\", "");
                 responseMessage = responseMessage.substring(1, responseMessage.length() - 1);
-                System.out.println(responseMessage);
                 CheckHotelAvailabilityResponseDto response = JsonReader.readDtoFromJson(responseMessage, CheckHotelAvailabilityResponseDto.class);
                 return response.isIfAvailable();
             }
@@ -64,7 +62,7 @@ public class BookHotelsSaga {
 
         String requestJson = JsonConverter.convert(request);
 
-        System.out.println("createHotelReservation: " + requestJson);
+        System.out.println("Creating Hotel reservation: " + requestJson);
 
         rabbitTemplate.convertAndSend(
                 QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION,
@@ -76,7 +74,7 @@ public class BookHotelsSaga {
     public void deleteHotelReservation(HotelReservationDeleteRequest hotelReservationDeleteRequest) {
         String requestJson = JsonConverter.convert(hotelReservationDeleteRequest);
 
-        System.out.println("deleteHotelReservation: " + requestJson);
+        System.out.println("Deleting hotel reservation: " + requestJson);
 
         rabbitTemplate.convertAndSend(
                 QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT_DELETE_RESERVATION,

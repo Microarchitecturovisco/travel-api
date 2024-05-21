@@ -32,7 +32,7 @@ public class BookTransportsSaga {
 
         String requestJson = JsonConverter.convert(availabilityRequest);
 
-        System.out.println("checkIfTransportIsAvailable: " + requestJson);
+        System.out.println("Checking transport availability: " + availabilityRequest);
 
         String responseJson = (String) rabbitTemplate.convertSendAndReceive(
                     QueuesTransportConfig.EXCHANGE_TRANSPORT,
@@ -58,7 +58,7 @@ public class BookTransportsSaga {
 
         String requestJson = JsonConverter.convert(request);
 
-        System.out.println("createTransportReservation: " + requestJson);
+        System.out.println("Creating Transport reservation: " + requestJson);
 
         rabbitTemplate.convertAndSend(
                 QueuesTransportConfig.EXCHANGE_TRANSPORT_FANOUT,
@@ -70,7 +70,7 @@ public class BookTransportsSaga {
     public void deleteTransportReservation(TransportReservationDeleteRequest transportReservationDeleteRequest) {
 
         String requestJson = JsonConverter.convert(transportReservationDeleteRequest);
-        System.out.println("deleteTransportReservation: " + requestJson);
+        System.out.println("Deleting transport reservation: " + requestJson);
 
         rabbitTemplate.convertAndSend(
                 QueuesTransportConfig.EXCHANGE_TRANSPORT_FANOUT_DELETE_RESERVATION,

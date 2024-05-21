@@ -121,7 +121,7 @@ public class ReservationService {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-        return null; // reservationId
+        return reservationId;
     }
 
     private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
@@ -132,8 +132,8 @@ public class ReservationService {
     }
 
     private void checkTransportAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
-//        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-        boolean transportIsAvailable = true; // debug only
+        boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
+//        boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
     }
