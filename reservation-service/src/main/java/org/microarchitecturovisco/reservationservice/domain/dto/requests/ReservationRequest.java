@@ -35,5 +35,5 @@ public class ReservationRequest implements Serializable {
     private List<String> roomReservationsNames;
     private String locationNameFrom;
     private String locationNameTo;
-
+    private String transportType;
 }

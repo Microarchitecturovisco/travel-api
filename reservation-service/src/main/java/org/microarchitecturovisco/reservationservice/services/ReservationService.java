@@ -137,7 +137,9 @@ public class ReservationService {
         String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
         String locationNameFrom = "locationNameFrom: " + reservationRequest.getLocationNameFrom();
         String locationNameTo = "locationNameTo: " + reservationRequest.getLocationNameTo();
-        String message = String.join(" | ", hotelId, roomNames, locationNameFrom, locationNameTo);
+        String transportType = "transportType: " + reservationRequest.getTransportType();
+        
+        String message = String.join(" | ", hotelId, roomNames, locationNameFrom, locationNameTo, transportType);
 
         reservationWebSocketHandlerBooking.sendMessageToUI("Booked: " + message);
     }
