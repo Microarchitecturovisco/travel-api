@@ -133,13 +133,13 @@ public class ReservationService {
     }
 
     private void sendBookingOfferWebsocketMessages(ReservationRequest reservationRequest) {
-        String hotelId = "hotelId:" + reservationRequest.getHotelId();
+        String hotelName = "hotelName: " + reservationRequest.getHotelName();
         String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
         String locationNameFrom = "locationNameFrom: " + reservationRequest.getLocationNameFrom();
         String locationNameTo = "locationNameTo: " + reservationRequest.getLocationNameTo();
         String transportType = "transportType: " + reservationRequest.getTransportType();
-        
-        String message = String.join(" | ", hotelId, roomNames, locationNameFrom, locationNameTo, transportType);
+
+        String message = String.join(" | ", hotelName, roomNames, locationNameFrom, locationNameTo, transportType);
 
         reservationWebSocketHandlerBooking.sendMessageToUI("Booked: " + message);
     }

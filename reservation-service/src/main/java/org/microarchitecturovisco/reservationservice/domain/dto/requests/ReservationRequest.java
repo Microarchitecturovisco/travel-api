@@ -32,6 +32,7 @@ public class ReservationRequest implements Serializable {
     private List<UUID> transportReservationsIds;
     private UUID userId;
 
+    private String hotelName;
     private List<String> roomReservationsNames;
     private String locationNameFrom;
     private String locationNameTo;
