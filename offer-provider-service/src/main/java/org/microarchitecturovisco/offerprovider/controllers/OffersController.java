@@ -2,12 +2,11 @@ package org.microarchitecturovisco.offerprovider.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.offerprovider.domain.dto.OfferDto;
-import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDto;
 import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.services.OffersService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

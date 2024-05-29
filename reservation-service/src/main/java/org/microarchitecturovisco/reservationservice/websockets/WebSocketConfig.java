@@ -11,10 +11,16 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final ReservationWebSocketHandlerBooking webSocketHandler;
+    private final ReservationWebSocketHandlerBooking webSocketHandlerBooking;
+    private final ReservationWebSocketHandler webSocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketHandler, "/reservations/ws/offerBooked").setAllowedOrigins("*");
+        registry.addHandler(webSocketHandlerBooking, "/reservations/ws/offerBooked").setAllowedOrigins("*");
+    }
+
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(webSocketHandler, "/reservations/ws/offerBought").setAllowedOrigins("*");
     }
 }

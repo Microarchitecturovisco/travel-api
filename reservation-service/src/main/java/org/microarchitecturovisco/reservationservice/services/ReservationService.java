@@ -25,6 +25,7 @@ import org.microarchitecturovisco.reservationservice.services.saga.BookTransport
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
 import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandlerBooking;
+import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandler;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -58,6 +59,7 @@ public class ReservationService {
     private final RabbitTemplate rabbitTemplate;
 
     private final ReservationWebSocketHandlerBooking reservationWebSocketHandlerBooking;
+    private final ReservationWebSocketHandler reservationWebSocketHandler;
 
     public Reservation createReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
                                                       int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
@@ -268,6 +270,8 @@ public class ReservationService {
 
         logger.info("Purchased reservation: " + reservation);
 
+        sendBoughtOfferWebsocketMessages("Ktoś kupił wycieczkę do aktualnie przeglądanego hotelu!", String.valueOf(reservation.getHotelId()));
+
         return ReservationConfirmationResponse.builder()
                 .hotelName(hotelInfo.getName())
                 .price(reservation.getPrice())
@@ -280,6 +284,10 @@ public class ReservationService {
                 .roomTypes(hotelInfo.getRoomTypes())
                 .transport(transportInfo)
                 .build();
+    }
+
+    private void sendBoughtOfferWebsocketMessages(String message, String idHotel) {
+        reservationWebSocketHandler.sendMessageToSubscribedByIdHotel(message, idHotel);
     }
 
     private HotelInfo getHotelInformation(UUID hotelId) {
