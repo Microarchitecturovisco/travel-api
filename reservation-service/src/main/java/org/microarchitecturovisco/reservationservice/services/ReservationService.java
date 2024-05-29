@@ -127,15 +127,18 @@ public class ReservationService {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-        String hotelId = "hotelId:" + reservationRequest.getHotelId();
-        String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
-        String messageToUI = String.join(" | ", hotelId, roomNames);
-        sendBookingOfferWebsocketMessages(messageToUI);
+        sendBookingOfferWebsocketMessages(reservationRequest);
 
         return reservationId;
     }
 
-    private void sendBookingOfferWebsocketMessages(String message) {
+    private void sendBookingOfferWebsocketMessages(ReservationRequest reservationRequest) {
+        String hotelId = "hotelId:" + reservationRequest.getHotelId();
+        String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
+        String locationNameFrom = "locationNameFrom: " + reservationRequest.getLocationNameFrom();
+        String locationNameTo = "locationNameTo: " + reservationRequest.getLocationNameTo();
+        String message = String.join(" | ", hotelId, roomNames, locationNameFrom, locationNameTo);
+
         reservationWebSocketHandlerBooking.sendMessageToUI("Booked: " + message);
     }
 
