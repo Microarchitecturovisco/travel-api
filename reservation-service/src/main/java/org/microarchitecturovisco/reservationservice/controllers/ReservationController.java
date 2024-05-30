@@ -8,6 +8,7 @@ import org.microarchitecturovisco.reservationservice.domain.model.PurchaseReques
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
+import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandlerBooking;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,10 +23,12 @@ import java.util.UUID;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationWebSocketHandlerBooking reservationWebSocketHandlerBooking;
 
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
         try {
+            System.out.println("RESERVATION REQUEST:" + reservationRequest.toString());
             UUID reservationId = reservationService.bookOrchestration(reservationRequest);
             return "Reservation with id " + reservationId.toString() + " created successfully!";
         } catch (ReservationFailException exception) {
@@ -43,6 +46,8 @@ public class ReservationController {
 
         ReservationRequest reservationRequest = JsonReader.readDtoFromJson(reservationRequestJson, ReservationRequest.class);
 
+        sendBookingOfferWebsocketMessages(reservationRequest);
+
         Reservation reservation = reservationService.createReservation(
                 reservationRequest.getHotelTimeFrom(),
                 reservationRequest.getHotelTimeTo(),
@@ -58,5 +63,17 @@ public class ReservationController {
                 reservationRequest.getId()
         );
         System.out.println("Reservation in Reservation module created successfully: " + reservation.getId());
+    }
+
+    private void sendBookingOfferWebsocketMessages(ReservationRequest reservationRequest) {
+        String hotelName = "hotelName: " + reservationRequest.getHotelName();
+        String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
+        String locationNameFrom = "locationNameFrom: " + reservationRequest.getLocationNameFrom();
+        String locationNameTo = "locationNameTo: " + reservationRequest.getLocationNameTo();
+        String transportType = "transportType: " + reservationRequest.getTransportType();
+
+        String message = String.join(" | ", hotelName, roomNames, locationNameFrom, locationNameTo, transportType);
+
+        reservationWebSocketHandlerBooking.sendMessageToUI("Booked: " + message);
     }
 }
