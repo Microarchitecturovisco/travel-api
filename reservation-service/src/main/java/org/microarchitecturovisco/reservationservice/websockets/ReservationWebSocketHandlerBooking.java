@@ -36,15 +36,17 @@ public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
     }
 
     public void sendMessageToUI(String message) {
-        logger.info("Sending message: " + message + " to UI.");
         for (WebSocketSession session : sessions) {
+            logger.info("Session ID: " + session.getId() + ", isOpen: " + session.isOpen());
             try {
                 if (session.isOpen()) {
                     session.sendMessage(new TextMessage(message));
+                    logger.info("Sending message: " + message + " to UI.");
                 }
             } catch (IOException e) {
                 logger.severe("Error sending message: " + e.getMessage());
             }
         }
     }
+
 }

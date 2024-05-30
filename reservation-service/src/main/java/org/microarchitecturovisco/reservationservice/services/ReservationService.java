@@ -24,7 +24,6 @@ import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSag
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
-import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandlerBooking;
 import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandler;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
@@ -58,7 +57,6 @@ public class ReservationService {
 
     private final RabbitTemplate rabbitTemplate;
 
-    private final ReservationWebSocketHandlerBooking reservationWebSocketHandlerBooking;
     private final ReservationWebSocketHandler reservationWebSocketHandler;
 
     public Reservation createReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
@@ -129,22 +127,9 @@ public class ReservationService {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-        sendBookingOfferWebsocketMessages(reservationRequest);
-
         return reservationId;
     }
 
-    private void sendBookingOfferWebsocketMessages(ReservationRequest reservationRequest) {
-        String hotelName = "hotelName: " + reservationRequest.getHotelName();
-        String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
-        String locationNameFrom = "locationNameFrom: " + reservationRequest.getLocationNameFrom();
-        String locationNameTo = "locationNameTo: " + reservationRequest.getLocationNameTo();
-        String transportType = "transportType: " + reservationRequest.getTransportType();
-
-        String message = String.join(" | ", hotelName, roomNames, locationNameFrom, locationNameTo, transportType);
-
-        reservationWebSocketHandlerBooking.sendMessageToUI("Booked: " + message);
-    }
 
     private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
