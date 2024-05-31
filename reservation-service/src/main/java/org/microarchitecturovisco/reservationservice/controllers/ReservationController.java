@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @RestController
@@ -46,7 +48,7 @@ public class ReservationController {
 
         ReservationRequest reservationRequest = JsonReader.readDtoFromJson(reservationRequestJson, ReservationRequest.class);
 
-        sendBookingOfferWebsocketMessages(reservationRequest);
+        updateBookingPreferences(reservationRequest);
 
         Reservation reservation = reservationService.createReservation(
                 reservationRequest.getHotelTimeFrom(),
@@ -65,15 +67,22 @@ public class ReservationController {
         System.out.println("Reservation in Reservation module created successfully: " + reservation.getId());
     }
 
-    private void sendBookingOfferWebsocketMessages(ReservationRequest reservationRequest) {
+    private void updateBookingPreferences(ReservationRequest reservationRequest) {
         String hotelName = "hotelName: " + reservationRequest.getHotelName();
         String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
-        String locationNameFrom = "locationNameFrom: " + reservationRequest.getLocationNameFrom();
-        String locationNameTo = "locationNameTo: " + reservationRequest.getLocationNameTo();
+        String locationNameFrom = "locationFromNameRegionAndCountry: " + reservationRequest.getLocationFromNameRegionAndCountry();
+        String locationNameTo = "locationToNameRegionAndCountry: " + reservationRequest.getLocationToNameRegionAndCountry();
         String transportType = "transportType: " + reservationRequest.getTransportType();
+        String reservationTime = "reservationTime: " + getCurrentTime();
 
-        String message = String.join(" | ", hotelName, roomNames, locationNameFrom, locationNameTo, transportType);
+        String message = String.join(" | ", hotelName, roomNames, locationNameFrom, locationNameTo, transportType, reservationTime);
 
-        reservationWebSocketHandlerBooking.sendMessageToUI("Booked: " + message);
+        reservationWebSocketHandlerBooking.updateReservationPreferences("Booked: " + message);
+    }
+
+    private String getCurrentTime(){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return now.format(formatter);
     }
 }

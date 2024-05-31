@@ -34,7 +34,7 @@ public class ReservationRequest implements Serializable {
 
     private String hotelName;
     private List<String> roomReservationsNames;
-    private String locationNameFrom;
-    private String locationNameTo;
+    private String locationFromNameRegionAndCountry;
+    private String locationToNameRegionAndCountry;
     private String transportType;
 }
