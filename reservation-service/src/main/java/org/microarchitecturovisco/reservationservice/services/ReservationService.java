@@ -7,6 +7,8 @@ import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReser
 import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseDto;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
@@ -16,9 +18,7 @@ import org.microarchitecturovisco.reservationservice.domain.exceptions.Reservati
 import org.microarchitecturovisco.reservationservice.domain.model.LocationReservationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.domain.model.TransportReservationResponse;
-import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesReservationConfig;
-import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
@@ -129,6 +129,7 @@ public class ReservationService {
 
         return reservationId;
     }
+
 
     private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
