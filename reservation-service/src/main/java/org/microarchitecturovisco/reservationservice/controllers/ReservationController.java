@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.reservationservice.domain.dto.ReservationPreference;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
@@ -68,16 +69,17 @@ public class ReservationController {
     }
 
     private void updateBookingPreferences(ReservationRequest reservationRequest) {
-        String hotelName = "hotelName: " + reservationRequest.getHotelName();
-        String roomNames = "roomNames: " + reservationRequest.getRoomReservationsNames();
-        String locationNameFrom = "locationFromNameRegionAndCountry: " + reservationRequest.getLocationFromNameRegionAndCountry();
-        String locationNameTo = "locationToNameRegionAndCountry: " + reservationRequest.getLocationToNameRegionAndCountry();
-        String transportType = "transportType: " + reservationRequest.getTransportType();
-        String reservationTime = "reservationTime: " + getCurrentTime();
 
-        String message = String.join(" | ", hotelName, roomNames, locationNameFrom, locationNameTo, transportType, reservationTime);
+        ReservationPreference reservationPreference = ReservationPreference.builder()
+                .hotelName(reservationRequest.getHotelName())
+                .roomReservationsNames(reservationRequest.getRoomReservationsNames())
+                .locationFromNameRegionAndCountry(reservationRequest.getLocationFromNameRegionAndCountry())
+                .locationToNameRegionAndCountry(reservationRequest.getLocationToNameRegionAndCountry())
+                .transportType(reservationRequest.getTransportType())
+                .reservationTime(getCurrentTime())
+                .build();
 
-        reservationWebSocketHandlerBooking.updateReservationPreferences("Booked: " + message);
+        reservationWebSocketHandlerBooking.updateReservationPreferences(reservationPreference);
     }
 
     private String getCurrentTime(){

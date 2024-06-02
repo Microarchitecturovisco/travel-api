@@ -1,5 +1,7 @@
 package org.microarchitecturovisco.reservationservice.websockets;
 
+import org.microarchitecturovisco.reservationservice.domain.dto.ReservationPreference;
+import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -17,12 +19,11 @@ public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
 
     private final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
     private static final Logger logger = Logger.getLogger("ReservationWebSocketHandlerBooking");
-    private final LinkedList<String> recentReservationRequests = new LinkedList<>();
+    private final LinkedList<ReservationPreference> recentReservationRequests = new LinkedList<>();
     private final Map<String, Integer> hotelNameCounts = new HashMap<>();
     private final Map<String, Integer> roomNameCounts = new HashMap<>();
     private final Map<String, Integer> locationNameToCounts = new HashMap<>();
     private final Map<String, Integer> transportTypeCounts = new HashMap<>();
-    private final int maxReservationRequestsCount = 30;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -46,33 +47,33 @@ public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
         super.afterConnectionClosed(session, status);
     }
 
-    public void updateReservationPreferences(String message) {
-        updateRecentReservationList(message);
-        updateCounts(message);
-        sendNewReservation(message);
+    public void updateReservationPreferences(ReservationPreference reservationPreference) {
+
+        updateRecentReservationList(reservationPreference);
+        updateCounts(reservationPreference);
+        sendNewReservation(reservationPreference);
         sendTop3MostPopularTravelHotels();
         sendTop3MostPopularRoomTypes();
         sendTop3MostPopularLocationNamesTo();
         sendTop3MostPopularTransportTypes();
     }
 
-    private void updateCounts(String message) {
-        String[] parts = message.split(" \\| ");
-        if (parts.length >= 5) {
-            String hotelName = parts[0].split(": ")[2];
-            hotelNameCounts.put(hotelName, hotelNameCounts.getOrDefault(hotelName, 0) + 1);
+    private void updateCounts(ReservationPreference reservationPreference) {
 
-            String[] roomNames = parts[1].split(": ")[1].split(", ");
-            for (String roomName : roomNames) {
-                roomNameCounts.put(roomName, roomNameCounts.getOrDefault(roomName, 0) + 1);
-            }
+        String hotelName = reservationPreference.getHotelName();
+        hotelNameCounts.put(hotelName, hotelNameCounts.getOrDefault(hotelName, 0) + 1);
 
-            String locationNameTo = parts[3].split(": ")[1];
-            locationNameToCounts.put(locationNameTo, locationNameToCounts.getOrDefault(locationNameTo, 0) + 1);
-
-            String transportType = parts[4].split(": ")[1];
-            transportTypeCounts.put(transportType, transportTypeCounts.getOrDefault(transportType, 0) + 1);
+        List<String> roomNames = reservationPreference.getRoomReservationsNames();
+        for (String roomName : roomNames) {
+            roomNameCounts.put(roomName, roomNameCounts.getOrDefault(roomName, 0) + 1);
         }
+
+        String locationNameTo = reservationPreference.getLocationToNameRegionAndCountry();
+        locationNameToCounts.put(locationNameTo, locationNameToCounts.getOrDefault(locationNameTo, 0) + 1);
+
+        String transportType = reservationPreference.getTransportType();
+        transportTypeCounts.put(transportType, transportTypeCounts.getOrDefault(transportType, 0) + 1);
+
     }
     public void sendMessageToFrontend(String message) {
         for (WebSocketSession session : sessions) {
@@ -87,20 +88,23 @@ public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
         }
     }
 
-    private void updateRecentReservationList(String message) {
-        recentReservationRequests.addLast(message);
+    private void updateRecentReservationList(ReservationPreference reservationPreference) {
+        recentReservationRequests.addLast(reservationPreference);
+        int maxReservationRequestsCount = 30;
         if (recentReservationRequests.size() > maxReservationRequestsCount) {
             recentReservationRequests.removeLast();
         }
     }
 
-    private void sendNewReservation(String message) {
-        sendMessageToFrontend("SingleReservation: " + message);
+    private void sendNewReservation(ReservationPreference reservationPreference) {
+        String reservationPreferenceJson = JsonConverter.convert(reservationPreference);
+        sendMessageToFrontend("SingleReservation: " + reservationPreferenceJson);
     }
 
     private void sendRecentReservationList() {
-        for (String request : recentReservationRequests) {
-            sendMessageToFrontend("SingleReservation: " + request);
+        for (ReservationPreference reservationPreference : recentReservationRequests) {
+            String reservationPreferenceJson = JsonConverter.convert(reservationPreference);
+            sendMessageToFrontend("SingleReservation: " + reservationPreferenceJson);
         }
     }
 
@@ -131,10 +135,10 @@ public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
         List<Map.Entry<String, Long>> sortedCounts = counts.entrySet().stream()
                 .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
                 .limit(n)
-                .collect(Collectors.toList());
+                .toList();
 
         List<String> topN = sortedCounts.stream()
-                .map(entry -> entry.getKey())
+                .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
         sendMessageToFrontend(messageType + ": " + String.join(" # ", topN));
@@ -142,51 +146,31 @@ public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
 
     private List<String> extractHotelNames() {
         return recentReservationRequests.stream()
-                .map(request -> {
-                    String[] parts = request.split(" \\| ");
-                    if (parts.length >= 1) {
-                        return parts[0].split(": ")[2];
-                    }
-                    return null;
-                })
+                .map(ReservationPreference::getHotelName)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
+
     private List<String> extractRoomNames() {
-        List<String> roomNames = new ArrayList<>();
-        for (String request : recentReservationRequests) {
-            String[] parts = request.split(" \\| ");
-            if (parts.length >= 2) {
-                String roomNamesString = parts[1].split(": ")[1];
-                roomNames.addAll(Arrays.asList(roomNamesString.split(", ")));
-            }
-        }
-        return roomNames;
+        return recentReservationRequests.stream()
+                .flatMap(request -> request.getRoomReservationsNames().stream())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
+
 
     private List<String> extractLocationNamesTo() {
         return recentReservationRequests.stream()
-                .map(request -> {
-                    String[] parts = request.split(" \\| ");
-                    if (parts.length >= 4) {
-                        return parts[3].split(": ")[1];
-                    }
-                    return null;
-                })
+                .map(ReservationPreference::getLocationToNameRegionAndCountry)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
+
     private List<String> extractTransportTypes() {
         return recentReservationRequests.stream()
-                .map(request -> {
-                    String[] parts = request.split(" \\| ");
-                    if (parts.length >= 5) {
-                        return parts[4].split(": ")[1];
-                    }
-                    return null;
-                })
+                .map(ReservationPreference::getTransportType)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
