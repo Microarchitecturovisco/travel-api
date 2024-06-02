@@ -9,7 +9,7 @@ import org.microarchitecturovisco.reservationservice.domain.model.PurchaseReques
 import org.microarchitecturovisco.reservationservice.domain.model.ReservationConfirmationResponse;
 import org.microarchitecturovisco.reservationservice.services.ReservationService;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
-import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandlerBooking;
+import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandlerPreferences;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +26,7 @@ import java.util.UUID;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final ReservationWebSocketHandlerBooking reservationWebSocketHandlerBooking;
+    private final ReservationWebSocketHandlerPreferences reservationWebSocketHandlerPreferences;
 
     @PostMapping("/reservation")
     public String addReservation(@RequestBody ReservationRequest reservationRequest) {
@@ -79,7 +79,7 @@ public class ReservationController {
                 .reservationTime(getCurrentTime())
                 .build();
 
-        reservationWebSocketHandlerBooking.updateReservationPreferences(reservationPreference);
+        reservationWebSocketHandlerPreferences.updateReservationPreferences(reservationPreference);
     }
 
     private String getCurrentTime(){

@@ -15,10 +15,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Component
-public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
+public class ReservationWebSocketHandlerPreferences extends TextWebSocketHandler {
 
     private final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
-    private static final Logger logger = Logger.getLogger("ReservationWebSocketHandlerBooking");
+    private static final Logger logger = Logger.getLogger("ReservationWebSocketHandlerPreferences");
     private final LinkedList<ReservationPreference> recentReservationRequests = new LinkedList<>();
     private final Map<String, Integer> hotelNameCounts = new HashMap<>();
     private final Map<String, Integer> roomNameCounts = new HashMap<>();
