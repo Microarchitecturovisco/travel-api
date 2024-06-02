@@ -154,7 +154,8 @@ public class ReservationWebSocketHandlerBooking extends TextWebSocketHandler {
 
     private List<String> extractRoomNames() {
         return recentReservationRequests.stream()
-                .flatMap(request -> request.getRoomReservationsNames().stream())
+                .flatMap(request -> request.getRoomReservationsNames().stream()
+                        .map(roomName -> request.getHotelName() + " - " + roomName))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
