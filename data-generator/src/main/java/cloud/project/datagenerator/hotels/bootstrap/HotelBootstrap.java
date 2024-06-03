@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 @Component
 @RequiredArgsConstructor
-public class Bootstrap implements CommandLineRunner {
+public class HotelBootstrap implements CommandLineRunner {
     private final HotelParser hotelParser;
     private final RoomParser roomParser;
     private final ResourceLoader resourceLoader;
@@ -26,7 +26,7 @@ public class Bootstrap implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws IOException {
-        Logger logger = Logger.getLogger("Bootstrap");
+        Logger logger = Logger.getLogger("TransportBootstrap");
 
         Resource hotelCsvFile = resourceLoader.getResource("classpath:initData/hotels.csv");
         Resource hotelRoomsCsvFile = resourceLoader.getResource("classpath:initData/hotel_rooms.csv");

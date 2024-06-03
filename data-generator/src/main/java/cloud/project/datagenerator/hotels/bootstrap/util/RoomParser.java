@@ -24,7 +24,7 @@ public class RoomParser {
     private final HotelCsvReader hotelCsvReader;
 
     public void importRooms(Resource resource, List<Hotel> hotels) {
-        Logger logger = Logger.getLogger("Bootstrap | Rooms");
+        Logger logger = Logger.getLogger("TransportBootstrap | Rooms");
         RoomCapacityCalculator capacityCalculator = new RoomCapacityCalculator();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
