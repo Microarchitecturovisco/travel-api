@@ -3,7 +3,6 @@ package cloud.project.datagenerator.hotels;
 import cloud.project.datagenerator.hotels.domain.Hotel;
 import cloud.project.datagenerator.hotels.domain.Room;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
-import cloud.project.datagenerator.hotels.repositories.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,14 +16,13 @@ import java.util.UUID;
 public class HotelsDataGenerator {
 
     private final HotelRepository hotelRepository;
-    private final RoomRepository roomRepository;
     private final Random random = new Random();
 
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
     public void generateRandomHotelData() {
         System.out.println("Generating Hotel Data...");
 
-        int action = random.nextInt(3);  // Generate a random number: 0, 1, or 2
+        int action = random.nextInt(3);
 
         switch (action) {
             case 0:
@@ -55,7 +53,7 @@ public class HotelsDataGenerator {
         System.out.println("Creating new room: " + newRoom);
 
         // Todo: send the room using rabbitmq
-        
+
     }
 
     private void updateRandomRoom() {
@@ -64,10 +62,10 @@ public class HotelsDataGenerator {
 
         Room randomRoom = randomHotel.getRooms().get(random.nextInt(randomHotel.getRooms().size()));
         int currentGuestCapacity = randomRoom.getGuestCapacity();
-        int newGuestCapacity = random.nextInt(3, currentGuestCapacity + 1);
+        int newGuestCapacity = random.nextInt(1, currentGuestCapacity + 10);
 
         System.out.println("Updating room " + randomRoom.getName() + " in hotel " + randomHotel.getName() +
-                " with new guest capacity: " + newGuestCapacity);
+                " - old guest capacity: " + currentGuestCapacity + " new guest capacity: " + newGuestCapacity);
 
         // Todo: send the room using rabbitmq
         randomRoom.setGuestCapacity(newGuestCapacity);
@@ -86,7 +84,6 @@ public class HotelsDataGenerator {
     }
 
     private Hotel getRandomHotel() {
-        // Fetch all hotels
         List<Hotel> hotels = hotelRepository.findAll();
 
         if (hotels.isEmpty()) {
@@ -94,13 +91,19 @@ public class HotelsDataGenerator {
             return null;
         }
 
-        // Select a random hotel
-        Hotel randomHotel = hotels.get(random.nextInt(hotels.size()));
+        Hotel randomHotel;
+        int attempts = 0;
+        do {
+            randomHotel = hotels.get(random.nextInt(hotels.size()));
+            attempts++;
+        } while (randomHotel.getRooms().isEmpty() && attempts < hotels.size());
 
         if (randomHotel.getRooms().isEmpty()) {
             System.out.println("No rooms found in the selected hotel.");
             return null;
         }
+
         return randomHotel;
     }
+
 }
