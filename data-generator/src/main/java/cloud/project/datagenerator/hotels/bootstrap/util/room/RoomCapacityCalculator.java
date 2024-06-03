@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.bootstrap.util.room;
+package cloud.project.datagenerator.hotels.bootstrap.util.room;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

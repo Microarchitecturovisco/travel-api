@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.model.domain;
+package cloud.project.datagenerator.hotels.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

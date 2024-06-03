@@ -1,7 +1,7 @@
-package cloud.project.datagenerator.bootstrap.util;
+package cloud.project.datagenerator.hotels.bootstrap.util;
 
 
-import cloud.project.datagenerator.model.domain.Hotel;
+import cloud.project.datagenerator.hotels.domain.Hotel;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 

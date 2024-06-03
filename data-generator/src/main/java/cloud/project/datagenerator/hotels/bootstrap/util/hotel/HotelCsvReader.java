@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.bootstrap.util.hotel;
+package cloud.project.datagenerator.hotels.bootstrap.util.hotel;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;

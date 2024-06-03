@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.model.domain;
+package cloud.project.datagenerator.hotels.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -29,4 +29,9 @@ public class Room {
 
     @NotNull
     private float pricePerAdult;
+
+    @Lob
+    private String description;
+
+    // List of room reservations for each room is empty
 }

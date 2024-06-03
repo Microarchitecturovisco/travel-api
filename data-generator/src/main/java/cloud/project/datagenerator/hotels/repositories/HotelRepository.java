@@ -1,7 +1,7 @@
-package cloud.project.datagenerator.repositories;
+package cloud.project.datagenerator.hotels.repositories;
 
 
-import cloud.project.datagenerator.model.domain.Hotel;
+import cloud.project.datagenerator.hotels.domain.Hotel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

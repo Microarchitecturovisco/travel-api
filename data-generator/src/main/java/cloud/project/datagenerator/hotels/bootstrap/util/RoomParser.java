@@ -1,9 +1,9 @@
-package cloud.project.datagenerator.bootstrap.util;
+package cloud.project.datagenerator.hotels.bootstrap.util;
 
-import cloud.project.datagenerator.bootstrap.util.hotel.HotelCsvReader;
-import cloud.project.datagenerator.bootstrap.util.room.RoomCapacityCalculator;
-import cloud.project.datagenerator.model.domain.Hotel;
-import cloud.project.datagenerator.model.domain.Room;
+import cloud.project.datagenerator.hotels.bootstrap.util.hotel.HotelCsvReader;
+import cloud.project.datagenerator.hotels.bootstrap.util.room.RoomCapacityCalculator;
+import cloud.project.datagenerator.hotels.domain.Hotel;
+import cloud.project.datagenerator.hotels.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -49,6 +49,7 @@ public class RoomParser {
     private Room createNewRoom(Logger logger, RoomCapacityCalculator capacityCalculator, String[] data, List<Hotel> hotels) throws FileNotFoundException {
         int hotelId = Integer.parseInt(data[0]);
         String roomName = data[1];
+        String description = data[2];
         int guestCapacity = capacityCalculator.calculateGuestCapacity(roomName);
         float pricePerAdult = Float.parseFloat(data[3]);
         UUID roomId = UUID.fromString((data[4]));
@@ -62,6 +63,7 @@ public class RoomParser {
                     .name(roomName)
                     .guestCapacity(guestCapacity)
                     .pricePerAdult(pricePerAdult)
+                    .description(description)
                     .build();
         } else {
             logger.info("Hotel not found for room with ID: " + hotelId);

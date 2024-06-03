@@ -1,10 +1,10 @@
-package cloud.project.datagenerator.bootstrap;
+package cloud.project.datagenerator.hotels.bootstrap;
 
-import cloud.project.datagenerator.bootstrap.util.HotelParser;
-import cloud.project.datagenerator.bootstrap.util.RoomParser;
-import cloud.project.datagenerator.model.domain.Hotel;
-import cloud.project.datagenerator.repositories.HotelRepository;
-import cloud.project.datagenerator.repositories.RoomRepository;
+import cloud.project.datagenerator.hotels.bootstrap.util.HotelParser;
+import cloud.project.datagenerator.hotels.bootstrap.util.RoomParser;
+import cloud.project.datagenerator.hotels.domain.Hotel;
+import cloud.project.datagenerator.hotels.repositories.HotelRepository;
+import cloud.project.datagenerator.hotels.repositories.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
