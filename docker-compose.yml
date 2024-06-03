@@ -87,5 +87,16 @@ services:
     networks:
       - backend
 
+  data-generator:
+    build: ./data-generator
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+      - hotel
+      - transport
+    networks:
+      - backend
+
 networks:
   backend:

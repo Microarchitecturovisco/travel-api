@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="offer-provider-service" />
+        <module name="data-generator" />
         <module name="payment-service" />
         <module name="reservation-service" />
         <module name="api-gateway" />
@@ -21,6 +22,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
+      <module name="data-generator" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="hotel-service" options="-parameters" />
       <module name="offer-provider-service" options="-parameters" />

@@ -86,5 +86,16 @@ services:
     networks:
       - backend
 
+  data-generator:
+    image: mcarchvsc-data-generator
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+      - hotel
+      - transport
+    networks:
+      - backend
+
 networks:
   backend:
