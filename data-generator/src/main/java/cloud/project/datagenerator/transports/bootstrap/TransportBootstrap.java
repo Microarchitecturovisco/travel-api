@@ -64,7 +64,7 @@ public class TransportBootstrap implements CommandLineRunner {
 
                 UUID transportId = UUID.nameUUIDFromBytes((
                                   departureDate
-                                + planeCourse.toString()
+                                + planeCourse.getId().toString()
                                 + capacity
                                 + day).getBytes());
 
@@ -87,7 +87,7 @@ public class TransportBootstrap implements CommandLineRunner {
 
                 UUID transportId = UUID.nameUUIDFromBytes((
                                   departureDate
-                                + busCourse.toString()
+                                + busCourse.getId().toString()
                                 + capacity
                                 + day).getBytes());
 
