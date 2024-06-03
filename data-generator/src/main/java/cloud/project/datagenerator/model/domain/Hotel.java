@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.domain;
+package cloud.project.datagenerator.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
