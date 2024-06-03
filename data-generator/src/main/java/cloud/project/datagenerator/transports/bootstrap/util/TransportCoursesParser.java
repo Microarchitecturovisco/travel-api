@@ -113,7 +113,7 @@ public class TransportCoursesParser {
                         if (!planeConnections.contains(connectionKey)) {
                             // Add plane connection
                             // todo change to random number using the random seed
-                            UUID planeConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.toString() + hotelLocation.toString() + TransportType.PLANE + String.valueOf(100)).getBytes());
+                            UUID planeConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.PLANE + String.valueOf(100)).getBytes());
                             planeCourses.add(TransportCourse.builder()
                                     .id(planeConnectionArriveId)
                                     .departureFrom(departureLocation)
@@ -122,7 +122,7 @@ public class TransportCoursesParser {
                                     .build());
 
                             // Add return plane connection
-                            UUID planeConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.toString() + hotelLocation.toString() + TransportType.PLANE + String.valueOf(200)).getBytes());
+                            UUID planeConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.PLANE + String.valueOf(200)).getBytes());
                             planeCourses.add(TransportCourse.builder()
                                     .id(planeConnectionReturnId)
                                     .departureFrom(hotelLocation)
@@ -148,29 +148,29 @@ public class TransportCoursesParser {
                 Location hotelLocation = hotelLocationMap.get(hotelId);
 
                 for (String departureCity : departureCities) {
-                    for (Location depLocation : departureLocations) {
-                        String connectionKey = depLocation.getRegion() + "-" + hotelLocation.getRegion();
+                    for (Location departureLocation : departureLocations) {
+                        String connectionKey = departureLocation.getRegion() + "-" + hotelLocation.getRegion();
 
                         // Check if the connection already exists
-                        if (!busConnections.contains(connectionKey) && depLocation.getRegion().equals(departureCity)) {
+                        if (!busConnections.contains(connectionKey) && departureLocation.getRegion().equals(departureCity)) {
                             // Check if the destination location is among the bus arrival locations
                             for (Location busArrivalLocation : busArrivalLocations) {
                                 if (busArrivalLocation.getRegion().equals(hotelLocation.getRegion())) {
                                     // Add bus connection
-                                    UUID busConnectionArriveId = UUID.nameUUIDFromBytes((depLocation.toString() + hotelLocation.toString() + TransportType.BUS + String.valueOf(100)).getBytes());
+                                    UUID busConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.BUS + String.valueOf(100)).getBytes());
                                     busCourses.add(TransportCourse.builder()
                                             .id(busConnectionArriveId)
-                                            .departureFrom(depLocation)
+                                            .departureFrom(departureLocation)
                                             .arrivalAt(hotelLocation)
                                             .type(TransportType.BUS)
                                             .build());
 
                                     // Add return bus connection
-                                    UUID bussConnectionReturnId = UUID.nameUUIDFromBytes((depLocation.toString() + hotelLocation.toString() + TransportType.BUS + String.valueOf(200)).getBytes());
+                                    UUID bussConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.BUS + String.valueOf(200)).getBytes());
                                     busCourses.add(TransportCourse.builder()
                                             .id(bussConnectionReturnId)
                                             .departureFrom(hotelLocation)
-                                            .arrivalAt(depLocation)
+                                            .arrivalAt(departureLocation)
                                             .type(TransportType.BUS)
                                             .build());
 

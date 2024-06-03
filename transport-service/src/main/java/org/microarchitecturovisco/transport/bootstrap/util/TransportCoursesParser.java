@@ -1,13 +1,12 @@
 package org.microarchitecturovisco.transport.bootstrap.util;
 
+import org.microarchitecturovisco.transport.model.domain.TransportType;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
-import org.microarchitecturovisco.transport.model.domain.TransportType;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -113,7 +112,7 @@ public class TransportCoursesParser {
                         // Check if the connection already exists - do not allow duplicates
                         if (!planeConnections.contains(connectionKey)) {
                             // Add plane connection
-                            UUID planeConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.toString() + hotelLocation.toString() + TransportType.PLANE + String.valueOf(100)).getBytes());
+                            UUID planeConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.PLANE + String.valueOf(100)).getBytes());
                             planeCourses.add(TransportCourseDto.builder()
                                     .idTransportCourse(planeConnectionArriveId)
                                     .departureFromLocation(departureLocation)
@@ -122,7 +121,7 @@ public class TransportCoursesParser {
                                     .build());
 
                             // Add return plane connection
-                            UUID planeConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.toString() + hotelLocation.toString() + TransportType.PLANE + String.valueOf(200)).getBytes());
+                            UUID planeConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.PLANE + String.valueOf(200)).getBytes());
                             planeCourses.add(TransportCourseDto.builder()
                                     .idTransportCourse(planeConnectionReturnId)
                                     .departureFromLocation(hotelLocation)
@@ -148,29 +147,29 @@ public class TransportCoursesParser {
                 LocationDto hotelLocation = hotelLocationMap.get(hotelId);
 
                 for (String departureCity : departureCities) {
-                    for (LocationDto depLocation : departureLocations) {
-                        String connectionKey = depLocation.getRegion() + "-" + hotelLocation.getRegion();
+                    for (LocationDto departureLocation : departureLocations) {
+                        String connectionKey = departureLocation.getRegion() + "-" + hotelLocation.getRegion();
 
                         // Check if the connection already exists
-                        if (!busConnections.contains(connectionKey) && depLocation.getRegion().equals(departureCity)) {
+                        if (!busConnections.contains(connectionKey) && departureLocation.getRegion().equals(departureCity)) {
                             // Check if the destination location is among the bus arrival locations
                             for (LocationDto busArrivalLocation : busArrivalLocations) {
                                 if (busArrivalLocation.getRegion().equals(hotelLocation.getRegion())) {
                                     // Add bus connection
-                                    UUID busConnectionArriveId = UUID.nameUUIDFromBytes((depLocation.toString() + hotelLocation.toString() + TransportType.BUS + String.valueOf(100)).getBytes());
+                                    UUID busConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.BUS + String.valueOf(100)).getBytes());
                                     busCourses.add(TransportCourseDto.builder()
                                             .idTransportCourse(busConnectionArriveId)
-                                            .departureFromLocation(depLocation)
+                                            .departureFromLocation(departureLocation)
                                             .arrivalAtLocation(hotelLocation)
                                             .type(TransportType.BUS)
                                             .build());
 
                                     // Add return bus connection
-                                    UUID bussConnectionReturnId = UUID.nameUUIDFromBytes((depLocation.toString() + hotelLocation.toString() + TransportType.BUS + String.valueOf(200)).getBytes());
+                                    UUID bussConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.BUS + String.valueOf(200)).getBytes());
                                     busCourses.add(TransportCourseDto.builder()
                                             .idTransportCourse(bussConnectionReturnId)
                                             .departureFromLocation(hotelLocation)
-                                            .arrivalAtLocation(depLocation)
+                                            .arrivalAtLocation(departureLocation)
                                             .type(TransportType.BUS)
                                             .build());
 
