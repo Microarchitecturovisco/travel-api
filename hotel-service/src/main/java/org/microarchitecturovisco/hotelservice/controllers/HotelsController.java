@@ -7,6 +7,7 @@ import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHo
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
+import org.microarchitecturovisco.hotelservice.model.dto.data_generator.RoomUpdateRequest;
 import org.microarchitecturovisco.hotelservice.model.dto.request.CheckHotelAvailabilityQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySearchQueryRequestDto;
@@ -141,6 +142,10 @@ public class HotelsController {
     @RabbitListener(queues = "#{handleDataGeneratorCreateQueue}")
     public void consumeDataGeneratorMessage(String requestJson) {
         System.out.println("Got hotel data generator: " + requestJson);
+
+        RoomUpdateRequest request = JsonReader.readDtoFromJson(requestJson, RoomUpdateRequest.class);
+
+
     }
 
 }

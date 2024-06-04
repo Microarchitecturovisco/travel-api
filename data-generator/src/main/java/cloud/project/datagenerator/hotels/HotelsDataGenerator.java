@@ -5,6 +5,7 @@ import cloud.project.datagenerator.hotels.domain.Room;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
 import cloud.project.datagenerator.rabbitmq.QueuesConfig;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
+import cloud.project.datagenerator.rabbitmq.requests.DataUpdateType;
 import cloud.project.datagenerator.rabbitmq.requests.RoomUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,10 +19,6 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class HotelsDataGenerator {
-    enum DataUpdateType {
-        CREATE,
-        UPDATE
-    }
 
     private final HotelRepository hotelRepository;
     private final Random random = new Random();
@@ -99,7 +96,7 @@ public class HotelsDataGenerator {
 
     public void updateHotelDataInHotelModules(DataUpdateType updateType, Room room) {
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.builder()
-                .updateType(String.valueOf(updateType))
+                .updateType(updateType)
                 .id(room.getId())
                 .hotelId(room.getHotel().getId())
                 .name(room.getName())
