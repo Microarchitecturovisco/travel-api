@@ -20,8 +20,7 @@ import java.util.UUID;
 public class HotelsDataGenerator {
     enum DataUpdateType {
         CREATE,
-        UPDATE,
-        DELETE
+        UPDATE
     }
 
     private final HotelRepository hotelRepository;
@@ -38,9 +37,6 @@ public class HotelsDataGenerator {
                 break;
             case 1:
                 updateRandomRoom();
-                break;
-            case 2:
-                deleteRandomRoom();
                 break;
         }
     }
@@ -76,17 +72,6 @@ public class HotelsDataGenerator {
         randomRoom.setPricePerAdult(newPricePerAdult);
 
         updateHotelDataInHotelModules(DataUpdateType.UPDATE, randomRoom);
-    }
-
-    private void deleteRandomRoom() {
-        Hotel randomHotel = getRandomHotel();
-        if (randomHotel == null) return;
-
-        Room randomRoom = randomHotel.getRooms().get(random.nextInt(randomHotel.getRooms().size()));
-
-        System.out.println("Deleting room: " + randomRoom);
-
-        updateHotelDataInHotelModules(DataUpdateType.DELETE, randomRoom);
     }
 
     private Hotel getRandomHotel() {
