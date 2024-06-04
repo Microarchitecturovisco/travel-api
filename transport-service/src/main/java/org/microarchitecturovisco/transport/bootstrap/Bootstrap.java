@@ -70,7 +70,7 @@ public class Bootstrap implements CommandLineRunner {
 
                 UUID transportId = UUID.nameUUIDFromBytes((
                                   departureDate
-                                + planeCourse.toString()
+                                + planeCourse.getIdTransportCourse().toString()
                                 + capacity
                                 + day).getBytes());
 
@@ -89,7 +89,7 @@ public class Bootstrap implements CommandLineRunner {
                         .build()
                 );
 
-                createReservationsForTransport(random, planeCourse, capacity, transportDto);
+                createReservationsForTransport(planeCourse, capacity, transportDto);
             }
 
             for (TransportCourseDto busCourse : busCourses) {
@@ -98,7 +98,7 @@ public class Bootstrap implements CommandLineRunner {
 
                 UUID transportId = UUID.nameUUIDFromBytes((
                                   departureDate
-                                + busCourse.toString()
+                                + busCourse.getIdTransportCourse().toString()
                                 + capacity
                                 + day).getBytes());
 
@@ -122,16 +122,19 @@ public class Bootstrap implements CommandLineRunner {
         logger.info("Bootstrap finished importing data");
     }
 
-    private void createReservationsForTransport(Random random, TransportCourseDto planeCourse, int capacity, TransportDto transportDto) {
-        int numberOfReservationsToMake = random.nextInt(0, 10) > 7 ? capacity : (int) (capacity * 0.6);
+    private void createReservationsForTransport(TransportCourseDto planeCourse, int capacity, TransportDto transportDto) {
+        int randomSeed = 12345678;
+        Random randomReservations = new Random(randomSeed);
+
+        int numberOfReservationsToMake = randomReservations.nextInt(0, 10) > 7 ? capacity : (int) (capacity * 0.6);
 
         while (numberOfReservationsToMake > 0) {
-            int occupiedSeats = random.nextInt(1, 8);
+            int occupiedSeats = randomReservations.nextInt(1, 8);
 
             if (numberOfReservationsToMake - occupiedSeats < 0) continue;
 
             UUID transportReservationId = UUID.nameUUIDFromBytes((
-                            planeCourse.toString()
+                            planeCourse.getIdTransportCourse().toString()
                             + capacity
                             + transportDto.getIdTransport()
                             + numberOfReservationsToMake).getBytes());

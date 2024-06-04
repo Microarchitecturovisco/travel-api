@@ -1,8 +1,8 @@
-package org.microarchitecturovisco.transport.bootstrap.util;
+package cloud.project.datagenerator.transports.bootstrap.util;
 
-import org.microarchitecturovisco.transport.model.domain.TransportType;
-import org.microarchitecturovisco.transport.model.dto.LocationDto;
-import org.microarchitecturovisco.transport.model.dto.TransportCourseDto;
+import cloud.project.datagenerator.transports.domain.Location;
+import cloud.project.datagenerator.transports.domain.TransportCourse;
+import cloud.project.datagenerator.transports.domain.TransportType;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -14,12 +14,12 @@ import java.util.*;
 @Component
 public class TransportCoursesParser {
 
-    public Map<String, List<TransportCourseDto>> createTransportCourses(Resource hotelCsvFile, Resource hotelDepartureOptionsCsvFile, List<LocationDto> busArrivalLocations, List<LocationDto> planeArrivalLocations, List<LocationDto> departureLocations) {
-        List<TransportCourseDto> planeCourses = new ArrayList<>();
-        List<TransportCourseDto> busCourses = new ArrayList<>();
+    public Map<String, List<TransportCourse>> createTransportCourses(Resource hotelCsvFile, Resource hotelDepartureOptionsCsvFile, List<Location> busArrivalLocations, List<Location> planeArrivalLocations, List<Location> departureLocations) {
+        List<TransportCourse> planeCourses = new ArrayList<>();
+        List<TransportCourse> busCourses = new ArrayList<>();
 
         Map<Integer, List<String>> departureCitiesMap = readDepartureCities(hotelDepartureOptionsCsvFile);
-        Map<Integer, LocationDto> hotelLocationMap = readHotelLocations(hotelCsvFile, planeArrivalLocations);
+        Map<Integer, Location> hotelLocationMap = readHotelLocations(hotelCsvFile, planeArrivalLocations);
 
         Set<String> planeConnections = new HashSet<>();
         Set<String> busConnections = new HashSet<>();
@@ -27,7 +27,7 @@ public class TransportCoursesParser {
         createPlaneConnections(planeCourses, departureCitiesMap, hotelLocationMap, departureLocations, planeConnections);
         createBusConnections(busCourses, departureCitiesMap, hotelLocationMap, busArrivalLocations, departureLocations, busConnections);
 
-        Map<String, List<TransportCourseDto>> transportCoursesMap = new HashMap<>();
+        Map<String, List<TransportCourse>> transportCoursesMap = new HashMap<>();
         transportCoursesMap.put("PLANE", planeCourses);
         transportCoursesMap.put("BUS", busCourses);
 
@@ -62,8 +62,8 @@ public class TransportCoursesParser {
         return departureCitiesMap;
     }
 
-    private Map<Integer, LocationDto> readHotelLocations(Resource resource, List<LocationDto> planeArrivalLocations) {
-        Map<Integer, LocationDto> hotelLocationMap = new HashMap<>();
+    private Map<Integer, Location> readHotelLocations(Resource resource, List<Location> planeArrivalLocations) {
+        Map<Integer, Location> hotelLocationMap = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
@@ -76,7 +76,7 @@ public class TransportCoursesParser {
                 String region = data[5];
 
                 // Find the matching location in the planeArrivalLocations list
-                LocationDto hotelLocation = findMatchingLocation(country, region, planeArrivalLocations);
+                Location hotelLocation = findMatchingLocation(country, region, planeArrivalLocations);
                 hotelLocationMap.put(hotelId, hotelLocation);
             }
         } catch (IOException e) {
@@ -86,7 +86,7 @@ public class TransportCoursesParser {
         return hotelLocationMap;
     }
 
-    private LocationDto findMatchingLocation(String country, String region, List<LocationDto> locations) {
+    private Location findMatchingLocation(String country, String region, List<Location> locations) {
         return locations.stream()
                 .filter(location -> location.getCountry().equals(country) && location.getRegion().equals(region))
                 .findFirst()
@@ -94,17 +94,17 @@ public class TransportCoursesParser {
     }
 
 
-    private void createPlaneConnections(List<TransportCourseDto> planeCourses, Map<Integer, List<String>> departureCitiesMap, Map<Integer, LocationDto> hotelLocationMap, List<LocationDto> departureLocations, Set<String> planeConnections) {
+    private void createPlaneConnections(List<TransportCourse> planeCourses, Map<Integer, List<String>> departureCitiesMap, Map<Integer, Location> hotelLocationMap, List<Location> departureLocations, Set<String> planeConnections) {
         for (Map.Entry<Integer, List<String>> entry : departureCitiesMap.entrySet()) {
             int hotelId = entry.getKey();
             List<String> departureCities = entry.getValue();
 
             if (hotelLocationMap.containsKey(hotelId)) {
-                LocationDto hotelLocation = hotelLocationMap.get(hotelId);
+                Location hotelLocation = hotelLocationMap.get(hotelId);
 
                 for (String departureCity : departureCities) {
                     // Find the departure location DTO for the current departure city
-                    LocationDto departureLocation = findMatchingLocation("Polska", departureCity, departureLocations);
+                    Location departureLocation = findMatchingLocation("Polska", departureCity, departureLocations);
 
                     if (departureLocation != null) {
                         String connectionKey = departureLocation.getRegion() + "-" + hotelLocation.getRegion();
@@ -112,20 +112,21 @@ public class TransportCoursesParser {
                         // Check if the connection already exists - do not allow duplicates
                         if (!planeConnections.contains(connectionKey)) {
                             // Add plane connection
-                            UUID planeConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.PLANE + String.valueOf(100)).getBytes());
-                            planeCourses.add(TransportCourseDto.builder()
-                                    .idTransportCourse(planeConnectionArriveId)
-                                    .departureFromLocation(departureLocation)
-                                    .arrivalAtLocation(hotelLocation)
+                            // todo change to random number using the random seed
+                            UUID planeConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.PLANE + String.valueOf(100)).getBytes());
+                            planeCourses.add(TransportCourse.builder()
+                                    .id(planeConnectionArriveId)
+                                    .departureFrom(departureLocation)
+                                    .arrivalAt(hotelLocation)
                                     .type(TransportType.PLANE)
                                     .build());
 
                             // Add return plane connection
-                            UUID planeConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.PLANE + String.valueOf(200)).getBytes());
-                            planeCourses.add(TransportCourseDto.builder()
-                                    .idTransportCourse(planeConnectionReturnId)
-                                    .departureFromLocation(hotelLocation)
-                                    .arrivalAtLocation(departureLocation)
+                            UUID planeConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.PLANE + String.valueOf(200)).getBytes());
+                            planeCourses.add(TransportCourse.builder()
+                                    .id(planeConnectionReturnId)
+                                    .departureFrom(hotelLocation)
+                                    .arrivalAt(departureLocation)
                                     .type(TransportType.PLANE)
                                     .build());
 
@@ -138,38 +139,38 @@ public class TransportCoursesParser {
         }
     }
 
-    private void createBusConnections(List<TransportCourseDto> busCourses, Map<Integer, List<String>> departureCitiesMap, Map<Integer, LocationDto> hotelLocationMap, List<LocationDto> busArrivalLocations, List<LocationDto> departureLocations, Set<String> busConnections) {
+    private void createBusConnections(List<TransportCourse> busCourses, Map<Integer, List<String>> departureCitiesMap, Map<Integer, Location> hotelLocationMap, List<Location> busArrivalLocations, List<Location> departureLocations, Set<String> busConnections) {
         for (Map.Entry<Integer, List<String>> entry : departureCitiesMap.entrySet()) {
             int hotelId = entry.getKey();
             List<String> departureCities = entry.getValue();
 
             if (hotelLocationMap.containsKey(hotelId)) {
-                LocationDto hotelLocation = hotelLocationMap.get(hotelId);
+                Location hotelLocation = hotelLocationMap.get(hotelId);
 
                 for (String departureCity : departureCities) {
-                    for (LocationDto departureLocation : departureLocations) {
+                    for (Location departureLocation : departureLocations) {
                         String connectionKey = departureLocation.getRegion() + "-" + hotelLocation.getRegion();
 
                         // Check if the connection already exists
                         if (!busConnections.contains(connectionKey) && departureLocation.getRegion().equals(departureCity)) {
                             // Check if the destination location is among the bus arrival locations
-                            for (LocationDto busArrivalLocation : busArrivalLocations) {
+                            for (Location busArrivalLocation : busArrivalLocations) {
                                 if (busArrivalLocation.getRegion().equals(hotelLocation.getRegion())) {
                                     // Add bus connection
-                                    UUID busConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.BUS + String.valueOf(100)).getBytes());
-                                    busCourses.add(TransportCourseDto.builder()
-                                            .idTransportCourse(busConnectionArriveId)
-                                            .departureFromLocation(departureLocation)
-                                            .arrivalAtLocation(hotelLocation)
+                                    UUID busConnectionArriveId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.BUS + String.valueOf(100)).getBytes());
+                                    busCourses.add(TransportCourse.builder()
+                                            .id(busConnectionArriveId)
+                                            .departureFrom(departureLocation)
+                                            .arrivalAt(hotelLocation)
                                             .type(TransportType.BUS)
                                             .build());
 
                                     // Add return bus connection
-                                    UUID bussConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getIdLocation().toString() + hotelLocation.getIdLocation().toString() + TransportType.BUS + String.valueOf(200)).getBytes());
-                                    busCourses.add(TransportCourseDto.builder()
-                                            .idTransportCourse(bussConnectionReturnId)
-                                            .departureFromLocation(hotelLocation)
-                                            .arrivalAtLocation(departureLocation)
+                                    UUID bussConnectionReturnId = UUID.nameUUIDFromBytes((departureLocation.getId().toString() + hotelLocation.getId().toString() + TransportType.BUS + String.valueOf(200)).getBytes());
+                                    busCourses.add(TransportCourse.builder()
+                                            .id(bussConnectionReturnId)
+                                            .departureFrom(hotelLocation)
+                                            .arrivalAt(departureLocation)
                                             .type(TransportType.BUS)
                                             .build());
 
