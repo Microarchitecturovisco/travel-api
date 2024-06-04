@@ -2,11 +2,11 @@ name: Travel API CI - Data-generator service
 
 on:
   push:
-    branches: [ "RSWW-134-Create-and-configure-DataGenerator-module" ]
+    branches: [ "dev" ]
     paths:
       - 'data-generator/**'
   pull_request:
-    branches: [ "RSWW-134-Create-and-configure-DataGenerator-module" ]
+    branches: [ "dev" ]
     paths:
       - 'data-generator/**'
 
