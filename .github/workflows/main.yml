@@ -1,0 +1,37 @@
+name: Travel API CI - Data-generator service
+
+on:
+  push:
+    branches: [ "RSWW-134-Create-and-configure-DataGenerator-module" ]
+    paths:
+      - 'data-generator/**'
+  pull_request:
+    branches: [ "RSWW-134-Create-and-configure-DataGenerator-module" ]
+    paths:
+      - 'data-generator/**'
+
+permissions: write-all
+
+jobs:
+  test:
+    name: Package and execute tests
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+          cache: maven
+      - name: Build data-generator
+        run: mvn -B package --file data-generator/pom.xml
+
+      - name: data-generator test reports
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            data-generator/target/surefire-reports/TEST-*.xml
