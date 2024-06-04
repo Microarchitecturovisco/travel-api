@@ -22,8 +22,7 @@ import java.util.UUID;
 public class TransportsDataGenerator {
     enum DataUpdateType {
         CREATE,
-        UPDATE,
-        DELETE
+        UPDATE
     }
 
     private final Random random = new Random();
@@ -33,7 +32,7 @@ public class TransportsDataGenerator {
 
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
     public void updateRandomTransportData() {
-        int action = random.nextInt(3);
+        int action = random.nextInt(2);
 
         switch (action) {
             case 0:
@@ -41,9 +40,6 @@ public class TransportsDataGenerator {
                 break;
             case 1:
                 updateRandomTransport();
-                break;
-            case 2:
-                deleteRandomTransport();
                 break;
         }
     }
@@ -81,13 +77,6 @@ public class TransportsDataGenerator {
         randomTransport.setPricePerAdult(newPricePerAdult);
 
         updateTransportDataInTransportModules(DataUpdateType.UPDATE, randomTransport);
-    }
-
-    private void deleteRandomTransport() {
-        Transport randomTransport = getRandomTransport();
-        if (randomTransport == null) return;
-
-        updateTransportDataInTransportModules(DataUpdateType.DELETE, randomTransport);
     }
 
     private TransportCourse getRandomTransportCourse() {
