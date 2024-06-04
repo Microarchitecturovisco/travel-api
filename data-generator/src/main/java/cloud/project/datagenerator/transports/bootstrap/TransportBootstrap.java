@@ -5,9 +5,11 @@ import cloud.project.datagenerator.transports.bootstrap.util.TransportCoursesPar
 import cloud.project.datagenerator.transports.domain.Location;
 import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
+import cloud.project.datagenerator.transports.domain.TransportReservation;
 import cloud.project.datagenerator.transports.repositories.LocationRepository;
 import cloud.project.datagenerator.transports.repositories.TransportCourseRepository;
 import cloud.project.datagenerator.transports.repositories.TransportRepository;
+import cloud.project.datagenerator.transports.repositories.TransportReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
@@ -31,6 +33,7 @@ public class TransportBootstrap implements CommandLineRunner {
     private final TransportRepository transportRepository;
     private final TransportCourseRepository transportCourseRepository;
     private final LocationRepository locationRepository;
+    private final TransportReservationRepository transportReservationRepository;
 
     @Override
     public void run(String... args) {
@@ -79,6 +82,8 @@ public class TransportBootstrap implements CommandLineRunner {
                 locationRepository.saveAll(List.of(planeCourse.getDepartureFrom(), planeCourse.getArrivalAt()));
                 transportCourseRepository.save(planeCourse);
                 transportRepository.save(transport);
+
+                createReservationsForTransport(planeCourse, capacity, transport);
             }
 
             for (TransportCourse busCourse : busCourses) {
@@ -107,4 +112,34 @@ public class TransportBootstrap implements CommandLineRunner {
         }
         logger.info("TransportBootstrap finished importing data");
     }
+
+    private void createReservationsForTransport(TransportCourse planeCourse, int capacity, Transport transport) {
+        int randomSeed = 12345678;
+        Random randomReservations = new Random(randomSeed);
+
+        int numberOfReservationsToMake = randomReservations.nextInt(0, 10) > 7 ? capacity : (int) (capacity * 0.6);
+
+        while (numberOfReservationsToMake > 0) {
+            int occupiedSeats = randomReservations.nextInt(1, 8);
+
+            if (numberOfReservationsToMake - occupiedSeats < 0) continue;
+
+            UUID transportReservationId = UUID.nameUUIDFromBytes((
+                    planeCourse.getId().toString()
+                            + capacity
+                            + transport.getId()
+                            + numberOfReservationsToMake).getBytes());
+
+            TransportReservation reservation = TransportReservation.builder()
+                    .id(transportReservationId)
+                    .numberOfSeats(occupiedSeats)
+                    .transport(transport)
+                    .build();
+
+            numberOfReservationsToMake -= occupiedSeats;
+
+            transportReservationRepository.save(reservation);
+        }
+    }
+
 }

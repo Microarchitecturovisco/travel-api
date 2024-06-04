@@ -1,8 +1,6 @@
 package cloud.project.datagenerator.transports.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -33,4 +32,7 @@ public class Transport {
 
     @NotNull
     private float pricePerAdult;
+
+    @OneToMany(mappedBy="transport", fetch = FetchType.EAGER)
+    private List<TransportReservation> transportReservations;
 }
