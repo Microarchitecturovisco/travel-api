@@ -23,7 +23,6 @@ public class Transport {
     @ManyToOne
     private TransportCourse course;
 
-    // the day the transport takes place
     @NotNull
     private LocalDateTime departureDate;
 

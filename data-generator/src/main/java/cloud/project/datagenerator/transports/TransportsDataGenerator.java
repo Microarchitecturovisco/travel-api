@@ -32,9 +32,7 @@ public class TransportsDataGenerator {
     private final TransportCourseRepository transportCourseRepository;
 
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
-    public void generateRandomTransportData() {
-        System.out.println("Generating Transport Data...");
-
+    public void updateRandomTransportData() {
         int action = random.nextInt(3);
 
         switch (action) {
@@ -49,7 +47,6 @@ public class TransportsDataGenerator {
                 break;
         }
     }
-
 
     private void createNewTransport() {
         TransportCourse randomTransportCourse = getRandomTransportCourse();
@@ -70,7 +67,6 @@ public class TransportsDataGenerator {
         updateTransportDataInTransportModules(DataUpdateType.CREATE, newTransport);
     }
 
-
     private void updateRandomTransport() {
         Transport randomTransport = getRandomTransport();
         if (randomTransport == null) return;
@@ -81,10 +77,6 @@ public class TransportsDataGenerator {
         float currentPricePerAdult = randomTransport.getPricePerAdult();
         float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult*10);
 
-//        System.out.println("Updating transport " + randomTransport.getId() +
-//                " - old capacity: " + currentGuestCapacity + " new capacity: " + newCapacity +
-//                " - old pricePerAdult: " + currentPricePerAdult + " new pricePerAdult: " + newPricePerAdult);
-
         randomTransport.setCapacity(newCapacity);
         randomTransport.setPricePerAdult(newPricePerAdult);
 
@@ -94,8 +86,6 @@ public class TransportsDataGenerator {
     private void deleteRandomTransport() {
         Transport randomTransport = getRandomTransport();
         if (randomTransport == null) return;
-
-//        System.out.println("Deleting transport: " + randomTransport.getId());
 
         updateTransportDataInTransportModules(DataUpdateType.DELETE, randomTransport);
     }
@@ -122,7 +112,6 @@ public class TransportsDataGenerator {
         return transports.get(random.nextInt(transports.size()));
     }
 
-
     public void updateTransportDataInTransportModules(DataUpdateType updateType, Transport transport) {
         TransportUpdateRequest transportUpdateRequest = TransportUpdateRequest.builder()
                 .updateType(String.valueOf(updateType))
@@ -135,9 +124,8 @@ public class TransportsDataGenerator {
 
         String transportUpdateRequestJson = JsonConverter.convert(transportUpdateRequest);
 
-        System.out.println(updateType + " - transportUpdateRequestJson: " + transportUpdateRequestJson);
+        System.out.println(updateType + " - Transport: " + transportUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
     }
-
 }
