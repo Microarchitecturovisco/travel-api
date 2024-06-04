@@ -2,9 +2,9 @@ package cloud.project.datagenerator.hotels;
 
 import cloud.project.datagenerator.hotels.domain.Hotel;
 import cloud.project.datagenerator.hotels.domain.Room;
-import cloud.project.datagenerator.hotels.rabbitmq.QueuesConfig;
-import cloud.project.datagenerator.hotels.rabbitmq.json.JsonConverter;
-import cloud.project.datagenerator.hotels.rabbitmq.requests.RoomUpdateRequest;
+import cloud.project.datagenerator.rabbitmq.QueuesConfig;
+import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
+import cloud.project.datagenerator.rabbitmq.requests.RoomUpdateRequest;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
