@@ -73,10 +73,15 @@ public class HotelsDataGenerator {
         int currentGuestCapacity = room.getGuestCapacity();
         int newGuestCapacity = random.nextInt(1, currentGuestCapacity + 10);
 
+        float currentPricePerAdult = room.getPricePerAdult();
+        float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult*10);
+
         System.out.println("Updating room " + room.getName() + " in hotel " + randomHotel.getName() +
-                " - old guest capacity: " + currentGuestCapacity + " new guest capacity: " + newGuestCapacity);
+                " - old guest capacity: " + currentGuestCapacity + " new guest capacity: " + newGuestCapacity +
+                " - old pricePerAdult: " + currentPricePerAdult + " new pricePerAdult: " + newPricePerAdult);
 
         room.setGuestCapacity(newGuestCapacity);
+        room.setPricePerAdult(newPricePerAdult);
 
         updateHotelDataInHotelModules(DataUpdateType.UPDATE, room);
 
