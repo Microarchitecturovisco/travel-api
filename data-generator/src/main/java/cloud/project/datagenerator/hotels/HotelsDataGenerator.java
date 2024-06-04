@@ -29,7 +29,7 @@ public class HotelsDataGenerator {
 
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
     public void updateRandomHotelData() {
-        int action = random.nextInt(3);
+        int action = random.nextInt(2);
 
         switch (action) {
             case 0:
