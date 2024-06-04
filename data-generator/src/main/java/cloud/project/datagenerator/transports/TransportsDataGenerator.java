@@ -2,9 +2,9 @@ package cloud.project.datagenerator.transports;
 
 import cloud.project.datagenerator.rabbitmq.QueuesConfig;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
+import cloud.project.datagenerator.rabbitmq.requests.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
-import cloud.project.datagenerator.rabbitmq.requests.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.repositories.TransportCourseRepository;
 import cloud.project.datagenerator.transports.repositories.TransportRepository;
 import lombok.RequiredArgsConstructor;
@@ -116,5 +116,11 @@ public class TransportsDataGenerator {
         System.out.println(updateType + " - Transport: " + transportUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
+
+        sendUpdateToFrontend(updateType, transport);
+    }
+
+    private void sendUpdateToFrontend(DataUpdateType updateType, Transport transport){
+        //TODO: here send a message to frontend via websocket
     }
 }

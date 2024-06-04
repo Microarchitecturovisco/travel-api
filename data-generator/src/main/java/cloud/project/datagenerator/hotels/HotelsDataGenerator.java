@@ -113,5 +113,11 @@ public class HotelsDataGenerator {
         System.out.println(updateType + " - Room: " + roomUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
+
+        sendUpdateToFrontend(updateType, room);
+    }
+
+    private void sendUpdateToFrontend(DataUpdateType updateType, Room room){
+        //TODO: here send a message to frontend via websocket
     }
 }
