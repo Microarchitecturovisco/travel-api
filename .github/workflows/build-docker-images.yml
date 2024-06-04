@@ -1,0 +1,137 @@
+name: Build Docker image
+
+on:
+  push:
+    # TODO remove test branch
+    branches: [ "dev", "RSWW-137-docker-images-ci" ]
+    tags: [ 'v*.*.*' ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/gateway
+            ${{ env.REGISTRY }}/discovery
+            ${{ env.REGISTRY }}/hotel
+            ${{ env.REGISTRY }}/offer-provider
+            ${{ env.REGISTRY }}/payment
+            ${{ env.REGISTRY }}/reservation
+            ${{ env.REGISTRY }}/transport
+            ${{ env.REGISTRY }}/user
+
+      - name: Build and push Gateway
+        id: build-and-push-gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api-gateway
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.REGISTRY }}/microarchitecturovisco/gateway:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Discovery
+        id: build-and-push-discovery
+        uses: docker/build-push-action@v5
+        with:
+          context: ./discovery-service
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.REGISTRY }}/microarchitecturovisco/discovery:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Hotels
+        id: build-and-push-hotels
+        uses: docker/build-push-action@v5
+        with:
+          context: ./hotel-service
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: hotel:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Offer Provider
+        id: build-and-push-offer-provider
+        uses: docker/build-push-action@v5
+        with:
+          context: ./offer-provider-service
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: offer-provider:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Payments
+        id: build-and-push-payment
+        uses: docker/build-push-action@v5
+        with:
+          context: ./payment-service
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: payment:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Reservations
+        id: build-and-push-reservation
+        uses: docker/build-push-action@v5
+        with:
+          context: ./reservation-service
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: reservation:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Transports
+        id: build-and-push-transport
+        uses: docker/build-push-action@v5
+        with:
+          context: ./transport-service
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: transport:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Users
+        id: build-and-push-user
+        uses: docker/build-push-action@v5
+        with:
+          context: ./user-service
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: user:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
