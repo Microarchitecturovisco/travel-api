@@ -138,5 +138,10 @@ public class HotelsController {
         }
     }
 
+    @RabbitListener(queues = "#{handleDataGeneratorCreateQueue}")
+    public void consumeDataGeneratorMessage(String requestJson) {
+        System.out.println("Got hotel data generator: " + requestJson);
+    }
+
 }
 
