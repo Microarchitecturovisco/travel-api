@@ -1,10 +1,11 @@
-package cloud.project.datagenerator.hotels.rabbitmq.requests;
+package cloud.project.datagenerator.rabbitmq.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -12,21 +13,17 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RoomUpdateRequest {
+public class TransportUpdateRequest {
 
     private String updateType;
 
     private UUID id;
 
-    private UUID hotelId;
+    private UUID courseId;
 
-    private String name;
+    private LocalDateTime departureDate;
 
-    private int guestCapacity;
+    private int capacity;
 
     private float pricePerAdult;
-
-    private String description;
-
-    // List of room reservations for each room is empty
 }

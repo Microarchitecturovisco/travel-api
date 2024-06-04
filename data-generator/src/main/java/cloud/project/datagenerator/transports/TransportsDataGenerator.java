@@ -1,7 +1,10 @@
 package cloud.project.datagenerator.transports;
 
+import cloud.project.datagenerator.rabbitmq.QueuesConfig;
+import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
+import cloud.project.datagenerator.rabbitmq.requests.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.repositories.TransportCourseRepository;
 import cloud.project.datagenerator.transports.repositories.TransportRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,19 +50,22 @@ public class TransportsDataGenerator {
         }
     }
 
+
     private void createNewTransport() {
         TransportCourse randomTransportCourse = getRandomTransportCourse();
         if (randomTransportCourse == null) return;
 
+        LocalDateTime departureDate = LocalDateTime.now().plusDays(1)
+                .withSecond(0)
+                .withNano(0);
+
         Transport newTransport = Transport.builder()
                 .id(UUID.randomUUID())
                 .course(randomTransportCourse)
-                .departureDate(LocalDateTime.now().plusDays(1))
+                .departureDate(departureDate)
                 .capacity(random.nextInt(1, 10))
                 .pricePerAdult(random.nextFloat(200, 1000))
                 .build();
-
-        System.out.println("Creating new transport: " + newTransport);
 
         updateTransportDataInTransportModules(DataUpdateType.CREATE, newTransport);
     }
@@ -72,20 +78,24 @@ public class TransportsDataGenerator {
         int currentGuestCapacity = randomTransport.getCapacity();
         int newCapacity = random.nextInt(0, (int) (currentGuestCapacity * random.nextDouble(0.1, 1.5)));
 
-        System.out.println("Updating transport " + randomTransport.getId() +
-                " - old capacity: " + currentGuestCapacity + " new capacity: " + newCapacity);
+        float currentPricePerAdult = randomTransport.getPricePerAdult();
+        float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult*10);
+
+//        System.out.println("Updating transport " + randomTransport.getId() +
+//                " - old capacity: " + currentGuestCapacity + " new capacity: " + newCapacity +
+//                " - old pricePerAdult: " + currentPricePerAdult + " new pricePerAdult: " + newPricePerAdult);
 
         randomTransport.setCapacity(newCapacity);
+        randomTransport.setPricePerAdult(newPricePerAdult);
 
         updateTransportDataInTransportModules(DataUpdateType.UPDATE, randomTransport);
-
     }
 
     private void deleteRandomTransport() {
         Transport randomTransport = getRandomTransport();
         if (randomTransport == null) return;
 
-        System.out.println("Deleting transport: " + randomTransport.getId());
+//        System.out.println("Deleting transport: " + randomTransport.getId());
 
         updateTransportDataInTransportModules(DataUpdateType.DELETE, randomTransport);
     }
@@ -114,7 +124,20 @@ public class TransportsDataGenerator {
 
 
     public void updateTransportDataInTransportModules(DataUpdateType updateType, Transport transport) {
-        // todo
+        TransportUpdateRequest transportUpdateRequest = TransportUpdateRequest.builder()
+                .updateType(String.valueOf(updateType))
+                .id(transport.getId())
+                .courseId(transport.getCourse().getId())
+                .departureDate(transport.getDepartureDate())
+                .capacity(transport.getCapacity())
+                .pricePerAdult(transport.getPricePerAdult())
+                .build();
+
+        String transportUpdateRequestJson = JsonConverter.convert(transportUpdateRequest);
+
+        System.out.println(updateType + " - transportUpdateRequestJson: " + transportUpdateRequestJson);
+
+        rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
     }
 
 }

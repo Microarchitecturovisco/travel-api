@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.hotels.rabbitmq.json;
+package cloud.project.datagenerator.rabbitmq.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
