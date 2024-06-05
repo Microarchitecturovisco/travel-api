@@ -6,7 +6,9 @@ import org.microarchitecturovisco.hotelservice.controllers.reservations.CreateHo
 import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHotelReservationRequest;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
+import org.microarchitecturovisco.hotelservice.model.domain.Hotel;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
+import org.microarchitecturovisco.hotelservice.model.dto.data_generator.DataUpdateType;
 import org.microarchitecturovisco.hotelservice.model.dto.data_generator.RoomUpdateRequest;
 import org.microarchitecturovisco.hotelservice.model.dto.request.CheckHotelAvailabilityQueryRequestDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelDetailsRequestDto;
@@ -14,6 +16,7 @@ import org.microarchitecturovisco.hotelservice.model.dto.request.GetHotelsBySear
 import org.microarchitecturovisco.hotelservice.model.dto.response.CheckHotelAvailabilityResponseDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySearchQueryResponseDto;
+import org.microarchitecturovisco.hotelservice.model.exceptions.HotelNoFoundException;
 import org.microarchitecturovisco.hotelservice.queues.config.QueuesConfig;
 import org.microarchitecturovisco.hotelservice.services.HotelsCommandService;
 import org.microarchitecturovisco.hotelservice.services.HotelsService;
@@ -145,7 +148,29 @@ public class HotelsController {
 
         RoomUpdateRequest request = JsonReader.readDtoFromJson(requestJson, RoomUpdateRequest.class);
 
+        // perform data update
+        Hotel hotel;
+        try {
+            hotel = hotelsService.getHotel(request.getHotelId());
+        } catch (HotelNoFoundException e) {
+            e.printStackTrace();
+        }
 
+        // create room
+        if (request.getUpdateType() == DataUpdateType.CREATE) {
+            System.out.println("Created room: " + request);
+            hotelsService.createRoomFromHotel(request.getHotelId(), request.getId(), request.getName(),
+                    request.getGuestCapacity(), request.getPricePerAdult(), request.getDescription());
+
+            return;
+        }
+
+        // update room
+        if (request.getUpdateType() == DataUpdateType.UPDATE) {
+            System.out.println("Updated room: " + request);
+
+            return;
+        }
     }
 
 }
