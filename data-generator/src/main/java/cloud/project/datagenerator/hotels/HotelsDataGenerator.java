@@ -8,12 +8,14 @@ import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.hotels.RoomUpdateRequest;
 import cloud.project.datagenerator.websockets.hotels.DataGeneratorHotelsWebSocketHandler;
 import cloud.project.datagenerator.websockets.hotels.HotelUpdate;
+import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -64,15 +66,15 @@ public class HotelsDataGenerator {
     }
 
     private void updateRandomRoom() {
-        Hotel randomHotel = getRandomHotel();
-        if (randomHotel == null) return;
+        Pair<Hotel, Room> randomRoomPair = getRandomRoomWithoutReservations();
+        Hotel randomHotel = randomRoomPair.getKey();
+        Room randomRoom = randomRoomPair.getValue();
 
-        Room randomRoom = randomHotel.getRooms().get(random.nextInt(randomHotel.getRooms().size()));
         int currentGuestCapacity = randomRoom.getGuestCapacity();
         int newGuestCapacity = random.nextInt(currentGuestCapacity, currentGuestCapacity + 10);
 
         float currentPricePerAdult = randomRoom.getPricePerAdult();
-        float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult*10);
+        float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult * 10);
 
         randomRoom.setGuestCapacity(newGuestCapacity);
         randomRoom.setPricePerAdult(newPricePerAdult);
@@ -83,6 +85,32 @@ public class HotelsDataGenerator {
         float priceChange = newPricePerAdult - currentPricePerAdult;
 
         updateHotelUpdatesOnFrontend(DataUpdateType.UPDATE, randomRoom.getName(), randomHotel.getName(), capacityChange, priceChange);
+    }
+
+
+    private Pair<Hotel, Room> getRandomRoomWithoutReservations() {
+        List<Hotel> hotels = hotelRepository.findAll();
+
+        if (hotels.isEmpty()) {
+            System.out.println("No hotels found.");
+            return null;
+        }
+
+        List<Pair<Hotel, Room>> roomsWithoutReservations = new ArrayList<>();
+        for (Hotel hotel : hotels) {
+            for (Room room : hotel.getRooms()) {
+                if (room.getRoomReservations().isEmpty()) {
+                    roomsWithoutReservations.add(new Pair<>(hotel, room));
+                }
+            }
+        }
+
+        if (roomsWithoutReservations.isEmpty()) {
+            System.out.println("No rooms found without reservations.");
+            return null;
+        }
+
+        return roomsWithoutReservations.get(random.nextInt(roomsWithoutReservations.size()));
     }
 
     private Hotel getRandomHotel() {
