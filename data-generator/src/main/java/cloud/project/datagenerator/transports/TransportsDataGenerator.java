@@ -33,7 +33,7 @@ public class TransportsDataGenerator {
     private final TransportCourseRepository transportCourseRepository;
     private final DataGeneratorTransportsWebSocketHandler dataGeneratorTransportsWebSocketHandler;
 
-    @Scheduled(fixedDelay = 5000, initialDelay = 5000)
+    @Scheduled(fixedDelay = 5000, initialDelay = 12500)
     public void updateRandomTransportData() {
         int action = random.nextInt(2);
 
@@ -126,7 +126,6 @@ public class TransportsDataGenerator {
         System.out.println(updateType + " - Transport: " + transportUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
-
     }
 
     private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, Transport transport, int capacityChange, float priceChange) {
