@@ -1,6 +1,6 @@
 package cloud.project.datagenerator.transports;
 
-import cloud.project.datagenerator.rabbitmq.QueuesConfig;
+import cloud.project.datagenerator.rabbitmq.QueuesConfigTransports;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.transports.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.domain.Transport;
@@ -125,7 +125,7 @@ public class TransportsDataGenerator {
 
         System.out.println(updateType + " - Transport: " + transportUpdateRequestJson);
 
-        rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
+        rabbitTemplate.convertAndSend(QueuesConfigTransports.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
     }
 
     private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, Transport transport, int capacityChange, float priceChange) {

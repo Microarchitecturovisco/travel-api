@@ -3,7 +3,7 @@ package cloud.project.datagenerator.hotels;
 import cloud.project.datagenerator.hotels.domain.Hotel;
 import cloud.project.datagenerator.hotels.domain.Room;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
-import cloud.project.datagenerator.rabbitmq.QueuesConfig;
+import cloud.project.datagenerator.rabbitmq.QueuesConfigHotels;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.hotels.RoomUpdateRequest;
 import cloud.project.datagenerator.websockets.hotels.DataGeneratorHotelsWebSocketHandler;
@@ -123,7 +123,7 @@ public class HotelsDataGenerator {
 
         System.out.println(updateType + " - Room: " + roomUpdateRequestJson);
 
-        rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
+        rabbitTemplate.convertAndSend(QueuesConfigHotels.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
     }
 
     private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, String roomName, String hotelName, int capacityChange, float priceChange) {

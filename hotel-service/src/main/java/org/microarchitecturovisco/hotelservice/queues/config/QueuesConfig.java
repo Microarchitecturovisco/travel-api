@@ -72,4 +72,6 @@ public class QueuesConfig {
             @Qualifier("handleDeleteHotelReservationQueue") Queue handleDeleteHotelReservationQueue) {
         return BindingBuilder.bind(handleDeleteHotelReservationQueue).to(fanoutExchangeDeleteHotelReservation);
     }
+
+
 }

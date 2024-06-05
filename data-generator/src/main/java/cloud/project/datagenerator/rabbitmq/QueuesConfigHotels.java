@@ -11,20 +11,12 @@ import org.springframework.context.annotation.Configuration;
 import java.util.UUID;
 
 @Configuration
-public class QueuesConfig {
+public class QueuesConfigHotels {
     public static final String EXCHANGE_HOTEL_FANOUT_UPDATE_DATA = "data.generate.hotels.exchange";
 
     @Bean
     public FanoutExchange updateHotelDataFanoutExchange() {
         return new FanoutExchange(EXCHANGE_HOTEL_FANOUT_UPDATE_DATA);
-    }
-
-
-    public static final String EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA = "data.generate.transports.exchange";
-
-    @Bean
-    public FanoutExchange updateTransportDataFanoutExchange() {
-        return new FanoutExchange(EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA);
     }
 
 
@@ -70,6 +62,5 @@ public class QueuesConfig {
             @Qualifier("handleDeleteHotelReservationQueue") Queue handleDeleteHotelReservationQueue) {
         return BindingBuilder.bind(handleDeleteHotelReservationQueue).to(fanoutExchangeDeleteHotelReservation);
     }
-
 
 }

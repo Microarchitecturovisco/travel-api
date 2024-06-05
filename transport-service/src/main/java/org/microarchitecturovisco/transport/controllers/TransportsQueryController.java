@@ -1,6 +1,7 @@
 package org.microarchitecturovisco.transport.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.microarchitecturovisco.transport.controllers.reservations.CreateTransportReservationRequest;
 import org.microarchitecturovisco.transport.controllers.reservations.DeleteTransportReservationRequest;
 import org.microarchitecturovisco.transport.model.cqrs.commands.CreateTransportReservationCommand;
 import org.microarchitecturovisco.transport.model.cqrs.commands.DeleteTransportReservationCommand;
