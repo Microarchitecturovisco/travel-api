@@ -11,11 +11,13 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final DataGeneratorHotelsWebSocketHandler webSocketHandler;
+    private final DataGeneratorHotelsWebSocketHandler webSocketHandlerHotels;
+    private final DataGeneratorTransportsWebSocketHandler webSocketHandlerTransports;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketHandler, "/data-generator/ws/hotel").setAllowedOrigins("*");
+        registry.addHandler(webSocketHandlerHotels, "/data-generator/ws/hotel").setAllowedOrigins("*");
+        registry.addHandler(webSocketHandlerTransports, "/data-generator/ws/transport").setAllowedOrigins("*");
     }
 }
 

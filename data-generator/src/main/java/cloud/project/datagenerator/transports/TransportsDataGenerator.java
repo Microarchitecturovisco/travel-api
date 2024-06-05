@@ -7,6 +7,8 @@ import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
 import cloud.project.datagenerator.transports.repositories.TransportCourseRepository;
 import cloud.project.datagenerator.transports.repositories.TransportRepository;
+import cloud.project.datagenerator.websockets.DataGeneratorTransportsWebSocketHandler;
+import cloud.project.datagenerator.websockets.TransportUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,6 +31,7 @@ public class TransportsDataGenerator {
     private final RabbitTemplate rabbitTemplate;
     private final TransportRepository transportRepository;
     private final TransportCourseRepository transportCourseRepository;
+    private final DataGeneratorTransportsWebSocketHandler dataGeneratorTransportsWebSocketHandler;
 
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
     public void updateRandomTransportData() {
@@ -61,6 +64,8 @@ public class TransportsDataGenerator {
                 .build();
 
         updateTransportDataInTransportModules(DataUpdateType.CREATE, newTransport);
+
+        updateHotelUpdatesOnFrontend(DataUpdateType.CREATE, newTransport, 0, 0);
     }
 
     private void updateRandomTransport() {
@@ -68,15 +73,20 @@ public class TransportsDataGenerator {
         if (randomTransport == null) return;
 
         int currentGuestCapacity = randomTransport.getCapacity();
-        int newCapacity = random.nextInt(0, (int) (currentGuestCapacity * random.nextDouble(0.1, 1.5)));
+        int newGuestCapacity = random.nextInt(0, (int) (currentGuestCapacity * random.nextDouble(0.1, 1.5)));
 
         float currentPricePerAdult = randomTransport.getPricePerAdult();
         float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult*10);
 
-        randomTransport.setCapacity(newCapacity);
+        int capacityChange = newGuestCapacity - currentGuestCapacity;
+        float priceChange = newPricePerAdult - currentPricePerAdult;
+
+        randomTransport.setCapacity(newGuestCapacity);
         randomTransport.setPricePerAdult(newPricePerAdult);
 
         updateTransportDataInTransportModules(DataUpdateType.UPDATE, randomTransport);
+
+        updateHotelUpdatesOnFrontend(DataUpdateType.CREATE, randomTransport, capacityChange, priceChange);
     }
 
     private TransportCourse getRandomTransportCourse() {
@@ -117,10 +127,27 @@ public class TransportsDataGenerator {
 
         rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
 
-        sendUpdateToFrontend(updateType, transport);
     }
 
-    private void sendUpdateToFrontend(DataUpdateType updateType, Transport transport){
-        //TODO: here send a message to frontend via websocket
+    private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, Transport transport, int capacityChange, float priceChange) {
+        LocalDateTime currentDateAndTime = LocalDateTime.now().withSecond(0).withNano(0);
+
+        String departureRegion = transport.getCourse().getDepartureFrom().getRegion();
+        String departureCountry = transport.getCourse().getDepartureFrom().getCountry();
+        String arrivalRegion = transport.getCourse().getArrivalAt().getRegion();
+        String arrivalCountry = transport.getCourse().getArrivalAt().getCountry();
+        String transportTypeName = transport.getCourse().getType().toString();
+
+        TransportUpdate transportUpdate = TransportUpdate.builder()
+                .updateDateTime(currentDateAndTime)
+                .updateType(String.valueOf(updateType))
+                .departureRegionAndCountry(departureRegion + ", " + departureCountry)
+                .arrivalRegionAndCountry(arrivalRegion + ", " + arrivalCountry)
+                .transportTypeName(transportTypeName)
+                .priceChange(priceChange)
+                .capacityChange(capacityChange)
+                .build();
+
+        dataGeneratorTransportsWebSocketHandler.updateTransportList(transportUpdate);
     }
 }
