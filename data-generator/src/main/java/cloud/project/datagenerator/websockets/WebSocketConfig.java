@@ -15,7 +15,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketHandler, "/touroperatorupdate/ws/hotel").setAllowedOrigins("*");
+        registry.addHandler(webSocketHandler, "/data-generator/ws/hotel").setAllowedOrigins("*");
     }
 }
 
