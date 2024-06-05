@@ -5,7 +5,7 @@ import cloud.project.datagenerator.hotels.domain.Room;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.RoomUpdateRequest;
-import cloud.project.datagenerator.websockets.DataGeneratorWebSocketHandler;
+import cloud.project.datagenerator.websockets.DataGeneratorHotelsWebSocketHandler;
 import cloud.project.datagenerator.websockets.HotelUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,7 +28,7 @@ public class HotelsDataGenerator {
     private final HotelRepository hotelRepository;
     private final Random random = new Random();
     private final RabbitTemplate rabbitTemplate;
-    private final DataGeneratorWebSocketHandler dataGeneratorWebSocketHandler;
+    private final DataGeneratorHotelsWebSocketHandler dataGeneratorHotelsWebSocketHandler;
 
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
     public void updateRandomHotelData() {
@@ -138,6 +138,6 @@ public class HotelsDataGenerator {
                 .capacityChange(capacityChange)
                 .build();
 
-        dataGeneratorWebSocketHandler.updateHotelList(hotelUpdate);
+        dataGeneratorHotelsWebSocketHandler.updateHotelList(hotelUpdate);
     }
 }

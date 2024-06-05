@@ -13,10 +13,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 @Component
-public class DataGeneratorWebSocketHandler extends TextWebSocketHandler {
+public class DataGeneratorHotelsWebSocketHandler extends TextWebSocketHandler {
 
     private final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
-    private static final Logger logger = Logger.getLogger("DataGeneratorWebSocketHandler");
+    private static final Logger logger = Logger.getLogger("DataGeneratorHotelsWebSocketHandler");
     private final LinkedList<HotelUpdate> recentHotelUpdates = new LinkedList<>();
 
     @Override
@@ -24,10 +24,6 @@ public class DataGeneratorWebSocketHandler extends TextWebSocketHandler {
         logger.info("Add session " + session.getId());
         sessions.add(session);
         sendAllHotelUpdates();
-    }
-
-    @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) {
     }
 
     @Override
