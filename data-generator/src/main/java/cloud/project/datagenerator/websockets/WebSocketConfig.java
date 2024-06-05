@@ -1,5 +1,7 @@
 package cloud.project.datagenerator.websockets;
 
+import cloud.project.datagenerator.websockets.hotels.DataGeneratorHotelsWebSocketHandler;
+import cloud.project.datagenerator.websockets.transports.DataGeneratorTransportsWebSocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

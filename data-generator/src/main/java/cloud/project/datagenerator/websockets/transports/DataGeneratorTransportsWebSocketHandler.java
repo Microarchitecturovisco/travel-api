@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.websockets;
+package cloud.project.datagenerator.websockets.transports;
 
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import org.springframework.stereotype.Component;
@@ -13,17 +13,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 @Component
-public class DataGeneratorHotelsWebSocketHandler extends TextWebSocketHandler {
+public class DataGeneratorTransportsWebSocketHandler extends TextWebSocketHandler {
 
     private final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
-    private static final Logger logger = Logger.getLogger("DataGeneratorHotelsWebSocketHandler");
-    private final LinkedList<HotelUpdate> recentHotelUpdates = new LinkedList<>();
+    private static final Logger logger = Logger.getLogger("DataGeneratorTransportsWebSocketHandler");
+    private final LinkedList<TransportUpdate> recentTransportUpdates = new LinkedList<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         logger.info("Add session " + session.getId());
         sessions.add(session);
-        sendAllHotelUpdates();
+        sendAllTransportUpdates();
     }
 
     @Override
@@ -33,9 +33,9 @@ public class DataGeneratorHotelsWebSocketHandler extends TextWebSocketHandler {
         super.afterConnectionClosed(session, status);
     }
 
-    public void updateHotelList(HotelUpdate hotelUpdate) {
-        updateHotelUpdatesList(hotelUpdate);
-        sendNewHotelUpdate(hotelUpdate);
+    public void updateTransportList(TransportUpdate transportUpdate) {
+        updateTransportUpdatesList(transportUpdate);
+        sendNewTransportUpdate(transportUpdate);
     }
     
     public void sendMessageToFrontend(String message) {
@@ -51,23 +51,23 @@ public class DataGeneratorHotelsWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void updateHotelUpdatesList(HotelUpdate hotelUpdate) {
-        recentHotelUpdates.addLast(hotelUpdate);
-        int maxHotelRequestsCount = 30;
-        if (recentHotelUpdates.size() > maxHotelRequestsCount) {
-            recentHotelUpdates.removeLast();
+    private void updateTransportUpdatesList(TransportUpdate transportUpdate) {
+        recentTransportUpdates.addLast(transportUpdate);
+        int maxTransportRequestsCount = 30;
+        if (recentTransportUpdates.size() > maxTransportRequestsCount) {
+            recentTransportUpdates.removeLast();
         }
     }
 
-    private void sendNewHotelUpdate(HotelUpdate hotelUpdate) {
-        String hotelUpdateJson = JsonConverter.convert(hotelUpdate);
-        sendMessageToFrontend("SingleHotel: " + hotelUpdateJson);
+    private void sendNewTransportUpdate(TransportUpdate transportUpdate) {
+        String transportUpdateJson = JsonConverter.convert(transportUpdate);
+        sendMessageToFrontend("SingleTransport: " + transportUpdateJson);
     }
 
-    private void sendAllHotelUpdates() {
-        for (HotelUpdate hotelUpdate : recentHotelUpdates) {
-            String hotelUpdateJson = JsonConverter.convert(hotelUpdate);
-            sendMessageToFrontend("SingleHotel: " + hotelUpdateJson);
+    private void sendAllTransportUpdates() {
+        for (TransportUpdate transportUpdate : recentTransportUpdates) {
+            String transportUpdateJson = JsonConverter.convert(transportUpdate);
+            sendMessageToFrontend("SingleTransport: " + transportUpdateJson);
         }
     }
 }

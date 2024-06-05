@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.websockets;
+package cloud.project.datagenerator.websockets.hotels;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,12 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TransportUpdate implements Serializable {
+public class HotelUpdate implements Serializable {
     private LocalDateTime updateDateTime;
     private String updateType;
-    private String departureRegionAndCountry;
-    private String arrivalRegionAndCountry;
-    private String transportTypeName;
+    private String hotelName;
+    private String roomName;
     private float priceChange;
     private int capacityChange;
 }
