@@ -5,7 +5,7 @@ import cloud.project.datagenerator.hotels.domain.Room;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
 import cloud.project.datagenerator.rabbitmq.QueuesConfig;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
-import cloud.project.datagenerator.rabbitmq.requests.RoomUpdateRequest;
+import cloud.project.datagenerator.rabbitmq.requests.hotels.RoomUpdateRequest;
 import cloud.project.datagenerator.websockets.hotels.DataGeneratorHotelsWebSocketHandler;
 import cloud.project.datagenerator.websockets.hotels.HotelUpdate;
 import lombok.RequiredArgsConstructor;

@@ -2,7 +2,7 @@ package cloud.project.datagenerator.transports;
 
 import cloud.project.datagenerator.rabbitmq.QueuesConfig;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
-import cloud.project.datagenerator.rabbitmq.requests.TransportUpdateRequest;
+import cloud.project.datagenerator.rabbitmq.requests.transports.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
 import cloud.project.datagenerator.transports.repositories.TransportCourseRepository;
