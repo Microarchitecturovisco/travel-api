@@ -3,7 +3,6 @@ package cloud.project.datagenerator.hotels;
 import cloud.project.datagenerator.hotels.domain.Hotel;
 import cloud.project.datagenerator.hotels.domain.Room;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
-import cloud.project.datagenerator.rabbitmq.QueuesConfig;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.RoomUpdateRequest;
 import cloud.project.datagenerator.websockets.DataGeneratorWebSocketHandler;
@@ -69,7 +68,7 @@ public class HotelsDataGenerator {
 
         Room randomRoom = randomHotel.getRooms().get(random.nextInt(randomHotel.getRooms().size()));
         int currentGuestCapacity = randomRoom.getGuestCapacity();
-        int newGuestCapacity = random.nextInt(1, currentGuestCapacity + 10);
+        int newGuestCapacity = random.nextInt(currentGuestCapacity, currentGuestCapacity + 10);
 
         float currentPricePerAdult = randomRoom.getPricePerAdult();
         float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult*10);
@@ -123,10 +122,11 @@ public class HotelsDataGenerator {
 
         System.out.println(updateType + " - Room: " + roomUpdateRequestJson);
 
-        rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
+        // debug only
+//        rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
     }
 
-    public void updateHotelUpdatesOnFrontend(DataUpdateType updateType, String roomName, String hotelName, int capacityChange, float priceChange) {
+    private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, String roomName, String hotelName, int capacityChange, float priceChange) {
         LocalDateTime currentDateAndTime = LocalDateTime.now().withSecond(0).withNano(0);
 
         HotelUpdate hotelUpdate = HotelUpdate.builder()
