@@ -6,11 +6,14 @@ import cloud.project.datagenerator.hotels.repositories.HotelRepository;
 import cloud.project.datagenerator.rabbitmq.QueuesConfig;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.RoomUpdateRequest;
+import cloud.project.datagenerator.websockets.DataGeneratorWebSocketHandler;
+import cloud.project.datagenerator.websockets.HotelUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -26,6 +29,7 @@ public class HotelsDataGenerator {
     private final HotelRepository hotelRepository;
     private final Random random = new Random();
     private final RabbitTemplate rabbitTemplate;
+    private final DataGeneratorWebSocketHandler dataGeneratorWebSocketHandler;
 
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
     public void updateRandomHotelData() {
@@ -55,6 +59,8 @@ public class HotelsDataGenerator {
                 .build();
 
         updateHotelDataInHotelModules(DataUpdateType.CREATE, newRoom);
+
+        updateHotelUpdatesOnFrontend(DataUpdateType.CREATE, newRoom.getName(), randomHotel.getName(), 0, 0);
     }
 
     private void updateRandomRoom() {
@@ -72,6 +78,11 @@ public class HotelsDataGenerator {
         randomRoom.setPricePerAdult(newPricePerAdult);
 
         updateHotelDataInHotelModules(DataUpdateType.UPDATE, randomRoom);
+
+        int capacityChange = newGuestCapacity - currentGuestCapacity;
+        float priceChange = newPricePerAdult - currentPricePerAdult;
+
+        updateHotelUpdatesOnFrontend(DataUpdateType.UPDATE, randomRoom.getName(), randomHotel.getName(), capacityChange, priceChange);
     }
 
     private Hotel getRandomHotel() {
@@ -113,11 +124,20 @@ public class HotelsDataGenerator {
         System.out.println(updateType + " - Room: " + roomUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfig.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
-
-        sendUpdateToFrontend(updateType, room);
     }
 
-    private void sendUpdateToFrontend(DataUpdateType updateType, Room room){
-        //TODO: here send a message to frontend via websocket
+    public void updateHotelUpdatesOnFrontend(DataUpdateType updateType, String roomName, String hotelName, int capacityChange, float priceChange) {
+        LocalDateTime currentDateAndTime = LocalDateTime.now().withSecond(0).withNano(0);
+
+        HotelUpdate hotelUpdate = HotelUpdate.builder()
+                .updateDateTime(currentDateAndTime)
+                .updateType(String.valueOf(updateType))
+                .hotelName(hotelName)
+                .roomName(roomName)
+                .priceChange(priceChange)
+                .capacityChange(capacityChange)
+                .build();
+
+        dataGeneratorWebSocketHandler.updateHotelList(hotelUpdate);
     }
 }
