@@ -89,7 +89,7 @@ public class Bootstrap implements CommandLineRunner {
                         .build()
                 );
 
-                createReservationsForTransport(planeCourse, capacity, transportDto);
+//                createReservationsForTransport(planeCourse, capacity, transportDto);
             }
 
             for (TransportCourseDto busCourse : busCourses) {

@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -69,7 +70,7 @@ public class TransportsDataGenerator {
     }
 
     private void updateRandomTransport() {
-        Transport randomTransport = getRandomTransport();
+        Transport randomTransport = getRandomTransportWithoutReservations();
         if (randomTransport == null) return;
 
         int currentGuestCapacity = randomTransport.getCapacity();
@@ -100,17 +101,6 @@ public class TransportsDataGenerator {
         return transportCourses.get(random.nextInt(transportCourses.size()));
     }
 
-    private Transport getRandomTransport() {
-        List<Transport> transports = transportRepository.findAll();
-
-        if (transports.isEmpty()) {
-            System.out.println("No transports found.");
-            return null;
-        }
-
-        return transports.get(random.nextInt(transports.size()));
-    }
-
     public void updateTransportDataInTransportModules(DataUpdateType updateType, Transport transport) {
         TransportUpdateRequest transportUpdateRequest = TransportUpdateRequest.builder()
                 .updateType(String.valueOf(updateType))
@@ -127,6 +117,30 @@ public class TransportsDataGenerator {
 
         rabbitTemplate.convertAndSend(QueuesConfigTransports.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
     }
+
+    private Transport getRandomTransportWithoutReservations() {
+        List<Transport> transports = transportRepository.findAll();
+
+        if (transports.isEmpty()) {
+            System.out.println("No transports found.");
+            return null;
+        }
+
+        List<Transport> transportsWithoutReservations = new ArrayList<>();
+        for (Transport transport : transports) {
+            if (transport.getTransportReservations().isEmpty()) {
+                transportsWithoutReservations.add(transport);
+            }
+        }
+
+        if (transportsWithoutReservations.isEmpty()) {
+            System.out.println("No transports found without reservations.");
+            return null;
+        }
+
+        return transportsWithoutReservations.get(random.nextInt(transportsWithoutReservations.size()));
+    }
+
 
     private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, Transport transport, int capacityChange, float priceChange) {
         LocalDateTime currentDateAndTime = LocalDateTime.now().withSecond(0).withNano(0);

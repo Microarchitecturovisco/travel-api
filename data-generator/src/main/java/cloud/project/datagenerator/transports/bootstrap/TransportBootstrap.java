@@ -83,7 +83,7 @@ public class TransportBootstrap implements CommandLineRunner {
                 transportCourseRepository.save(planeCourse);
                 transportRepository.save(transport);
 
-                createReservationsForTransport(planeCourse, capacity, transport);
+//                createReservationsForTransport(planeCourse, capacity, transport);
             }
 
             for (TransportCourse busCourse : busCourses) {
