@@ -121,7 +121,7 @@ public class HotelsDataGenerator {
 
         String roomUpdateRequestJson = JsonConverter.convert(roomUpdateRequest);
 
-        System.out.println(updateType + " - Room: " + roomUpdateRequestJson);
+//        System.out.println(updateType + " - Room: " + roomUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfigHotels.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
     }

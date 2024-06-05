@@ -123,7 +123,7 @@ public class TransportsDataGenerator {
 
         String transportUpdateRequestJson = JsonConverter.convert(transportUpdateRequest);
 
-        System.out.println(updateType + " - Transport: " + transportUpdateRequestJson);
+//        System.out.println(updateType + " - Transport: " + transportUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfigTransports.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
     }
