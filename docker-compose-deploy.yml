@@ -10,8 +10,21 @@ services:
     networks:
       - backend
 
+  front:
+    image: ghcr.io/microarchitecturovisco/travel-ui:latest
+    hostname: front
+    ports:
+      - "80:80"
+    depends_on:
+      - rabbitmq
+      - discovery
+    networks:
+      - backend
+    env_file:
+      - .frontend-env
+
   discovery:
-    image: rsww_184249-discovery
+    image: ghcr.io/microarchitecturovisco/discovery:latest
     hostname: discovery
     ports:
       - "18451:8010"
@@ -21,7 +34,7 @@ services:
       - backend
 
   gateway:
-    image: rsww_184249-gateway
+    image: ghcr.io/microarchitecturovisco/gateway:latest
     ports:
       - "18469:8082"
     depends_on:
@@ -31,9 +44,8 @@ services:
       - backend
 
 
-  # custom services
   hotel:
-    image: rsww_184249-hotel
+    image: ghcr.io/microarchitecturovisco/hotel:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -42,7 +54,7 @@ services:
       - backend
 
   offer-provider:
-    image: rsww_184249-offer-provider
+    image: ghcr.io/microarchitecturovisco/offer-provider:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -51,7 +63,7 @@ services:
       - backend
 
   payment:
-    image: rsww_184249-payment
+    image: ghcr.io/microarchitecturovisco/payment:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -60,7 +72,7 @@ services:
       - backend
 
   reservation:
-    image: rsww_184249-reservation
+    image: ghcr.io/microarchitecturovisco/reservation:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -69,7 +81,7 @@ services:
       - backend
 
   transport:
-    image: rsww_184249-transport
+    image: ghcr.io/microarchitecturovisco/transport:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -78,7 +90,7 @@ services:
       - backend
 
   user:
-    image: rsww_184249-user
+    image: ghcr.io/microarchitecturovisco/user:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -86,16 +98,16 @@ services:
     networks:
       - backend
 
-  data-generator:
-    image: mcarchvsc-data-generator
-    depends_on:
-      - rabbitmq
-      - discovery
-      - gateway
-      - hotel
-      - transport
-    networks:
-      - backend
+#  data-generator:
+#    image: ghcr.io/microarchitecturovisco/data-generator:latest
+#    depends_on:
+#      - rabbitmq
+#      - discovery
+#      - gateway
+#      - hotel
+#      - transport
+#    networks:
+#      - backend
 
 networks:
   backend:
