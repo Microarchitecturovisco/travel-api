@@ -77,7 +77,7 @@ public class TransportsDataGenerator {
         int newGuestCapacity = random.nextInt(0, (int) (currentGuestCapacity * random.nextDouble(0.1, 1.5)));
 
         float currentPricePerAdult = randomTransport.getPricePerAdult();
-        float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult*10);
+        float newPricePerAdult = random.nextFloat(100, currentPricePerAdult + 100);
 
         int capacityChange = newGuestCapacity - currentGuestCapacity;
         float priceChange = newPricePerAdult - currentPricePerAdult;
@@ -87,7 +87,7 @@ public class TransportsDataGenerator {
 
         updateTransportDataInTransportModules(DataUpdateType.UPDATE, randomTransport);
 
-        updateHotelUpdatesOnFrontend(DataUpdateType.CREATE, randomTransport, capacityChange, priceChange);
+        updateHotelUpdatesOnFrontend(DataUpdateType.UPDATE, randomTransport, capacityChange, priceChange);
     }
 
     private TransportCourse getRandomTransportCourse() {

@@ -74,7 +74,7 @@ public class HotelsDataGenerator {
         int newGuestCapacity = random.nextInt(currentGuestCapacity, currentGuestCapacity + 10);
 
         float currentPricePerAdult = randomRoom.getPricePerAdult();
-        float newPricePerAdult = random.nextFloat(currentPricePerAdult, currentPricePerAdult * 10);
+        float newPricePerAdult = random.nextFloat(100, currentPricePerAdult + 100);
 
         randomRoom.setGuestCapacity(newGuestCapacity);
         randomRoom.setPricePerAdult(newPricePerAdult);
