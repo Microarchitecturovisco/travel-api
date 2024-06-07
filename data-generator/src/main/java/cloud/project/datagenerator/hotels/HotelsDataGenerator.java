@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Component
 @RequiredArgsConstructor
@@ -32,7 +33,8 @@ public class HotelsDataGenerator {
     private final Random random = new Random();
     private final RabbitTemplate rabbitTemplate;
     private final DataGeneratorHotelsWebSocketHandler dataGeneratorHotelsWebSocketHandler;
-
+    Logger logger = Logger.getLogger("DataGenerator | Hotels");
+    
     @Scheduled(fixedDelay = 5000, initialDelay = 10000)
     public void updateRandomHotelData() {
         int action = random.nextInt(2);
@@ -92,7 +94,7 @@ public class HotelsDataGenerator {
         List<Hotel> hotels = hotelRepository.findAll();
 
         if (hotels.isEmpty()) {
-            System.out.println("No hotels found.");
+            logger.info("No hotels found.");
             return null;
         }
 
@@ -106,7 +108,7 @@ public class HotelsDataGenerator {
         }
 
         if (roomsWithoutReservations.isEmpty()) {
-            System.out.println("No rooms found without reservations.");
+            logger.info("No rooms found without reservations.");
             return null;
         }
 
@@ -117,7 +119,7 @@ public class HotelsDataGenerator {
         List<Hotel> hotels = hotelRepository.findAll();
 
         if (hotels.isEmpty()) {
-            System.out.println("No hotels found.");
+            logger.info("No hotels found.");
             return null;
         }
 
@@ -129,7 +131,7 @@ public class HotelsDataGenerator {
         } while (randomHotel.getRooms().isEmpty() && attempts < hotels.size());
 
         if (randomHotel.getRooms().isEmpty()) {
-            System.out.println("No rooms found in the selected hotel.");
+            logger.info("No rooms found in the selected hotel.");
             return null;
         }
 
@@ -149,7 +151,7 @@ public class HotelsDataGenerator {
 
         String roomUpdateRequestJson = JsonConverter.convert(roomUpdateRequest);
 
-//        System.out.println(updateType + " - Room: " + roomUpdateRequestJson);
+        logger.info(updateType + " - Room: " + roomUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfigHotels.EXCHANGE_HOTEL_FANOUT_UPDATE_DATA, "", roomUpdateRequestJson);
     }

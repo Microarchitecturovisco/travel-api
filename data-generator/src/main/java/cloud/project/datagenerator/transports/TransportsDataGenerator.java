@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class TransportsDataGenerator {
     private final TransportRepository transportRepository;
     private final TransportCourseRepository transportCourseRepository;
     private final DataGeneratorTransportsWebSocketHandler dataGeneratorTransportsWebSocketHandler;
+    Logger logger = Logger.getLogger("DataGenerator | Transports");
 
     @Scheduled(fixedDelay = 5000, initialDelay = 12500)
     public void updateRandomTransportData() {
@@ -94,7 +96,7 @@ public class TransportsDataGenerator {
         List<TransportCourse> transportCourses = transportCourseRepository.findAll();
 
         if (transportCourses.isEmpty()) {
-            System.out.println("No transport courses found.");
+            logger.info("No transport courses found.");
             return null;
         }
 
@@ -113,7 +115,7 @@ public class TransportsDataGenerator {
 
         String transportUpdateRequestJson = JsonConverter.convert(transportUpdateRequest);
 
-//        System.out.println(updateType + " - Transport: " + transportUpdateRequestJson);
+        logger.info(updateType + " - Transport: " + transportUpdateRequestJson);
 
         rabbitTemplate.convertAndSend(QueuesConfigTransports.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
     }
@@ -122,7 +124,7 @@ public class TransportsDataGenerator {
         List<Transport> transports = transportRepository.findAll();
 
         if (transports.isEmpty()) {
-            System.out.println("No transports found.");
+            logger.info("No transports found.");
             return null;
         }
 
@@ -134,7 +136,7 @@ public class TransportsDataGenerator {
         }
 
         if (transportsWithoutReservations.isEmpty()) {
-            System.out.println("No transports found without reservations.");
+            logger.info("No transports found without reservations.");
             return null;
         }
 
