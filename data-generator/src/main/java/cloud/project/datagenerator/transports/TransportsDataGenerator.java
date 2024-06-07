@@ -5,8 +5,7 @@ import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.transports.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
-import cloud.project.datagenerator.transports.repositories.TransportCourseRepository;
-import cloud.project.datagenerator.transports.repositories.TransportRepository;
+import cloud.project.datagenerator.transports.utils.TransportUtils;
 import cloud.project.datagenerator.websockets.transports.DataGeneratorTransportsWebSocketHandler;
 import cloud.project.datagenerator.websockets.transports.TransportUpdate;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -31,10 +28,9 @@ public class TransportsDataGenerator {
 
     private final Random random = new Random();
     private final RabbitTemplate rabbitTemplate;
-    private final TransportRepository transportRepository;
-    private final TransportCourseRepository transportCourseRepository;
     private final DataGeneratorTransportsWebSocketHandler dataGeneratorTransportsWebSocketHandler;
-    Logger logger = Logger.getLogger("DataGenerator | Transports");
+    private final Logger logger = Logger.getLogger("DataGenerator | Transports");
+    private final TransportUtils transportUtils;
 
     @Scheduled(fixedDelay = 5000, initialDelay = 12500)
     public void updateRandomTransportData() {
@@ -51,7 +47,7 @@ public class TransportsDataGenerator {
     }
 
     private void createNewTransport() {
-        TransportCourse randomTransportCourse = getRandomTransportCourse();
+        TransportCourse randomTransportCourse = transportUtils.getRandomTransportCourse();
         if (randomTransportCourse == null) return;
 
         LocalDateTime departureDate = LocalDateTime.now().plusDays(1)
@@ -68,15 +64,15 @@ public class TransportsDataGenerator {
 
         updateTransportDataInTransportModules(DataUpdateType.CREATE, newTransport);
 
-        updateHotelUpdatesOnFrontend(DataUpdateType.CREATE, newTransport, 0, 0);
+        updateTransportUpdatesOnFrontend(DataUpdateType.CREATE, newTransport, 0, 0);
     }
 
     private void updateRandomTransport() {
-        Transport randomTransport = getRandomTransportWithoutReservations();
+        Transport randomTransport = transportUtils.getRandomTransport();
         if (randomTransport == null) return;
 
         int currentGuestCapacity = randomTransport.getCapacity();
-        int newGuestCapacity = random.nextInt(0, (int) (currentGuestCapacity * random.nextDouble(0.1, 1.5)));
+        int newGuestCapacity = random.nextInt(currentGuestCapacity, currentGuestCapacity + 10);
 
         float currentPricePerAdult = randomTransport.getPricePerAdult();
         float newPricePerAdult = random.nextFloat(100, currentPricePerAdult + 100);
@@ -89,18 +85,7 @@ public class TransportsDataGenerator {
 
         updateTransportDataInTransportModules(DataUpdateType.UPDATE, randomTransport);
 
-        updateHotelUpdatesOnFrontend(DataUpdateType.UPDATE, randomTransport, capacityChange, priceChange);
-    }
-
-    private TransportCourse getRandomTransportCourse() {
-        List<TransportCourse> transportCourses = transportCourseRepository.findAll();
-
-        if (transportCourses.isEmpty()) {
-            logger.info("No transport courses found.");
-            return null;
-        }
-
-        return transportCourses.get(random.nextInt(transportCourses.size()));
+        updateTransportUpdatesOnFrontend(DataUpdateType.UPDATE, randomTransport, capacityChange, priceChange);
     }
 
     public void updateTransportDataInTransportModules(DataUpdateType updateType, Transport transport) {
@@ -120,31 +105,7 @@ public class TransportsDataGenerator {
         rabbitTemplate.convertAndSend(QueuesConfigTransports.EXCHANGE_TRANSPORT_FANOUT_UPDATE_DATA, "", transportUpdateRequestJson);
     }
 
-    private Transport getRandomTransportWithoutReservations() {
-        List<Transport> transports = transportRepository.findAll();
-
-        if (transports.isEmpty()) {
-            logger.info("No transports found.");
-            return null;
-        }
-
-        List<Transport> transportsWithoutReservations = new ArrayList<>();
-        for (Transport transport : transports) {
-            if (transport.getTransportReservations().isEmpty()) {
-                transportsWithoutReservations.add(transport);
-            }
-        }
-
-        if (transportsWithoutReservations.isEmpty()) {
-            logger.info("No transports found without reservations.");
-            return null;
-        }
-
-        return transportsWithoutReservations.get(random.nextInt(transportsWithoutReservations.size()));
-    }
-
-
-    private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, Transport transport, int capacityChange, float priceChange) {
+    private void updateTransportUpdatesOnFrontend(DataUpdateType updateType, Transport transport, int capacityChange, float priceChange) {
         LocalDateTime currentDateAndTime = LocalDateTime.now().withSecond(0).withNano(0);
 
         String departureRegion = transport.getCourse().getDepartureFrom().getRegion();

@@ -2,7 +2,7 @@ package cloud.project.datagenerator.hotels;
 
 import cloud.project.datagenerator.hotels.domain.Hotel;
 import cloud.project.datagenerator.hotels.domain.Room;
-import cloud.project.datagenerator.hotels.repositories.HotelRepository;
+import cloud.project.datagenerator.hotels.utils.HotelUtils;
 import cloud.project.datagenerator.rabbitmq.QueuesConfigHotels;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.hotels.RoomUpdateRequest;
@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -27,12 +26,12 @@ public class HotelsDataGenerator {
         UPDATE
     }
 
-    private final HotelRepository hotelRepository;
     private final Random random = new Random();
     private final RabbitTemplate rabbitTemplate;
     private final DataGeneratorHotelsWebSocketHandler dataGeneratorHotelsWebSocketHandler;
-    Logger logger = Logger.getLogger("DataGenerator | Hotels");
-    
+    private final Logger logger = Logger.getLogger("DataGenerator | Hotels");
+    private final HotelUtils hotelUtils;
+
     @Scheduled(fixedDelay = 5000, initialDelay = 10000)
     public void updateRandomHotelData() {
         int action = random.nextInt(2);
@@ -48,7 +47,7 @@ public class HotelsDataGenerator {
     }
 
     private void createNewRoom() {
-        Hotel randomHotel = getRandomHotel();
+        Hotel randomHotel = hotelUtils.getRandomHotel();
         if (randomHotel == null) return;
 
         Room newRoom = Room.builder()
@@ -66,10 +65,10 @@ public class HotelsDataGenerator {
     }
 
     private void updateRandomRoom() {
-        Hotel randomHotel = getRandomHotel();
+        Hotel randomHotel = hotelUtils.getRandomHotel();
         if (randomHotel == null) return;
 
-        Room randomRoom = getRandomRoomFromHotel(randomHotel);
+        Room randomRoom = hotelUtils.getRandomRoomFromHotel(randomHotel);
         if (randomRoom == null) return;
 
         int currentGuestCapacity = randomRoom.getGuestCapacity();
@@ -87,28 +86,6 @@ public class HotelsDataGenerator {
         float priceChange = newPricePerAdult - currentPricePerAdult;
 
         updateHotelUpdatesOnFrontend(DataUpdateType.UPDATE, randomRoom.getName(), randomHotel.getName(), capacityChange, priceChange);
-    }
-
-    private Hotel getRandomHotel() {
-        List<Hotel> hotels = hotelRepository.findAll();
-
-        if (hotels.isEmpty()) {
-            logger.info("No hotels found.");
-            return null;
-        }
-
-        return hotels.get(random.nextInt(hotels.size()));
-    }
-
-    private Room getRandomRoomFromHotel(Hotel hotel) {
-        List<Room> rooms = hotel.getRooms();
-
-        if (rooms.isEmpty()) {
-            logger.info("No rooms found in the selected hotel.");
-            return null;
-        }
-
-        return rooms.get(random.nextInt(rooms.size()));
     }
 
     public void updateHotelDataInHotelModules(DataUpdateType updateType, Room room) {
