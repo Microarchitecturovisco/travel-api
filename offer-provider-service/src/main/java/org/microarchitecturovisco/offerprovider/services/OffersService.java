@@ -307,7 +307,7 @@ public class OffersService {
                         List.of(hotelResponseDto.getLocation().getIdLocation()),
                         dates.getFirst(), dates.getSecond(),
                         requestDto.getAdults(), requestDto.getInfants(), requestDto.getKids(), requestDto.getTeens()
-                ).stream().sorted(Comparator.comparing(pair -> pair.getFirst().getPricePerAdult())).toList();
+                ).stream().sorted(Comparator.comparing(pair -> pair.getFirst().getPricePerAdult() + pair.getLast().getPricePerAdult())).toList();
 
                 List<TransportDto> transportsToHotel = transports
                         .stream()
@@ -329,6 +329,25 @@ public class OffersService {
 
                 List<CateringOptionDto> catering = hotelResponseDto.getCateringOptions().stream()
                         .sorted(Comparator.comparing(CateringOptionDto::getPrice)).toList();
+
+                if (roomConfigs.isEmpty() || transportsFromHotel.isEmpty() || transportsToHotel.isEmpty()) {
+                    return GetOfferDetailsResponseDto.builder()
+                            .idHotel(hotelResponseDto.getHotelId())
+                            .hotelName(hotelResponseDto.getHotelName())
+                            .description(hotelResponseDto.getDescription())
+                            .destination(hotelResponseDto.getLocation())
+                            .price(-1.0f)
+                            .roomConfiguration(!roomConfigs.isEmpty() ? roomConfigs.getFirst()
+                                     : RoomsConfigurationDto.builder().rooms(new ArrayList<>()).pricePerAdult(-1.0f).build())
+                            .possibleRoomConfigurations(!roomConfigs.isEmpty() ? roomConfigs.subList(1, roomConfigs.size()) : List.of())
+                            .departure((!transportsToHotel.isEmpty() && !transportsFromHotel.isEmpty()) ? List.of(transportsToHotel.getFirst(), transportsFromHotel.getFirst()) : List.of())
+                            .possibleDepartures(
+                                    (!transportsToHotel.isEmpty() && !transportsFromHotel.isEmpty())
+                                    ? List.of(transportsToHotel.subList(1, transportsToHotel.size()), transportsFromHotel.subList(1, transportsFromHotel.size())) : List.of())
+                            .imageUrls(hotelResponseDto.getPhotos())
+                            .cateringOptions(catering)
+                            .build();
+                }
 
                 return GetOfferDetailsResponseDto.builder()
                         .idHotel(hotelResponseDto.getHotelId())
@@ -364,6 +383,8 @@ public class OffersService {
 
     public Float getOfferPrice(GetOfferPriceRequestDto requestDto) {
         Pair<LocalDateTime, LocalDateTime> dates = parseDates(requestDto.getDateFrom(), requestDto.getDateTo());
+
+//        if (requestDto.getDeparture())
 
         return calculatePrice(
                 (int) ChronoUnit.DAYS.between(dates.getFirst(), dates.getSecond()),
