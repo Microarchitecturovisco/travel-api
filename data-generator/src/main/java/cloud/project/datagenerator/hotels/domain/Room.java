@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -33,5 +34,6 @@ public class Room {
     @Lob
     private String description;
 
-    // List of room reservations for each room is empty
+    @OneToMany(mappedBy="room", fetch = FetchType.EAGER)
+    private List<RoomReservation> roomReservations;
 }
