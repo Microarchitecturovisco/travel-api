@@ -11,6 +11,8 @@ import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDt
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportsBasedOnSearchQueryResponse;
 import org.microarchitecturovisco.offerprovider.domain.exceptions.ServiceTimeoutException;
 import org.microarchitecturovisco.offerprovider.domain.exceptions.WrongDateFormatException;
+import org.microarchitecturovisco.offerprovider.domain.requests.GetOfferDetailsRequestDto;
+import org.microarchitecturovisco.offerprovider.domain.requests.GetOfferPriceRequestDto;
 import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonConverter;
 import org.microarchitecturovisco.offerprovider.utils.json.JsonReader;
@@ -270,36 +272,26 @@ public class OffersService {
 
     }
 
-    public GetOfferDetailsResponseDto getOfferDetails(
-            UUID idHotel,
-            String dateFrom,
-            String dateTo,
-            List<UUID> departureBuses,
-            List<UUID> departurePlanes,
-            Integer adults,
-            Integer infants,
-            Integer kids,
-            Integer teens
-    ) {
-        Pair<LocalDateTime, LocalDateTime> dates = parseDates(dateFrom, dateTo);
+    public GetOfferDetailsResponseDto getOfferDetails(GetOfferDetailsRequestDto requestDto) {
+        Pair<LocalDateTime, LocalDateTime> dates = parseDates(requestDto.getDateFrom(), requestDto.getDateTo());
 
-        GetHotelDetailsRequestDto requestDto = GetHotelDetailsRequestDto.builder()
-                .hotelId(idHotel)
+        GetHotelDetailsRequestDto hotelDetailsRequestDto = GetHotelDetailsRequestDto.builder()
+                .hotelId(requestDto.getIdHotel())
                 .dateFrom(dates.getFirst())
                 .dateTo(dates.getSecond())
-                .adults(adults)
-                .childrenUnderThree(infants)
-                .childrenUnderTen(kids)
-                .childrenUnderEighteen(teens)
+                .adults(requestDto.getAdults())
+                .childrenUnderThree(requestDto.getInfants())
+                .childrenUnderTen(requestDto.getKids())
+                .childrenUnderEighteen(requestDto.getTeens())
                 .build();
 
-        String getOfferDetailsRequestString = JsonConverter.convert(requestDto);
+        String getHotelDetailsRequestString = JsonConverter.convert(hotelDetailsRequestDto);
 
         try {
             byte[] getOfferDetailsBytes = (byte[]) rabbitTemplate.convertSendAndReceive(
                     "hotels.requests.getHotelDetails",
                     "hotels.requests.getHotelDetails",
-                    getOfferDetailsRequestString
+                    getHotelDetailsRequestString
             );
 
             if (getOfferDetailsBytes != null) {
@@ -308,13 +300,13 @@ public class OffersService {
                 GetHotelDetailsResponseDto hotelResponseDto = JsonReader.readJson(getOfferDetailsResponseString, GetHotelDetailsResponseDto.class);
 
                 Logger logger = Logger.getLogger("Offer Provider");
-                logger.info("Offer details" + idHotel + ": Received hotel details");
+                logger.info("Offer details" + requestDto.getIdHotel() + ": Received hotel details");
 
                 List<List<TransportDto>> transports = getFilteredTransportsFromTransportModule(
-                        departureBuses, departurePlanes,
+                        requestDto.getDepartureBuses(), requestDto.getDeparturePlanes(),
                         List.of(hotelResponseDto.getLocation().getIdLocation()),
                         dates.getFirst(), dates.getSecond(),
-                        adults, infants, kids, teens
+                        requestDto.getAdults(), requestDto.getInfants(), requestDto.getKids(), requestDto.getTeens()
                 ).stream().sorted(Comparator.comparing(pair -> pair.getFirst().getPricePerAdult())).toList();
 
                 List<TransportDto> transportsToHotel = transports
@@ -328,12 +320,11 @@ public class OffersService {
                         .map(List::getLast)
                         .toList();
 
-                logger.info("Offer details " + idHotel + ": Received transports to hotel");
+                logger.info("Offer details " + requestDto.getIdHotel() + ": Received transports to hotel");
 
-                List<List<RoomResponseDto>> roomConfigs = hotelResponseDto
+                List<RoomsConfigurationDto> roomConfigs = hotelResponseDto
                         .getRoomsConfigurations().stream()
                         .sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult))
-                        .map(RoomsConfigurationDto::getRooms)
                         .toList();
 
                 List<CateringOptionDto> catering = hotelResponseDto.getCateringOptions().stream()
@@ -346,7 +337,7 @@ public class OffersService {
                         .destination(hotelResponseDto.getLocation())
                         .price(calculatePrice(
                                 (int) ChronoUnit.DAYS.between(dates.getFirst(), dates.getSecond()),
-                                adults, infants, kids, teens,
+                                requestDto.getAdults(), requestDto.getInfants(), requestDto.getKids(), requestDto.getTeens(),
                                 hotelResponseDto.getRoomsConfigurations().stream().sorted(Comparator.comparing(RoomsConfigurationDto::getPricePerAdult)).toList().getFirst().getPricePerAdult(),
                                 catering.isEmpty() ? 0.0f : catering.getFirst().getPrice(),
                                 (int) ChronoUnit.DAYS.between(dates.getFirst(), LocalDateTime.now()),
@@ -369,5 +360,18 @@ public class OffersService {
             e.printStackTrace();
             throw new ServiceTimeoutException();
         }
+    }
+
+    public Float getOfferPrice(GetOfferPriceRequestDto requestDto) {
+        Pair<LocalDateTime, LocalDateTime> dates = parseDates(requestDto.getDateFrom(), requestDto.getDateTo());
+
+        return calculatePrice(
+                (int) ChronoUnit.DAYS.between(dates.getFirst(), dates.getSecond()),
+                requestDto.getAdults(), requestDto.getInfants(), requestDto.getKids(), requestDto.getTeens(),
+                requestDto.getRoomConfiguration().getPricePerAdult(),
+                requestDto.getCateringOption().getPrice(),
+                (int) ChronoUnit.DAYS.between(dates.getFirst(), LocalDateTime.now()),
+                requestDto.getDeparture().getFirst().getPricePerAdult() + requestDto.getDeparture().getLast().getPricePerAdult()
+        );
     }
 }
