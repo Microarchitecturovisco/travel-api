@@ -5,6 +5,7 @@ import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.transports.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
+import cloud.project.datagenerator.transports.repositories.TransportRepository;
 import cloud.project.datagenerator.transports.utils.TransportUtils;
 import cloud.project.datagenerator.websockets.transports.DataGeneratorTransportsWebSocketHandler;
 import cloud.project.datagenerator.websockets.transports.TransportUpdate;
@@ -31,6 +32,7 @@ public class TransportsDataGenerator {
     private final DataGeneratorTransportsWebSocketHandler dataGeneratorTransportsWebSocketHandler;
     private final Logger logger = Logger.getLogger("DataGenerator | Transports");
     private final TransportUtils transportUtils;
+    private final TransportRepository transportRepository;
 
     @Scheduled(fixedDelay = 5000, initialDelay = 12500)
     public void updateRandomTransportData() {
@@ -62,6 +64,8 @@ public class TransportsDataGenerator {
                 .pricePerAdult(random.nextFloat(200, 1000))
                 .build();
 
+        transportRepository.save(newTransport);
+
         updateTransportDataInTransportModules(DataUpdateType.CREATE, newTransport);
 
         updateTransportUpdatesOnFrontend(DataUpdateType.CREATE, newTransport, 0, 0);
@@ -82,6 +86,8 @@ public class TransportsDataGenerator {
 
         randomTransport.setCapacity(newGuestCapacity);
         randomTransport.setPricePerAdult(newPricePerAdult);
+
+        transportRepository.save(randomTransport);
 
         updateTransportDataInTransportModules(DataUpdateType.UPDATE, randomTransport);
 
