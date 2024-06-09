@@ -55,7 +55,7 @@ public class DataGeneratorHotelsWebSocketHandler extends TextWebSocketHandler {
         recentHotelUpdates.addLast(hotelUpdate);
         int maxHotelRequestsCount = 30;
         if (recentHotelUpdates.size() > maxHotelRequestsCount) {
-            recentHotelUpdates.removeLast();
+            recentHotelUpdates.removeFirst();
         }
     }
 

@@ -6,7 +6,6 @@ import org.microarchitecturovisco.offerprovider.domain.requests.GetOfferDetailsR
 import org.microarchitecturovisco.offerprovider.domain.requests.GetOfferPriceRequestDto;
 import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.services.OffersService;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
