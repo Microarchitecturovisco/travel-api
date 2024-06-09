@@ -56,7 +56,9 @@ public class OfferDetailsWebSocketHandler extends TextWebSocketHandler {
         GetOfferDetailsResponseDto responseDto = offersController.getOfferDetails(requestDto);
 
         // add hotel location id for transport course updates
-        session.getAttributes().put("idHotelLocation", responseDto.getDeparture().getFirst().getTransportCourse().getArrivalAtLocation().getIdLocation().toString());
+        if (!responseDto.getDeparture().isEmpty()) {
+            session.getAttributes().put("idHotelLocation", responseDto.getDeparture().getFirst().getTransportCourse().getArrivalAtLocation().getIdLocation().toString());
+        }
         session.getAttributes().put("searchParams", requestDto);
 
         if (session.isOpen()) {
