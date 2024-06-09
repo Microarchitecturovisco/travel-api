@@ -132,6 +132,7 @@ public class TransportBootstrap implements CommandLineRunner {
 
             TransportReservation reservation = TransportReservation.builder()
                     .id(transportReservationId)
+                    .mainReservationId(UUID.randomUUID())
                     .numberOfSeats(occupiedSeats)
                     .transport(transport)
                     .build();

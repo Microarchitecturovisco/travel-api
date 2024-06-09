@@ -1,4 +1,4 @@
-package org.microarchitecturovisco.transport.model.dto.request;
+package cloud.project.datagenerator.rabbitmq.requests.transports;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

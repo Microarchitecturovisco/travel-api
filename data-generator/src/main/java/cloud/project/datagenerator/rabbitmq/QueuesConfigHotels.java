@@ -1,6 +1,9 @@
-package org.microarchitecturovisco.hotelservice.queues.config;
+package cloud.project.datagenerator.rabbitmq;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,27 +11,14 @@ import org.springframework.context.annotation.Configuration;
 import java.util.UUID;
 
 @Configuration
-public class QueuesConfig {
-    public static final String EXCHANGE_HOTEL = "hotels.requests.checkAvailabilityByQuery.exchange";
-    public static final String QUEUE_HOTEL_CHECK_AVAILABILITY_REQ = "hotels.requests.checkAvailabilityByQuery.queue";
-
-
-    @Bean(name="handleReservationExchange")
-    public TopicExchange handleReservationExchange() {
-        return new TopicExchange(EXCHANGE_HOTEL);
-    }
-
-    @Bean(name="handleReservationQueue")
-    public Queue handleReservationQueue() {
-        return new Queue(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ, false);
-    }
+public class QueuesConfigHotels {
+    public static final String EXCHANGE_HOTEL_FANOUT_UPDATE_DATA = "data.generate.hotels.exchange";
 
     @Bean
-    public Binding handleReservationRequestBinding(
-            @Qualifier("handleReservationExchange") TopicExchange handleReservationExchange,
-            @Qualifier("handleReservationQueue") Queue handleReservationQueue) {
-        return BindingBuilder.bind(handleReservationQueue).to(handleReservationExchange).with(QUEUE_HOTEL_CHECK_AVAILABILITY_REQ);
+    public FanoutExchange updateHotelDataFanoutExchange() {
+        return new FanoutExchange(EXCHANGE_HOTEL_FANOUT_UPDATE_DATA);
     }
+
 
     public static final String QUEUE_HOTEL_CREATE_RESERVATION_REQ_PREFIX = "hotels.events.createHotelReservation.queue.";
     public static final String EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION = "hotels.createReservation.exchange";
@@ -72,6 +62,5 @@ public class QueuesConfig {
             @Qualifier("handleDeleteHotelReservationQueue") Queue handleDeleteHotelReservationQueue) {
         return BindingBuilder.bind(handleDeleteHotelReservationQueue).to(fanoutExchangeDeleteHotelReservation);
     }
-
 
 }
