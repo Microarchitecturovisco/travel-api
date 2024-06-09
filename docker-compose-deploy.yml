@@ -23,7 +23,7 @@ services:
     env_file:
       - .frontend-env
     deploy:
-      replicas: 8
+      replicas: 4
 
   discovery:
     image: ghcr.io/microarchitecturovisco/discovery:latest
@@ -66,7 +66,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 16
+      replicas: 4
 
   payment:
     image: ghcr.io/microarchitecturovisco/payment:latest
