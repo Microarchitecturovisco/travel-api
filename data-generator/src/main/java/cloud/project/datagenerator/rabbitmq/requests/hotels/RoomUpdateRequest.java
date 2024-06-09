@@ -1,5 +1,6 @@
 package cloud.project.datagenerator.rabbitmq.requests.hotels;
 
+import cloud.project.datagenerator.rabbitmq.requests.DataUpdateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
