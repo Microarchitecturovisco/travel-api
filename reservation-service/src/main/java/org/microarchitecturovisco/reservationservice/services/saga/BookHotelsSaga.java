@@ -3,20 +3,23 @@ package org.microarchitecturovisco.reservationservice.services.saga;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.CheckHotelAvailabilityRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.CreateHotelReservationRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.responses.CheckHotelAvailabilityResponseDto;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
-import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.queues.config.QueuesHotelConfig;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.logging.Logger;
+
 @Service
 @RequiredArgsConstructor
 public class BookHotelsSaga {
     private final RabbitTemplate rabbitTemplate;
+    public static Logger logger = Logger.getLogger(BookHotelsSaga.class.getName());
 
     public boolean checkIfHotelIsAvailable(ReservationRequest reservationRequest) throws ReservationFailException {
         CheckHotelAvailabilityRequest availabilityRequest = CheckHotelAvailabilityRequest.builder()
@@ -28,7 +31,7 @@ public class BookHotelsSaga {
 
         String reservationRequestJson = JsonConverter.convert(availabilityRequest);
 
-        System.out.println("Checking hotel availability: " + availabilityRequest);
+        logger.info("Checking hotel availability: " + availabilityRequest);
 
         try {
             byte[] responseMessageB = (byte[]) rabbitTemplate.convertSendAndReceive(
@@ -43,7 +46,7 @@ public class BookHotelsSaga {
                 return response.isIfAvailable();
             }
             else {
-                System.out.println("Null message at: checkIfHotelIsAvailable()");
+                logger.info("Null message at: checkIfHotelIsAvailable()");
                 throw new ReservationFailException();
             }
         } catch (ReservationFailException e) {
@@ -62,7 +65,7 @@ public class BookHotelsSaga {
 
         String requestJson = JsonConverter.convert(request);
 
-        System.out.println("Creating Hotel reservation: " + requestJson);
+        logger.info("Creating Hotel reservation: " + requestJson);
 
         rabbitTemplate.convertAndSend(
                 QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT_CREATE_RESERVATION,
@@ -74,7 +77,7 @@ public class BookHotelsSaga {
     public void deleteHotelReservation(HotelReservationDeleteRequest hotelReservationDeleteRequest) {
         String requestJson = JsonConverter.convert(hotelReservationDeleteRequest);
 
-        System.out.println("Deleting hotel reservation: " + requestJson);
+        logger.info("Deleting hotel reservation: " + requestJson);
 
         rabbitTemplate.convertAndSend(
                 QueuesHotelConfig.EXCHANGE_HOTEL_FANOUT_DELETE_RESERVATION,

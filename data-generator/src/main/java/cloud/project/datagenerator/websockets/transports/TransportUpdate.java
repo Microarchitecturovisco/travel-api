@@ -6,14 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class TransportUpdate implements Serializable {
-    private LocalDateTime updateDateTime;
+    private String updateDateTime;
     private String updateType;
     private String departureRegionAndCountry;
     private String arrivalRegionAndCountry;

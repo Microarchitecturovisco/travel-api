@@ -110,10 +110,10 @@ public class HotelsDataGenerator {
     }
 
     private void updateHotelUpdatesOnFrontend(DataUpdateType updateType, String roomName, String hotelName, int capacityChange, float priceChange) {
-        LocalDateTime currentDateAndTime = LocalDateTime.now().withSecond(0).withNano(0);
+        LocalDateTime currentDateAndTime = LocalDateTime.now().withNano(0);
 
         HotelUpdate hotelUpdate = HotelUpdate.builder()
-                .updateDateTime(currentDateAndTime)
+                .updateDateTime(currentDateAndTime.toString())
                 .updateType(String.valueOf(updateType))
                 .hotelName(hotelName)
                 .roomName(roomName)

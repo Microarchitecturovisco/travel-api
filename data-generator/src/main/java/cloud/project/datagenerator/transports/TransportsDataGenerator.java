@@ -112,7 +112,7 @@ public class TransportsDataGenerator {
     }
 
     private void updateTransportUpdatesOnFrontend(DataUpdateType updateType, Transport transport, int capacityChange, float priceChange) {
-        LocalDateTime currentDateAndTime = LocalDateTime.now().withSecond(0).withNano(0);
+        LocalDateTime currentDateAndTime = LocalDateTime.now().withNano(0);
 
         String departureRegion = transport.getCourse().getDepartureFrom().getRegion();
         String departureCountry = transport.getCourse().getDepartureFrom().getCountry();
@@ -121,7 +121,7 @@ public class TransportsDataGenerator {
         String transportTypeName = transport.getCourse().getType().toString();
 
         TransportUpdate transportUpdate = TransportUpdate.builder()
-                .updateDateTime(currentDateAndTime)
+                .updateDateTime(currentDateAndTime.toString())
                 .updateType(String.valueOf(updateType))
                 .departureRegionAndCountry(departureRegion + ", " + departureCountry)
                 .arrivalRegionAndCountry(arrivalRegion + ", " + arrivalCountry)
