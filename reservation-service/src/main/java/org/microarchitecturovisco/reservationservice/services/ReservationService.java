@@ -2,14 +2,11 @@ package org.microarchitecturovisco.reservationservice.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.CreateReservationCommand;
-import org.microarchitecturovisco.reservationservice.domain.commands.DeleteReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseDto;
-import org.microarchitecturovisco.reservationservice.domain.dto.requests.HotelReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
-import org.microarchitecturovisco.reservationservice.domain.dto.requests.TransportReservationDeleteRequest;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PurchaseFailedException;
@@ -22,6 +19,7 @@ import org.microarchitecturovisco.reservationservice.queues.config.QueuesReserva
 import org.microarchitecturovisco.reservationservice.repositories.ReservationRepository;
 import org.microarchitecturovisco.reservationservice.services.saga.BookHotelsSaga;
 import org.microarchitecturovisco.reservationservice.services.saga.BookTransportsSaga;
+import org.microarchitecturovisco.reservationservice.services.saga.InvalidPaymentHandler;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonConverter;
 import org.microarchitecturovisco.reservationservice.utils.json.JsonReader;
 import org.microarchitecturovisco.reservationservice.websockets.ReservationWebSocketHandler;
@@ -35,16 +33,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
 
-    public static final int PAYMENT_TIMEOUT_SECONDS = 60;
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(ReservationService.class);
 
     public static Logger logger = Logger.getLogger(ReservationService.class.getName());
@@ -58,6 +52,8 @@ public class ReservationService {
     private final RabbitTemplate rabbitTemplate;
 
     private final ReservationWebSocketHandler reservationWebSocketHandler;
+
+    private final InvalidPaymentHandler invalidPaymentHandler;
 
     public Reservation createReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
                                                       int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
@@ -83,30 +79,6 @@ public class ReservationService {
         return reservationRepository.findById(reservationId).orElseThrow(RuntimeException::new);
     }
 
-    private void deleteReservation(LocalDateTime hotelTimeFrom, LocalDateTime hotelTimeTo,
-                                                          int infantsQuantity, int kidsQuantity, int teensQuantity, int adultsQuantity,
-                                                          float price, UUID hotelId, List<UUID> roomReservationsIds,
-                                                          List<UUID> transportReservationsIds, UUID userId, UUID reservationId) {
-
-            DeleteReservationCommand command = DeleteReservationCommand.builder()
-                    .id(reservationId)
-                    .hotelTimeFrom(hotelTimeFrom)
-                    .hotelTimeTo(hotelTimeTo)
-                    .infantsQuantity(infantsQuantity)
-                    .kidsQuantity(kidsQuantity)
-                    .teensQuantity(teensQuantity)
-                    .adultsQuantity(adultsQuantity)
-                    .price(price)
-                    .paid(false)
-                    .hotelId(hotelId)
-                    .roomReservationsIds(roomReservationsIds)
-                    .transportReservationsIds(transportReservationsIds)
-                    .userId(userId)
-                    .build();
-            reservationAggregate.handleDeleteReservationCommand(command);
-        }
-
-
     public UUID bookOrchestration(ReservationRequest reservationRequest) throws ReservationFailException {
 
         checkHotelAvailability(reservationRequest);
@@ -121,11 +93,7 @@ public class ReservationService {
 
         bookTransportsSaga.createTransportReservation(reservationRequest);
 
-        Runnable paymentTimeoutRunnable = () -> {
-            paymentTimeout(reservationRequest);
-        };
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorService.schedule(paymentTimeoutRunnable, PAYMENT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        invalidPaymentHandler.schedulePaymentTimeoutCheck(reservationRequest);
 
         return reservationId;
     }
@@ -133,14 +101,12 @@ public class ReservationService {
 
     private void checkHotelAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
         boolean hotelIsAvailable = bookHotelsSaga.checkIfHotelIsAvailable(reservationRequest);
-//        boolean hotelIsAvailable = true; // debug only
         System.out.println("hotelIsAvailable: "+ hotelIsAvailable);
         if(!hotelIsAvailable) { throw new ReservationFailException(); }
     }
 
     private void checkTransportAvailability(ReservationRequest reservationRequest) throws ReservationFailException {
         boolean transportIsAvailable = bookTransportsSaga.checkIfTransportIsAvailable(reservationRequest);
-//        boolean transportIsAvailable = true; // debug only
         System.out.println("transportIsAvailable: " + transportIsAvailable);
         if(!transportIsAvailable) { throw new ReservationFailException(); }
     }
@@ -153,54 +119,6 @@ public class ReservationService {
         rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequestJson);
 
         System.out.println("reservationCreated: " + reservationRequest.getId());
-    }
-
-    public void paymentTimeout(ReservationRequest reservationRequest) {
-        ReservationService.logger.warning("PAYMENT TIMEOUT FOR ID: " + reservationRequest.getId() + " !");
-
-        // Delete reservation in Transport service
-        rollbackForTransportReservation(reservationRequest);
-
-        // Delete reservation in Hotel service
-        rollbackForHotelReservation(reservationRequest);
-
-        // Delete reservation from the ReservationRepository in Reservation service
-        rollbackForReservationObject(reservationRequest);
-
-    }
-
-    private void rollbackForTransportReservation(ReservationRequest reservationRequest) {
-        TransportReservationDeleteRequest transportReservationDeleteRequest = TransportReservationDeleteRequest.builder()
-                .transportReservationsIds(reservationRequest.getTransportReservationsIds())
-                .reservationId(reservationRequest.getId())
-                .build();
-        bookTransportsSaga.deleteTransportReservation(transportReservationDeleteRequest);
-    }
-
-    private void rollbackForHotelReservation(ReservationRequest reservationRequest) {
-        HotelReservationDeleteRequest hotelReservationDeleteRequest = HotelReservationDeleteRequest.builder()
-                .hotelId(reservationRequest.getHotelId())
-                .reservationId(reservationRequest.getId())
-                .roomIds(reservationRequest.getRoomReservationsIds())
-                .build();
-        bookHotelsSaga.deleteHotelReservation(hotelReservationDeleteRequest);
-    }
-
-    private void rollbackForReservationObject(ReservationRequest reservationRequest) {
-        deleteReservation(
-                reservationRequest.getHotelTimeFrom(),
-                reservationRequest.getHotelTimeTo(),
-                reservationRequest.getChildrenUnder3Quantity(),
-                reservationRequest.getChildrenUnder10Quantity(),
-                reservationRequest.getChildrenUnder18Quantity(),
-                reservationRequest.getAdultsQuantity(),
-                reservationRequest.getPrice(),
-                reservationRequest.getHotelId(),
-                reservationRequest.getRoomReservationsIds(),
-                reservationRequest.getTransportReservationsIds(),
-                reservationRequest.getUserId(),
-                reservationRequest.getId()
-        );
     }
 
     public ReservationConfirmationResponse purchaseReservation(String reservationId, String cardNumber) {
@@ -234,14 +152,7 @@ public class ReservationService {
                         .userId(reservation.getUserId())
                         .build();
 
-                // Delete reservation in Transport service
-                rollbackForTransportReservation(reservationRequest);
-
-                // Delete reservation in Hotel service
-                rollbackForHotelReservation(reservationRequest);
-
-                // Delete reservation from the ReservationRepository in Reservation service
-                rollbackForReservationObject(reservationRequest);
+                invalidPaymentHandler.rollbackReservation(reservationRequest);
             }
 
             logger.severe("Payment failed: " + failedPaymentMessage);
