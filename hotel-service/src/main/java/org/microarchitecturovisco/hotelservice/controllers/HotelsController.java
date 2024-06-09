@@ -144,7 +144,8 @@ public class HotelsController {
 
     @RabbitListener(queues = "#{handleDataGeneratorCreateQueue}")
     public void consumeDataGeneratorMessage(String requestJson) {
-        System.out.println("Got hotel data generator: " + requestJson);
+        Logger logger = Logger.getLogger("HotelController");
+        logger.info("Got hotel data generator: " + requestJson);
 
         RoomUpdateRequest request = JsonReader.readDtoFromJson(requestJson, RoomUpdateRequest.class);
 
@@ -168,7 +169,7 @@ public class HotelsController {
         // update room
         if (request.getUpdateType() == DataUpdateType.UPDATE) {
             System.out.println("Updated room: " + request);
-
+            // TODO update room
             return;
         }
     }
