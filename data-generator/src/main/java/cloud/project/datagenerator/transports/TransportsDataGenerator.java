@@ -121,7 +121,7 @@ public class TransportsDataGenerator {
         String transportTypeName = transport.getCourse().getType().toString();
 
         TransportUpdate transportUpdate = TransportUpdate.builder()
-                .updateDateTime(currentDateAndTime)
+                .updateDateTime(currentDateAndTime.toString())
                 .updateType(String.valueOf(updateType))
                 .departureRegionAndCountry(departureRegion + ", " + departureCountry)
                 .arrivalRegionAndCountry(arrivalRegion + ", " + arrivalCountry)

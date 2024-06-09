@@ -113,7 +113,7 @@ public class HotelsDataGenerator {
         LocalDateTime currentDateAndTime = LocalDateTime.now().withNano(0);
 
         HotelUpdate hotelUpdate = HotelUpdate.builder()
-                .updateDateTime(currentDateAndTime)
+                .updateDateTime(currentDateAndTime.toString())
                 .updateType(String.valueOf(updateType))
                 .hotelName(hotelName)
                 .roomName(roomName)
