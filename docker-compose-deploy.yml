@@ -14,7 +14,7 @@ services:
     image: ghcr.io/microarchitecturovisco/travel-ui:latest
     hostname: front
     ports:
-      - "80:80"
+      - "18453:80"
     depends_on:
       - rabbitmq
       - discovery
