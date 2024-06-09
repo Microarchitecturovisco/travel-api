@@ -8,6 +8,7 @@ import org.microarchitecturovisco.hotelservice.model.dto.request.*;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySearchQueryResponseDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
 import org.microarchitecturovisco.hotelservice.model.events.RoomCreatedEvent;
+import org.microarchitecturovisco.hotelservice.model.events.RoomUpdateEvent;
 import org.microarchitecturovisco.hotelservice.model.exceptions.HotelNoFoundException;
 import org.microarchitecturovisco.hotelservice.model.mappers.CateringMapper;
 import org.microarchitecturovisco.hotelservice.model.mappers.HotelMapper;
@@ -196,8 +197,8 @@ public class HotelsService {
 
     public void updateRoomFromHotel(UUID hotelId, UUID roomId, String name, int guestCapacity, float pricePerAdult,
                                     String description) {
-
-        ;
+        RoomUpdateEvent roomUpdateEvent = new RoomUpdateEvent(hotelId, roomId, name, guestCapacity, pricePerAdult, description);
+        hotelEventProjector.project(List.of(roomUpdateEvent));
     }
 }
 
