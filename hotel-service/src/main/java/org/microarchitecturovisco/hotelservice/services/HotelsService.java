@@ -163,6 +163,18 @@ public class HotelsService {
         return true;
     }
 
+    public Room getRoomById(UUID uuid) {
+        return roomRepository.findById(uuid).orElseThrow(RuntimeException::new);
+    }
+
+    public boolean doesRoomHaveAnyReservationsInFuture(Room room) {
+        LocalDateTime date = LocalDateTime.now();
+        for(RoomReservation reservation : room.getRoomReservations()) {
+            if(reservation.getDateTo().isAfter(date)) return true;
+        }
+        return false;
+    }
+
     public Hotel getHotel(UUID id) throws HotelNoFoundException {
         return hotelRepository.findById(id).orElseThrow(HotelNoFoundException::new);
     }
@@ -184,6 +196,7 @@ public class HotelsService {
 
     public void updateRoomFromHotel(UUID hotelId, UUID roomId, String name, int guestCapacity, float pricePerAdult,
                                     String description) {
+
         ;
     }
 }

@@ -7,6 +7,7 @@ import org.microarchitecturovisco.hotelservice.controllers.reservations.DeleteHo
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.CreateRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.cqrs.commands.DeleteRoomReservationCommand;
 import org.microarchitecturovisco.hotelservice.model.domain.Hotel;
+import org.microarchitecturovisco.hotelservice.model.domain.Room;
 import org.microarchitecturovisco.hotelservice.model.dto.RoomReservationDto;
 import org.microarchitecturovisco.hotelservice.model.dto.data_generator.DataUpdateType;
 import org.microarchitecturovisco.hotelservice.model.dto.data_generator.RoomUpdateRequest;
@@ -169,8 +170,13 @@ public class HotelsController {
         // update room
         if (request.getUpdateType() == DataUpdateType.UPDATE) {
             System.out.println("Updated room: " + request);
-            // TODO update room
-            return;
+
+            Room roomToUpdate = hotelsService.getRoomById(request.getId());
+            if(hotelsService.doesRoomHaveAnyReservationsInFuture(roomToUpdate)) return;
+
+            hotelsService.updateRoomFromHotel(request.getHotelId(), request.getId(), request.getName(),
+                    request.getGuestCapacity(), request.getPricePerAdult(), request.getDescription());
+
         }
     }
 
