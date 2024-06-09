@@ -384,7 +384,9 @@ public class OffersService {
     public Float getOfferPrice(GetOfferPriceRequestDto requestDto) {
         Pair<LocalDateTime, LocalDateTime> dates = parseDates(requestDto.getDateFrom(), requestDto.getDateTo());
 
-//        if (requestDto.getDeparture())
+        if (requestDto.getDeparture().isEmpty() || requestDto.getDeparture().getFirst() == null || requestDto.getDeparture().getLast() == null) {
+            return -1.0f;
+        }
 
         return calculatePrice(
                 (int) ChronoUnit.DAYS.between(dates.getFirst(), dates.getSecond()),
