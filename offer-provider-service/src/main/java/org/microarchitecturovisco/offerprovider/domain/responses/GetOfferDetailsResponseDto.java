@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.microarchitecturovisco.offerprovider.domain.dto.CateringOptionDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.LocationDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.RoomResponseDto;
+import org.microarchitecturovisco.offerprovider.domain.dto.RoomsConfigurationDto;
 import org.microarchitecturovisco.offerprovider.domain.dto.responses.TransportDto;
 
 import java.util.List;
@@ -24,8 +25,8 @@ public class GetOfferDetailsResponseDto {
     private LocationDto destination;
     private List<String> imageUrls;
 
-    private List<RoomResponseDto> roomConfiguration;
-    private List<List<RoomResponseDto>> possibleRoomConfigurations;
+    private RoomsConfigurationDto roomConfiguration;
+    private List<RoomsConfigurationDto> possibleRoomConfigurations;
 
     private List<CateringOptionDto> cateringOptions;
 

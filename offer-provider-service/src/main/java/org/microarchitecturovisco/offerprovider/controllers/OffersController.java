@@ -2,6 +2,8 @@ package org.microarchitecturovisco.offerprovider.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.offerprovider.domain.dto.OfferDto;
+import org.microarchitecturovisco.offerprovider.domain.requests.GetOfferDetailsRequestDto;
+import org.microarchitecturovisco.offerprovider.domain.requests.GetOfferPriceRequestDto;
 import org.microarchitecturovisco.offerprovider.domain.responses.GetOfferDetailsResponseDto;
 import org.microarchitecturovisco.offerprovider.services.OffersService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -58,29 +60,20 @@ public class OffersController {
         return offerDtos;
     }
 
-    @GetMapping("/{idHotel}")
-    public GetOfferDetailsResponseDto getOfferDetails(
-            @PathVariable UUID idHotel,
-            @RequestParam(name = "date_from") String dateFrom,
-            @RequestParam(name = "date_to") String dateTo,
-            @RequestParam(name = "departure_buses", required = false) List<UUID> departureBuses,
-            @RequestParam(name = "departure_planes", required = false) List<UUID> departurePlanes,
-            @RequestParam(name = "adults") Integer adults,
-            @RequestParam(name = "infants") Integer infants,
-            @RequestParam(name = "kids") Integer kids,
-            @RequestParam(name = "teens") Integer teens
-    ) {
+    public GetOfferDetailsResponseDto getOfferDetails(GetOfferDetailsRequestDto requestDto) {
         Logger logger = Logger.getLogger("getOfferDetails");
-        logger.info("Request for hotel ID: " + idHotel);
+        logger.info("Request for hotel ID: " + requestDto.getIdHotel());
 
-        departureBuses = departureBuses != null ? departureBuses : new ArrayList<>();
-        departurePlanes = departurePlanes != null ? departurePlanes : new ArrayList<>();
+        requestDto.setDepartureBuses(requestDto.getDepartureBuses() != null ? requestDto.getDepartureBuses() : new ArrayList<>());
+        requestDto.setDeparturePlanes(requestDto.getDeparturePlanes() != null ? requestDto.getDeparturePlanes() : new ArrayList<>());
 
-        GetOfferDetailsResponseDto responseDto = offersService.getOfferDetails(
-                idHotel, dateFrom, dateTo, departureBuses, departurePlanes, adults, infants, kids, teens
-        );
+        GetOfferDetailsResponseDto responseDto = offersService.getOfferDetails(requestDto);
         logger.info("Response: " + responseDto);
 
         return responseDto;
+    }
+
+    public Float getOfferPrice(GetOfferPriceRequestDto requestDto) {
+        return offersService.getOfferPrice(requestDto);
     }
 }
