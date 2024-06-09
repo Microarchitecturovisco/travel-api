@@ -5,25 +5,40 @@ services:
     image: rabbitmq:3.13-management
     hostname: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "18424:5672"
+      - "18446:15672"
     networks:
       - backend
 
+  front:
+    image: ghcr.io/microarchitecturovisco/travel-ui:latest
+    hostname: front
+    ports:
+      - "18453:80"
+    depends_on:
+      - rabbitmq
+      - discovery
+    networks:
+      - backend
+    env_file:
+      - .frontend-env
+    deploy:
+      replicas: 4
+
   discovery:
-    image: mcarchvsc-discovery
+    image: ghcr.io/microarchitecturovisco/discovery:latest
     hostname: discovery
     ports:
-      - "8010:8010"
+      - "18451:8010"
     depends_on:
       - rabbitmq
     networks:
       - backend
 
   gateway:
-    image: mcarchvsc-gateway
+    image: ghcr.io/microarchitecturovisco/gateway:latest
     ports:
-      - "8082:8082"
+      - "18469:8082"
     depends_on:
       - rabbitmq
       - discovery
@@ -31,27 +46,30 @@ services:
       - backend
 
 
-  # custom services
   hotel:
-    image: mcarchvsc-hotel
+    image: ghcr.io/microarchitecturovisco/hotel:latest
     depends_on:
       - rabbitmq
       - discovery
       - gateway
     networks:
       - backend
+    deploy:
+      replicas: 16
 
   offer-provider:
-    image: mcarchvsc-offer-provider
+    image: ghcr.io/microarchitecturovisco/offer-provider:latest
     depends_on:
       - rabbitmq
       - discovery
       - gateway
     networks:
       - backend
+    deploy:
+      replicas: 4
 
   payment:
-    image: mcarchvsc-payment
+    image: ghcr.io/microarchitecturovisco/payment:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -60,7 +78,7 @@ services:
       - backend
 
   reservation:
-    image: mcarchvsc-reservation
+    image: ghcr.io/microarchitecturovisco/reservation:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -69,16 +87,18 @@ services:
       - backend
 
   transport:
-    image: mcarchvsc-transport
+    image: ghcr.io/microarchitecturovisco/transport:latest
     depends_on:
       - rabbitmq
       - discovery
       - gateway
     networks:
       - backend
+    deploy:
+      replicas: 16
 
   user:
-    image: mcarchvsc-user
+    image: ghcr.io/microarchitecturovisco/user:latest
     depends_on:
       - rabbitmq
       - discovery
@@ -87,7 +107,7 @@ services:
       - backend
 
   data-generator:
-    image: mcarchvsc-data-generator
+    image: ghcr.io/microarchitecturovisco/data-generator:latest
     depends_on:
       - rabbitmq
       - discovery
