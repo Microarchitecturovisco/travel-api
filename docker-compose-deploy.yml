@@ -22,6 +22,8 @@ services:
       - backend
     env_file:
       - .frontend-env
+    deploy:
+      replicas: 8
 
   discovery:
     image: ghcr.io/microarchitecturovisco/discovery:latest
@@ -52,6 +54,8 @@ services:
       - gateway
     networks:
       - backend
+    deploy:
+      replicas: 16
 
   offer-provider:
     image: ghcr.io/microarchitecturovisco/offer-provider:latest
@@ -61,6 +65,8 @@ services:
       - gateway
     networks:
       - backend
+    deploy:
+      replicas: 16
 
   payment:
     image: ghcr.io/microarchitecturovisco/payment:latest
@@ -88,6 +94,8 @@ services:
       - gateway
     networks:
       - backend
+    deploy:
+      replicas: 16
 
   user:
     image: ghcr.io/microarchitecturovisco/user:latest
