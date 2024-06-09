@@ -6,6 +6,7 @@ import cloud.project.datagenerator.hotels.repositories.RoomRepository;
 import cloud.project.datagenerator.hotels.utils.HotelUtils;
 import cloud.project.datagenerator.rabbitmq.QueuesConfigHotels;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
+import cloud.project.datagenerator.rabbitmq.requests.DataUpdateType;
 import cloud.project.datagenerator.rabbitmq.requests.hotels.RoomUpdateRequest;
 import cloud.project.datagenerator.websockets.hotels.DataGeneratorHotelsWebSocketHandler;
 import cloud.project.datagenerator.websockets.hotels.HotelUpdate;
@@ -22,10 +23,6 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class HotelsDataGenerator {
-    enum DataUpdateType {
-        CREATE,
-        UPDATE
-    }
 
     private final Random random = new Random();
     private final RabbitTemplate rabbitTemplate;
@@ -96,7 +93,7 @@ public class HotelsDataGenerator {
 
     public void updateHotelDataInHotelModules(DataUpdateType updateType, Room room) {
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.builder()
-                .updateType(String.valueOf(updateType))
+                .updateType(updateType)
                 .id(room.getId())
                 .hotelId(room.getHotel().getId())
                 .name(room.getName())

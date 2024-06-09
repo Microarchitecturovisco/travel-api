@@ -28,17 +28,20 @@ public class HotelEventProjector {
             if (hotelEvent instanceof HotelCreatedEvent){
                 apply((HotelCreatedEvent) hotelEvent);
             }
-            if (hotelEvent instanceof CateringOptionCreatedEvent){
+            else if (hotelEvent instanceof CateringOptionCreatedEvent){
                 apply((CateringOptionCreatedEvent) hotelEvent);
             }
-            if (hotelEvent instanceof RoomCreatedEvent){
+            else if (hotelEvent instanceof RoomCreatedEvent){
                 apply((RoomCreatedEvent) hotelEvent);
             }
-            if (hotelEvent instanceof RoomReservationCreatedEvent){
+            else if (hotelEvent instanceof RoomReservationCreatedEvent){
                 apply((RoomReservationCreatedEvent) hotelEvent);
             }
-            if (hotelEvent instanceof RoomReservationDeletedEvent){
+            else if (hotelEvent instanceof RoomReservationDeletedEvent){
                 apply((RoomReservationDeletedEvent) hotelEvent);
+            }
+            else if (hotelEvent instanceof RoomUpdateEvent) {
+                apply((RoomUpdateEvent) hotelEvent);
             }
         }
     }
@@ -132,6 +135,19 @@ public class HotelEventProjector {
                 }
             }
         }
+    }
+
+    private void apply(RoomUpdateEvent event){
+        Room room = roomRepository.findById(event.getRoomId()).orElseThrow(RuntimeException::new);
+
+        room.setName(event.getName());
+        room.setName(event.getName());
+        room.setGuestCapacity(event.getGuestCapacity());
+        room.setPricePerAdult(event.getPricePerAdult());
+        room.setDescription(event.getDescription());
+
+        roomRepository.save(room);
+
     }
 
 }

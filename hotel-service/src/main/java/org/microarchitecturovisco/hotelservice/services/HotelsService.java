@@ -7,6 +7,9 @@ import org.microarchitecturovisco.hotelservice.model.dto.RoomsConfigurationDto;
 import org.microarchitecturovisco.hotelservice.model.dto.request.*;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelsBySearchQueryResponseDto;
 import org.microarchitecturovisco.hotelservice.model.dto.response.GetHotelDetailsResponseDto;
+import org.microarchitecturovisco.hotelservice.model.events.RoomCreatedEvent;
+import org.microarchitecturovisco.hotelservice.model.events.RoomUpdateEvent;
+import org.microarchitecturovisco.hotelservice.model.exceptions.HotelNoFoundException;
 import org.microarchitecturovisco.hotelservice.model.mappers.CateringMapper;
 import org.microarchitecturovisco.hotelservice.model.mappers.HotelMapper;
 import org.microarchitecturovisco.hotelservice.model.mappers.LocationMapper;
@@ -26,6 +29,7 @@ public class HotelsService {
 
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
+    private final HotelEventProjector hotelEventProjector;
 
     public GetHotelDetailsResponseDto getHotelDetails(GetHotelDetailsRequestDto requestDto){
         LocalDateTime dateFrom = requestDto.getDateFrom();
@@ -160,6 +164,41 @@ public class HotelsService {
         return true;
     }
 
+    public Room getRoomById(UUID uuid) {
+        return roomRepository.findById(uuid).orElseThrow(RuntimeException::new);
+    }
 
+    public boolean doesRoomHaveAnyReservationsInFuture(Room room) {
+        LocalDateTime date = LocalDateTime.now();
+        for(RoomReservation reservation : room.getRoomReservations()) {
+            if(reservation.getDateTo().isAfter(date)) return true;
+        }
+        return false;
+    }
+
+    public Hotel getHotel(UUID id) throws HotelNoFoundException {
+        return hotelRepository.findById(id).orElseThrow(HotelNoFoundException::new);
+    }
+
+    public void createRoomFromHotel(UUID hotelId, UUID roomId, String name, int guestCapacity, float pricePerAdult,
+                                    String description) {
+        // hotel event projector
+        RoomCreatedEvent roomCreatedEvent = RoomCreatedEvent.builder()
+                .idHotel(hotelId)
+                .roomId(roomId)
+                .name(name)
+                .guestCapacity(guestCapacity)
+                .pricePerAdult(pricePerAdult)
+                .description(description)
+                .build();
+
+        hotelEventProjector.project(List.of(roomCreatedEvent));
+    }
+
+    public void updateRoomFromHotel(UUID hotelId, UUID roomId, String name, int guestCapacity, float pricePerAdult,
+                                    String description) {
+        RoomUpdateEvent roomUpdateEvent = new RoomUpdateEvent(hotelId, roomId, name, guestCapacity, pricePerAdult, description);
+        hotelEventProjector.project(List.of(roomUpdateEvent));
+    }
 }
 
