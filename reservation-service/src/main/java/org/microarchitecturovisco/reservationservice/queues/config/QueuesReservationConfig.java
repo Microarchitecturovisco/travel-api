@@ -52,4 +52,25 @@ public class QueuesReservationConfig {
             Queue handleReservationDeleteQueue) {
         return BindingBuilder.bind(handleReservationDeleteQueue).to(handleReservationDeleteExchange);
     }
+
+
+    public static final String EXCHANGE_UPDATE_RESERVATION = "reservations.events.updateReservation.exchange";
+
+    @Bean
+    public FanoutExchange handleReservationUpdateExchange() {
+        return new FanoutExchange(EXCHANGE_UPDATE_RESERVATION);
+    }
+
+    @Bean
+    public Queue handleReservationUpdateQueue() {
+        String uniqueQueueName = "reservations.events.updateReservation.queue." + UUID.randomUUID();
+        return new Queue(uniqueQueueName, false, false, true);
+    }
+
+    @Bean
+    public Binding handleReservationUpdateRequestBinding(
+            FanoutExchange handleReservationUpdateExchange,
+            Queue handleReservationUpdateQueue) {
+        return BindingBuilder.bind(handleReservationUpdateQueue).to(handleReservationUpdateExchange);
+    }
 }

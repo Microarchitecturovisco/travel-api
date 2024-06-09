@@ -2,8 +2,10 @@ package org.microarchitecturovisco.reservationservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.DeleteReservationCommand;
+import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.dto.ReservationPreference;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.UpdateReservationPaymentStatus;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.ReservationFailException;
 import org.microarchitecturovisco.reservationservice.domain.model.PurchaseRequestBody;
@@ -139,4 +141,16 @@ public class ReservationController {
                 .build();
         reservationAggregate.handleDeleteReservationCommand(command);
     }
+
+
+    @RabbitListener(queues = "#{handleReservationUpdateQueue.name}")
+    public void consumeMessageUpdateReservationPaymentStatus(String reservationPaymentStatusJson) {
+        UpdateReservationPaymentStatus reservationPaymentStatus = JsonReader.readDtoFromJson(reservationPaymentStatusJson, UpdateReservationPaymentStatus.class);
+        UUID reservationId = reservationPaymentStatus.getReservationId();
+
+        reservationAggregate.handleReservationUpdateCommand(UpdateReservationCommand.builder().reservationId(reservationId).paid(true).build());
+
+        logger.info("Reservation in Reservation module updated successfully");
+    }
+
 }
