@@ -11,7 +11,7 @@ services:
       - backend
 
   front:
-    image: ghcr.io/microarchitecturovisco/travel-ui:latest
+    image: ghcr.io/microarchitecturovisco/travel-ui:dev
     hostname: front
     ports:
       - "18453:80"
@@ -24,7 +24,7 @@ services:
       replicas: 2
 
   discovery:
-    image: ghcr.io/microarchitecturovisco/discovery:latest
+    image: ghcr.io/microarchitecturovisco/discovery:dev
     hostname: discovery
     ports:
       - "18451:8010"
@@ -34,7 +34,7 @@ services:
       - backend
 
   gateway:
-    image: ghcr.io/microarchitecturovisco/gateway:latest
+    image: ghcr.io/microarchitecturovisco/gateway:dev
     ports:
       - "18469:8082"
     depends_on:
@@ -45,7 +45,7 @@ services:
 
 
   hotel:
-    image: ghcr.io/microarchitecturovisco/hotel:latest
+    image: ghcr.io/microarchitecturovisco/hotel:dev
     depends_on:
       - rabbitmq
       - discovery
@@ -56,7 +56,7 @@ services:
       replicas: 8
 
   offer-provider:
-    image: ghcr.io/microarchitecturovisco/offer-provider:latest
+    image: ghcr.io/microarchitecturovisco/offer-provider:dev
     depends_on:
       - rabbitmq
       - discovery
@@ -67,7 +67,7 @@ services:
       replicas: 2
 
   payment:
-    image: ghcr.io/microarchitecturovisco/payment:latest
+    image: ghcr.io/microarchitecturovisco/payment:dev
     depends_on:
       - rabbitmq
       - discovery
@@ -76,7 +76,7 @@ services:
       - backend
 
   reservation:
-    image: ghcr.io/microarchitecturovisco/reservation:latest
+    image: ghcr.io/microarchitecturovisco/reservation:dev
     depends_on:
       - rabbitmq
       - discovery
@@ -85,7 +85,7 @@ services:
       - backend
 
   transport:
-    image: ghcr.io/microarchitecturovisco/transport:latest
+    image: ghcr.io/microarchitecturovisco/transport:dev
     depends_on:
       - rabbitmq
       - discovery
@@ -105,7 +105,7 @@ services:
       - backend
 
   data-generator:
-    image: ghcr.io/microarchitecturovisco/data-generator:latest
+    image: ghcr.io/microarchitecturovisco/data-generator:dev
     depends_on:
       - rabbitmq
       - discovery
