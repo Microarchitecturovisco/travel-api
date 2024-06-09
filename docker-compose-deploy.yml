@@ -20,10 +20,8 @@ services:
       - discovery
     networks:
       - backend
-    env_file:
-      - .frontend-env
     deploy:
-      replicas: 4
+      replicas: 2
 
   discovery:
     image: ghcr.io/microarchitecturovisco/discovery:latest
@@ -55,7 +53,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 16
+      replicas: 8
 
   offer-provider:
     image: ghcr.io/microarchitecturovisco/offer-provider:latest
@@ -66,7 +64,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 4
+      replicas: 2
 
   payment:
     image: ghcr.io/microarchitecturovisco/payment:latest
@@ -95,7 +93,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 16
+      replicas: 8
 
   user:
     image: ghcr.io/microarchitecturovisco/user:latest
