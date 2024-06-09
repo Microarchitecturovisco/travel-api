@@ -2,11 +2,11 @@ package org.microarchitecturovisco.reservationservice.services;
 
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.reservationservice.domain.commands.CreateReservationCommand;
-import org.microarchitecturovisco.reservationservice.domain.commands.UpdateReservationCommand;
 import org.microarchitecturovisco.reservationservice.domain.dto.HotelInfo;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentRequestDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.PaymentResponseDto;
 import org.microarchitecturovisco.reservationservice.domain.dto.requests.ReservationRequest;
+import org.microarchitecturovisco.reservationservice.domain.dto.requests.UpdateReservationPaymentStatus;
 import org.microarchitecturovisco.reservationservice.domain.entity.Reservation;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PaymentProcessException;
 import org.microarchitecturovisco.reservationservice.domain.exceptions.PurchaseFailedException;
@@ -159,7 +159,8 @@ public class ReservationService {
             throw new PurchaseFailedException(failedPaymentMessage);
         }
 
-        reservationAggregate.handleReservationUpdateCommand(UpdateReservationCommand.builder().reservationId(UUID.fromString(reservationId)).paid(true).build());
+        updateReservationPaymentStatus(reservationId);
+
         Reservation reservation = reservationRepository.findById(UUID.fromString(reservationId)).orElseThrow(ReservationNotFoundAfterPaymentException::new);
         HotelInfo hotelInfo = getHotelInformation(reservation.getHotelId());
         TransportReservationResponse transportInfo = getTransportInformation(reservation.getTransportReservationsIds().stream().map(UUID::toString).toList());
@@ -180,6 +181,21 @@ public class ReservationService {
                 .roomTypes(hotelInfo.getRoomTypes())
                 .transport(transportInfo)
                 .build();
+    }
+
+    private void updateReservationPaymentStatus(String reservationId) {
+        UpdateReservationPaymentStatus updateReservationPaymentStatus = new UpdateReservationPaymentStatus();
+        updateReservationPaymentStatus.setReservationId(UUID.fromString(reservationId));
+
+        String requestJson = JsonConverter.convert(updateReservationPaymentStatus);
+
+        logger.info("Updating reservation object: " + requestJson);
+
+        rabbitTemplate.convertAndSend(
+                QueuesReservationConfig.EXCHANGE_UPDATE_RESERVATION,
+                "", // Routing key is ignored for FanoutExchange
+                requestJson
+        );
     }
 
     private void sendBoughtOfferWebsocketMessages(String message, String idHotel) {
