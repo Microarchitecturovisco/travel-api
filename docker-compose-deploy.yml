@@ -98,16 +98,16 @@ services:
     networks:
       - backend
 
-#  data-generator:
-#    image: ghcr.io/microarchitecturovisco/data-generator:latest
-#    depends_on:
-#      - rabbitmq
-#      - discovery
-#      - gateway
-#      - hotel
-#      - transport
-#    networks:
-#      - backend
+  data-generator:
+    image: ghcr.io/microarchitecturovisco/data-generator:latest
+    depends_on:
+      - rabbitmq
+      - discovery
+      - gateway
+      - hotel
+      - transport
+    networks:
+      - backend
 
 networks:
   backend:
