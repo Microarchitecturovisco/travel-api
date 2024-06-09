@@ -116,7 +116,7 @@ public class ReservationService {
 
         System.out.println("reservationRequestJson: " + reservationRequestJson);
 
-        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_RESERVATION, "", reservationRequestJson);
+        rabbitTemplate.convertAndSend(QueuesReservationConfig.EXCHANGE_CREATE_RESERVATION, "", reservationRequestJson);
 
         System.out.println("reservationCreated: " + reservationRequest.getId());
     }

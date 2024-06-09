@@ -40,6 +40,7 @@ public class TransportsQueryController {
 
     private final TransportsQueryService transportsQueryService;
     private final RabbitTemplate rabbitTemplate;
+    public static Logger logger = Logger.getLogger(TransportsQueryController.class.getName());
 
     private final TransportCommandService transportCommandService;
 
@@ -116,7 +117,7 @@ public class TransportsQueryController {
     @RabbitListener(queues = QueuesConfig.QUEUE_TRANSPORT_CHECK_AVAILABILITY_REQ)
     public String consumeMessageFromQueueCheckTransportAvailability(String requestDtoJson) {
         CheckTransportAvailabilityRequestDto request = JsonReader.readDtoFromJson(requestDtoJson, CheckTransportAvailabilityRequestDto.class);
-        System.out.println("Checking transport availability: " + request);
+        logger.info("Checking transport availability: " + request);
 
         UUID transportReservationsIdFrom = request.getTransportReservationsIdFrom();
         UUID transportReservationsIdArrival = request.getTransportReservationsIdArrival();
@@ -128,7 +129,7 @@ public class TransportsQueryController {
             CheckTransportAvailabilityResponseDto response = CheckTransportAvailabilityResponseDto.builder()
                     .ifAvailable(false)
                     .build();
-            System.out.println("Transport available:" + response.isIfAvailable());
+            logger.info("Transport available:" + response.isIfAvailable());
             String responseJson = JsonConverter.convertToJsonWithLocalDateTime(response);
             return responseJson;
         }
@@ -142,7 +143,7 @@ public class TransportsQueryController {
                 .ifAvailable(ifAvailable)
                 .build();
 
-        System.out.println("Transport available:" + response.isIfAvailable());
+        logger.info("Transport available:" + response.isIfAvailable());
         String responseJson = JsonConverter.convertToJsonWithLocalDateTime(response);
 
         return responseJson;
@@ -164,7 +165,7 @@ public class TransportsQueryController {
     public void consumeMessageCreateTransportReservation(String requestDtoJson) {
         CreateTransportReservationRequest request = JsonReader.readDtoFromJson(requestDtoJson, CreateTransportReservationRequest.class);
 
-        System.out.println("Creating transport reservations: " + request);
+        logger.info("Creating transport reservations: " + request);
 
         for (UUID idTransport: request.getTransportIds()) {
 
@@ -188,7 +189,7 @@ public class TransportsQueryController {
     public void consumeMessageDeleteTransportReservation(String requestJson) {
         DeleteTransportReservationRequest request = JsonReader.readDtoFromJson(requestJson, DeleteTransportReservationRequest.class);
 
-        System.out.println("Deleting transport reservations: " + request);
+        logger.info("Deleting transport reservations: " + request);
 
         for (UUID transportId : request.getTransportReservationsIds()){
             DeleteTransportReservationCommand command = DeleteTransportReservationCommand.builder()

@@ -12,11 +12,11 @@ import java.util.UUID;
 @Configuration
 public class QueuesReservationConfig {
 
-    public static final String EXCHANGE_RESERVATION = "reservations.events.createReservation.exchange";
+    public static final String EXCHANGE_CREATE_RESERVATION = "reservations.events.createReservation.exchange";
 
     @Bean
     public FanoutExchange handleReservationCreateExchange() {
-        return new FanoutExchange(EXCHANGE_RESERVATION);
+        return new FanoutExchange(EXCHANGE_CREATE_RESERVATION);
     }
 
     @Bean
@@ -30,5 +30,26 @@ public class QueuesReservationConfig {
             FanoutExchange handleReservationCreateExchange,
             Queue handleReservationCreateQueue) {
         return BindingBuilder.bind(handleReservationCreateQueue).to(handleReservationCreateExchange);
+    }
+
+
+    public static final String EXCHANGE_DELETE_RESERVATION = "reservations.events.deleteReservation.exchange";
+
+    @Bean
+    public FanoutExchange handleReservationDeleteExchange() {
+        return new FanoutExchange(EXCHANGE_DELETE_RESERVATION);
+    }
+
+    @Bean
+    public Queue handleReservationDeleteQueue() {
+        String uniqueQueueName = "reservations.events.deleteReservation.queue." + UUID.randomUUID();
+        return new Queue(uniqueQueueName, false, false, true);
+    }
+
+    @Bean
+    public Binding handleReservationDeleteRequestBinding(
+            FanoutExchange handleReservationDeleteExchange,
+            Queue handleReservationDeleteQueue) {
+        return BindingBuilder.bind(handleReservationDeleteQueue).to(handleReservationDeleteExchange);
     }
 }
