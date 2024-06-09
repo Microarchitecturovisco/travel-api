@@ -349,11 +349,11 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/Microarchitecturovisco/data-generator
 
-      - name: Build and push Users
+      - name: Build and push Data generator
         id: build-and-push-user
         uses: docker/build-push-action@v5
         with:
-          context: ./user-service
+          context: ./data-generator
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
