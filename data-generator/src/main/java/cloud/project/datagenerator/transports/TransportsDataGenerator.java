@@ -1,5 +1,7 @@
 package cloud.project.datagenerator.transports;
 
+import cloud.project.datagenerator.hotels.domain.Hotel;
+import cloud.project.datagenerator.hotels.repositories.HotelRepository;
 import cloud.project.datagenerator.rabbitmq.QueuesConfigTransports;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
 import cloud.project.datagenerator.rabbitmq.requests.transports.TransportUpdateRequest;
@@ -22,6 +24,8 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class TransportsDataGenerator {
+    private final HotelRepository hotelRepository;
+
     enum DataUpdateType {
         CREATE,
         UPDATE
@@ -99,6 +103,8 @@ public class TransportsDataGenerator {
                 .updateType(String.valueOf(updateType))
                 .id(transport.getId())
                 .courseId(transport.getCourse().getId())
+                .courseLocationFromId(transport.getCourse().getDepartureFrom().getId())
+                .courseLocationToId(transport.getCourse().getArrivalAt().getId())
                 .departureDate(transport.getDepartureDate())
                 .capacity(transport.getCapacity())
                 .pricePerAdult(transport.getPricePerAdult())

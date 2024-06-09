@@ -1,4 +1,4 @@
-package cloud.project.datagenerator.rabbitmq.requests.transports;
+package org.microarchitecturovisco.offerprovider.domain.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -55,6 +55,10 @@ public class OfferDetailsWebSocketHandler extends TextWebSocketHandler {
 
         GetOfferDetailsResponseDto responseDto = offersController.getOfferDetails(requestDto);
 
+        // add hotel location id for transport course updates
+        session.getAttributes().put("idHotelLocation", responseDto.getDeparture().getFirst().getTransportCourse().getArrivalAtLocation().getIdLocation().toString());
+        session.getAttributes().put("searchParams", requestDto);
+
         if (session.isOpen()) {
             try {
                 session.sendMessage(new TextMessage(JsonConverter.convert(responseDto)));
@@ -72,11 +76,18 @@ public class OfferDetailsWebSocketHandler extends TextWebSocketHandler {
         super.afterConnectionClosed(session, status);
     }
 
-    public void sendMessageToAll(String message) {
-        for (WebSocketSession session : sessions) {
+    public void sendOfferDetailsToSubscribedByHotelId(String idHotel) {
+        Logger logger = Logger.getLogger("ReservationWebSocketHandler");
+        logger.info("Sending message to clients subscribed to hotel " + idHotel);
+
+        for (WebSocketSession session : sessions.stream().filter(sess -> sess.getAttributes().get("idHotel").equals(idHotel)).toList()) {
             try {
                 if (session.isOpen()) {
-                    session.sendMessage(new TextMessage(message));
+                    GetOfferDetailsResponseDto responseDto = offersController.getOfferDetails((GetOfferDetailsRequestDto) session.getAttributes().get("searchParams"));
+
+                    responseDto.setDataGeneratorUpdate(true);
+
+                    session.sendMessage(new TextMessage(JsonConverter.convert(responseDto)));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -84,13 +95,22 @@ public class OfferDetailsWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    public void sendMessageToSubscribedByIdHotel(String message, String idHotel) {
+    public void sendOfferDetailsToSubscribedByLocationIds(String idFromLocation, String idToLocation) {
         Logger logger = Logger.getLogger("ReservationWebSocketHandler");
-        logger.info("Sending message to clients subscribed to " + idHotel);
-        for (WebSocketSession session : sessions.stream().filter(sess -> sess.getAttributes().get("idHotel").equals(idHotel)).toList()) {
+        logger.info("Sending message to clients subscribed to one of those locations: " + idFromLocation + " " + idToLocation);
+
+        for (WebSocketSession session : sessions.stream().filter(sess ->
+                sess.getAttributes().get("idHotelLocation") != null &&
+                        (sess.getAttributes().get("idHotelLocation").equals(idFromLocation) || sess.getAttributes().get("idHotelLocation").equals(idToLocation))).toList()) {
             try {
                 if (session.isOpen()) {
-                    session.sendMessage(new TextMessage(message));
+                    logger.info("sending message to session with hotel id " + session.getAttributes().get("idHotel"));
+
+                    GetOfferDetailsResponseDto responseDto = offersController.getOfferDetails((GetOfferDetailsRequestDto) session.getAttributes().get("searchParams"));
+
+                    responseDto.setDataGeneratorUpdate(true);
+
+                    session.sendMessage(new TextMessage(JsonConverter.convert(responseDto)));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

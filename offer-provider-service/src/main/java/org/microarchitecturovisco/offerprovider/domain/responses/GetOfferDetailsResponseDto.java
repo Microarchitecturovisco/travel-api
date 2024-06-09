@@ -25,6 +25,8 @@ public class GetOfferDetailsResponseDto {
     private LocationDto destination;
     private List<String> imageUrls;
 
+    private boolean dataGeneratorUpdate = false;
+
     private RoomsConfigurationDto roomConfiguration;
     private List<RoomsConfigurationDto> possibleRoomConfigurations;
 
