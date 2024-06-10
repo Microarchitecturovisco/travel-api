@@ -205,34 +205,4 @@ public class TransportsQueryController {
         }
     }
 
-    @RabbitListener(queues = "#{handleDataGeneratorCreateQueue}")
-    public void consumeDataGeneratorMessage(String requestJson) {
-        Logger logger = Logger.getLogger("TransportController");
-        logger.info("Got transport data generator: " + requestJson);
-
-        TransportUpdateRequest request = JsonReader.readDtoFromJson(requestJson, TransportUpdateRequest.class);
-
-        // create transport
-        if (request.getUpdateType() == DataUpdateType.CREATE) {
-            System.out.println("Created transport: " + request);
-
-            transportsQueryService.createTransport(request.getId(), request.getCourseId(), request.getDepartureDate(),
-                    request.getCapacity(), request.getPricePerAdult());
-            return;
-        }
-
-        Transport transport = null;
-        transport = transportsQueryService.getTransportById(request.getId());
-        if (transport == null)
-        {
-            return;
-        }
-        // update transport
-        if (request.getUpdateType() == DataUpdateType.UPDATE) {
-            System.out.println("Updated transport: " + request);
-
-            transportsQueryService.updateTransport(request.getId(), request.getCapacity(), request.getPricePerAdult());
-
-        }
-    }
 }

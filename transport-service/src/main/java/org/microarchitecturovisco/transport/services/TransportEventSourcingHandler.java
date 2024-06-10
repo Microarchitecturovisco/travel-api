@@ -39,9 +39,6 @@ public class TransportEventSourcingHandler {
             if (transportEvent instanceof TransportUpdateEvent){
                 apply((TransportUpdateEvent) transportEvent);
             }
-            if (transportEvent instanceof TransportOnlyCreatedEvent){
-                apply((TransportOnlyCreatedEvent) transportEvent);
-            }
         }
     }
 
@@ -120,20 +117,5 @@ public class TransportEventSourcingHandler {
         transport.setCapacity(event.getCapacity());
         transport.setPricePerAdult(event.getPricePerAdult());
         transportRepository.save(transport);
-    }
-
-    private void apply(TransportOnlyCreatedEvent event){
-        TransportCourse transportCourse = transportCourseRepository.findById(event.getCourseId()).orElseThrow(RuntimeException::new);
-
-        Transport transport = new Transport();
-        transport.setId(event.getIdTransport());
-        transport.setDepartureDate(event.getDepartureDate());
-        transport.setCourse(transportCourse);
-        transport.setCapacity(event.getCapacity());
-        transport.setPricePerAdult(event.getPricePerAdult());
-
-        transportRepository.save(transport);
-        transportCourseRepository.save(transportCourse);
-
     }
 }

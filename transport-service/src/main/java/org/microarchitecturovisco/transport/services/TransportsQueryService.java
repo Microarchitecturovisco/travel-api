@@ -3,7 +3,6 @@ package org.microarchitecturovisco.transport.services;
 import lombok.RequiredArgsConstructor;
 import org.microarchitecturovisco.transport.model.domain.*;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
-import org.microarchitecturovisco.transport.model.dto.data_generator.DataUpdateType;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBetweenMultipleLocationsRequestDto;
 import org.microarchitecturovisco.transport.model.dto.request.GetTransportsBySearchQueryRequestDto;
@@ -11,16 +10,12 @@ import org.microarchitecturovisco.transport.model.dto.response.AvailableTranspor
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBetweenLocationsResponseDto;
 import org.microarchitecturovisco.transport.model.dto.response.GetTransportsBySearchQueryResponseDto;
-import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
-import org.microarchitecturovisco.transport.model.events.TransportOnlyCreatedEvent;
-import org.microarchitecturovisco.transport.model.events.TransportUpdateEvent;
 import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -273,19 +268,6 @@ public class TransportsQueryService {
                 .sum();
     }
 
-    public void updateTransport(UUID transportId, int capacity, float pricePerAdult) {
-        TransportUpdateEvent transportUpdateEvent =  new TransportUpdateEvent(transportId, capacity, pricePerAdult);
-        transportEventStore.save(transportUpdateEvent);
-        transportEventSourcingHandler.project(List.of(transportUpdateEvent));
-    }
 
-    public void createTransport(UUID transportId, UUID courseId, LocalDateTime departureDate, int capacity,
-                                float pricePerAdult) {
-
-        TransportOnlyCreatedEvent transportOnlyCreatedEvent = new TransportOnlyCreatedEvent(transportId,
-                courseId, departureDate, capacity, pricePerAdult);
-        transportEventStore.save(transportOnlyCreatedEvent);
-        transportEventSourcingHandler.project(List.of(transportOnlyCreatedEvent));
-    }
 
 }
