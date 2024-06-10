@@ -18,6 +18,7 @@ import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
+import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class TransportsQueryService {
     private final TransportRepository transportRepository;
     private final LocationRepository locationRepository;
     private final TransportEventSourcingHandler transportEventSourcingHandler;
+    private final TransportEventStore transportEventStore;
 
     public List<TransportDto> getAllTransports() {
         List<Transport> transports = transportRepository.findAll();
@@ -273,6 +275,7 @@ public class TransportsQueryService {
 
     public void updateTransport(UUID transportId, int capacity, float pricePerAdult) {
         TransportUpdateEvent transportUpdateEvent =  new TransportUpdateEvent(transportId, capacity, pricePerAdult);
+        transportEventStore.save(transportUpdateEvent);
         transportEventSourcingHandler.project(List.of(transportUpdateEvent));
     }
 
@@ -281,6 +284,7 @@ public class TransportsQueryService {
 
         TransportOnlyCreatedEvent transportOnlyCreatedEvent = new TransportOnlyCreatedEvent(transportId,
                 courseId, departureDate, capacity, pricePerAdult);
+        transportEventStore.save(transportOnlyCreatedEvent);
         transportEventSourcingHandler.project(List.of(transportOnlyCreatedEvent));
     }
 

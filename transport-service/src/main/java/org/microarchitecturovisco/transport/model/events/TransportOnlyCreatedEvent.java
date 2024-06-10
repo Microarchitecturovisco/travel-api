@@ -19,7 +19,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class TransportOnlyCreatedEvent extends TransportEvent {
-    private UUID transportId;
     private UUID courseId;
     private LocalDateTime departureDate;
     private int capacity;
@@ -27,7 +26,8 @@ public class TransportOnlyCreatedEvent extends TransportEvent {
 
     public TransportOnlyCreatedEvent(UUID transportId, UUID courseId, LocalDateTime departureDate, int capacity,
                                      float pricePerAdult) {
-        this.transportId = transportId;
+        this.setIdTransport(transportId);
+        this.setEventTimeStamp(LocalDateTime.now());
         this.courseId = courseId;
         this.departureDate = departureDate;
         this.capacity = capacity;

@@ -117,10 +117,8 @@ public class TransportEventSourcingHandler {
     private void apply(TransportUpdateEvent event)
     {
         Transport transport = transportRepository.findById(event.getIdTransport()).orElseThrow(RuntimeException::new);
-
         transport.setCapacity(event.getCapacity());
         transport.setPricePerAdult(event.getPricePerAdult());
-
         transportRepository.save(transport);
     }
 
@@ -132,8 +130,10 @@ public class TransportEventSourcingHandler {
         transport.setDepartureDate(event.getDepartureDate());
         transport.setCourse(transportCourse);
         transport.setCapacity(event.getCapacity());
+        transport.setPricePerAdult(event.getPricePerAdult());
 
         transportRepository.save(transport);
         transportCourseRepository.save(transportCourse);
+
     }
 }

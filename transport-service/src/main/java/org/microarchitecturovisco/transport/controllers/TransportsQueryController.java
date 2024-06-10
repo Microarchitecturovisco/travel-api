@@ -212,19 +212,6 @@ public class TransportsQueryController {
 
         TransportUpdateRequest request = JsonReader.readDtoFromJson(requestJson, TransportUpdateRequest.class);
 
-        // perform data update
-        Transport transport;
-        try {
-            transport = transportsQueryService.getTransportById(request.getId());
-            if (transport == null)
-            {
-                System.out.println("Transport not found");
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         // create transport
         if (request.getUpdateType() == DataUpdateType.CREATE) {
             System.out.println("Created transport: " + request);
@@ -234,6 +221,12 @@ public class TransportsQueryController {
             return;
         }
 
+        Transport transport = null;
+        transport = transportsQueryService.getTransportById(request.getId());
+        if (transport == null)
+        {
+            return;
+        }
         // update transport
         if (request.getUpdateType() == DataUpdateType.UPDATE) {
             System.out.println("Updated transport: " + request);

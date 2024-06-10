@@ -17,13 +17,12 @@ import java.util.UUID;
 @Getter
 @Setter
 public class TransportUpdateEvent extends TransportEvent {
-    private UUID transportId;
     private int capacity;
     private float pricePerAdult;
 
     public TransportUpdateEvent(UUID transportId, int capacity, float pricePerAdult){
         this.setEventTimeStamp(LocalDateTime.now());
-        this.transportId = transportId;
+        this.setIdTransport(transportId);
         this.capacity = capacity;
         this.pricePerAdult = pricePerAdult;
     }
