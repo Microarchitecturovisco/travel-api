@@ -10,6 +10,7 @@ import org.microarchitecturovisco.transport.model.domain.TransportReservation;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
+import org.microarchitecturovisco.transport.model.dto.data_generator.TransportUpdateRequest;
 import org.microarchitecturovisco.transport.model.dto.request.*;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.CheckTransportAvailabilityResponseDto;
@@ -32,6 +33,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import org.microarchitecturovisco.transport.model.dto.data_generator.DataUpdateType;
+
 
 @RestController()
 @RequestMapping("/transports")
@@ -199,6 +202,44 @@ public class TransportsQueryController {
                     .build();
 
             transportCommandService.deleteReservation(command);
+        }
+    }
+
+    @RabbitListener(queues = "#{handleDataGeneratorCreateQueue}")
+    public void consumeDataGeneratorMessage(String requestJson) {
+        Logger logger = Logger.getLogger("TransportController");
+        logger.info("Got transport data generator: " + requestJson);
+
+        TransportUpdateRequest request = JsonReader.readDtoFromJson(requestJson, TransportUpdateRequest.class);
+
+        // perform data update
+        Transport transport;
+        try {
+            transport = transportsQueryService.getTransportById(request.getId());
+            if (transport == null)
+            {
+                System.out.println("Transport not found");
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // create transport
+        if (request.getUpdateType() == DataUpdateType.CREATE) {
+            System.out.println("Created transport: " + request);
+
+            transportsQueryService.createTransport(request.getId(), request.getCourseId(), request.getDepartureDate(),
+                    request.getCapacity(), request.getPricePerAdult());
+            return;
+        }
+
+        // update transport
+        if (request.getUpdateType() == DataUpdateType.UPDATE) {
+            System.out.println("Updated transport: " + request);
+
+            transportsQueryService.updateTransport(request.getId(), request.getCapacity(), request.getPricePerAdult());
+
         }
     }
 }

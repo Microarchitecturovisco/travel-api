@@ -4,6 +4,7 @@ import cloud.project.datagenerator.hotels.domain.Hotel;
 import cloud.project.datagenerator.hotels.repositories.HotelRepository;
 import cloud.project.datagenerator.rabbitmq.QueuesConfigTransports;
 import cloud.project.datagenerator.rabbitmq.json.JsonConverter;
+import cloud.project.datagenerator.rabbitmq.requests.DataUpdateType;
 import cloud.project.datagenerator.rabbitmq.requests.transports.TransportUpdateRequest;
 import cloud.project.datagenerator.transports.domain.Transport;
 import cloud.project.datagenerator.transports.domain.TransportCourse;
@@ -26,10 +27,6 @@ import java.util.logging.Logger;
 public class TransportsDataGenerator {
     private final HotelRepository hotelRepository;
 
-    enum DataUpdateType {
-        CREATE,
-        UPDATE
-    }
 
     private final Random random = new Random();
     private final RabbitTemplate rabbitTemplate;
@@ -100,7 +97,7 @@ public class TransportsDataGenerator {
 
     public void updateTransportDataInTransportModules(DataUpdateType updateType, Transport transport) {
         TransportUpdateRequest transportUpdateRequest = TransportUpdateRequest.builder()
-                .updateType(String.valueOf(updateType))
+                .updateType(updateType)
                 .id(transport.getId())
                 .courseId(transport.getCourse().getId())
                 .courseLocationFromId(transport.getCourse().getDepartureFrom().getId())

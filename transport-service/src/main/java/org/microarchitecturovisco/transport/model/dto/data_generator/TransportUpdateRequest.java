@@ -1,6 +1,5 @@
-package cloud.project.datagenerator.rabbitmq.requests.transports;
+package org.microarchitecturovisco.transport.model.dto.data_generator;
 
-import cloud.project.datagenerator.rabbitmq.requests.DataUpdateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,3 +30,4 @@ public class TransportUpdateRequest {
 
     private float pricePerAdult;
 }
+
