@@ -26,7 +26,7 @@ public class HotelUtils {
             return null;
         }
 
-        return hotels.get(random.nextInt(hotels.size()));
+        return hotels.get(random.nextInt(5));
     }
 
     public Room getRandomRoomFromHotel(Hotel hotel) {
