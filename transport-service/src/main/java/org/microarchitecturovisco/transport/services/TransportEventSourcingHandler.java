@@ -5,10 +5,7 @@ import org.microarchitecturovisco.transport.model.domain.Location;
 import org.microarchitecturovisco.transport.model.domain.Transport;
 import org.microarchitecturovisco.transport.model.domain.TransportCourse;
 import org.microarchitecturovisco.transport.model.domain.TransportReservation;
-import org.microarchitecturovisco.transport.model.events.TransportCreatedEvent;
-import org.microarchitecturovisco.transport.model.events.TransportEvent;
-import org.microarchitecturovisco.transport.model.events.TransportReservationCreatedEvent;
-import org.microarchitecturovisco.transport.model.events.TransportReservationDeletedEvent;
+import org.microarchitecturovisco.transport.model.events.*;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
@@ -38,6 +35,9 @@ public class TransportEventSourcingHandler {
             }
             if (transportEvent instanceof TransportReservationDeletedEvent) {
                 apply((TransportReservationDeletedEvent) transportEvent);
+            }
+            if (transportEvent instanceof TransportUpdateEvent){
+                apply((TransportUpdateEvent) transportEvent);
             }
         }
     }
@@ -109,5 +109,13 @@ public class TransportEventSourcingHandler {
             }
         }
 
+    }
+
+    private void apply(TransportUpdateEvent event)
+    {
+        Transport transport = transportRepository.findById(event.getIdTransport()).orElseThrow(RuntimeException::new);
+        transport.setCapacity(event.getCapacity());
+        transport.setPricePerAdult(event.getPricePerAdult());
+        transportRepository.save(transport);
     }
 }

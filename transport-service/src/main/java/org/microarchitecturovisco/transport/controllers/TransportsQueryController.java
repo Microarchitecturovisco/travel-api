@@ -10,6 +10,7 @@ import org.microarchitecturovisco.transport.model.domain.TransportReservation;
 import org.microarchitecturovisco.transport.model.dto.LocationDto;
 import org.microarchitecturovisco.transport.model.dto.TransportDto;
 import org.microarchitecturovisco.transport.model.dto.TransportReservationDto;
+import org.microarchitecturovisco.transport.model.dto.data_generator.TransportUpdateRequest;
 import org.microarchitecturovisco.transport.model.dto.request.*;
 import org.microarchitecturovisco.transport.model.dto.response.AvailableTransportsDto;
 import org.microarchitecturovisco.transport.model.dto.response.CheckTransportAvailabilityResponseDto;
@@ -32,6 +33,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import org.microarchitecturovisco.transport.model.dto.data_generator.DataUpdateType;
+
 
 @RestController()
 @RequestMapping("/transports")
@@ -201,4 +204,5 @@ public class TransportsQueryController {
             transportCommandService.deleteReservation(command);
         }
     }
+
 }

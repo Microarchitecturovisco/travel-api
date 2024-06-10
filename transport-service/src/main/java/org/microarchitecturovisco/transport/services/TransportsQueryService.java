@@ -14,6 +14,7 @@ import org.microarchitecturovisco.transport.model.mappers.LocationMapper;
 import org.microarchitecturovisco.transport.model.mappers.TransportMapper;
 import org.microarchitecturovisco.transport.repositories.LocationRepository;
 import org.microarchitecturovisco.transport.repositories.TransportCourseRepository;
+import org.microarchitecturovisco.transport.repositories.TransportEventStore;
 import org.microarchitecturovisco.transport.repositories.TransportRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,8 @@ public class TransportsQueryService {
     private final TransportCourseRepository transportCourseRepository;
     private final TransportRepository transportRepository;
     private final LocationRepository locationRepository;
+    private final TransportEventSourcingHandler transportEventSourcingHandler;
+    private final TransportEventStore transportEventStore;
 
     public List<TransportDto> getAllTransports() {
         List<Transport> transports = transportRepository.findAll();
