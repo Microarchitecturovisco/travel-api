@@ -31,7 +31,7 @@ public class HotelsDataGenerator {
     private final HotelUtils hotelUtils;
     private final RoomRepository roomRepository;
 
-    @Scheduled(fixedDelay = 10000, initialDelay = 120000)
+    @Scheduled(fixedDelay = 10000, initialDelay = 600000)
     public void updateRandomHotelData() {
         int action = random.nextInt(2);
 

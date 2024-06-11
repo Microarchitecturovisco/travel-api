@@ -21,7 +21,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 2
+      replicas: 1
 
   discovery:
     image: ghcr.io/microarchitecturovisco/discovery:dev
@@ -53,7 +53,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 8
+      replicas: 2
 
   offer-provider:
     image: ghcr.io/microarchitecturovisco/offer-provider:dev
@@ -93,7 +93,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 8
+      replicas: 2
 
   user:
     image: ghcr.io/microarchitecturovisco/user:latest

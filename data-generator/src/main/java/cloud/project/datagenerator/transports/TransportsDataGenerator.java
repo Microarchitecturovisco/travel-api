@@ -35,7 +35,7 @@ public class TransportsDataGenerator {
     private final TransportUtils transportUtils;
     private final TransportRepository transportRepository;
 
-    @Scheduled(fixedDelay = 5000, initialDelay = 12500)
+    @Scheduled(fixedDelay = 10000, initialDelay = 600000)
     public void updateRandomTransportData() {
         int action = random.nextInt(2);
 
