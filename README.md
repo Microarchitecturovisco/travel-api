@@ -31,9 +31,12 @@ This project is devided into 9 modules:
 ## Services description
 
 - **offer provide service** - This service provides offers for users. It communicates through queues with transports and hotels to get available hotels/rooms and transport at certain period and connect it to present avvailable offers (transport + rooms) to user. It also provides detailed view of specific offer with data collected from hotel module.
-- **reservation service** - This service orchestrates the process of reservation. 
+
+- **reservation service** - This service orchestrates the process of reservation with usaged of saga pattern. It communicated with hotel service and transport service to reserve needed resources. If during reservation, any of the resource is not available, then it communicate with the provider of resource already booked to unreserve the resource. Alos when the payment is unsuccesfull, then all resources are freed.
+
 - **hotel service** - This service stores hotel data such as hotel details, room details and room reservation. It provides information about avaivability of a room/hotel to offer provider and reservation service and shares an option with reservation service to reserve certain rooms.
-- **transport service** - 
+
+- **transport service** - This service stores data about transports and transport reservations. It provides information about avaivability of a certain transport to offer provider and reservation service and shares an option with reservation service to reserve a transport.
 
 ## Running with docker
 
