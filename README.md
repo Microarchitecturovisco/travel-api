@@ -8,6 +8,10 @@ for communication between components. Used CQRS, Event Sourcing and Saga pattern
 
 Frontend side of this project can be found [here](https://github.com/Microarchitecturovisco/travel-ui).
 
+<div align="center">
+  <img src="photos/result_get_offer_query.png" width="800"/>
+</div>
+
 ## Table of contents
 - [Microservices architecture](#microservices-architecture)
 - [Services description](#services-description)
@@ -28,6 +32,8 @@ This project is devided into 9 modules:
 - **data generator** - additional module for seeking live changes of the hotel and transport data
 
 **RabbitMQ** is used as the message broker.
+
+
 
 ## Services description
 
