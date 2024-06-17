@@ -10,8 +10,9 @@ Frontend side of this project can be found [here](https://github.com/Microarchit
 
 ## Table of contents
 - [Microservices architecture](#microservices-architecture)
-- [Using docker compose](#using-docker-compose)
 - [Services description](#services-description)
+- [Use Cases](#use-cases)
+- [Using docker compose](#using-docker-compose)
 
 ## Microservices architecture
 
