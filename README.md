@@ -13,10 +13,21 @@ Frontend side of this project can be found [here](https://github.com/Microarchit
 </div>
 
 ## Table of contents
+- [Technology](#technology)
 - [Microservices architecture](#microservices-architecture)
 - [Services description](#services-description)
+- [Database schema](#database-schema)
 - [Use Cases](#use-cases)
 - [Using docker compose](#using-docker-compose)
+
+## Technology
+
+- **Framework:** Spring Boot
+- **Discovery:** Eureka Discovery Service
+- **Database:** H2 Database + Springa Data JPA + Hibernate Validator
+- **Communication:** Spring AMQP with RabbitMQ
+- **Maven**
+- **Lombok**
 
 ## Microservices architecture
 
@@ -45,6 +56,26 @@ This project is devided into 9 modules:
 
 - **transport service** - This service stores data about transports and transport reservations. It provides information about avaivability of a certain transport to offer provider and reservation service and shares an option with reservation service to reserve a transport.
 
+## Database Schema
+We use the CQRS pattern and Event Sourcing to manage databases
+
+### Hotels database
+<div align="center">
+  <img src="photos/database_hotels.png" width="800"/>
+</div>
+
+### Transports database
+<div align="center">
+  <img src="photos/database_transports.png" width="800"/>
+</div>
+
+### Reservations database
+<div align="center">
+  <img src="photos/database_reservations.png" width="300"/>
+</div>
+
+
+
 ## Use cases
 
 - **Get offer based on search query** - Firstly user asks Transport Module for all cities from which you can leave and Hotel Module for all cities to which you can go. Then user send search query for desired cities with parameters like dates and number of people in different age. After that Offer Provider asks Hotel and Transport Moduls for all Hotels and Transports that satisfies those conditions. After getting both answers Offer Provider combines them and send to user all available offers (Hotel + Transport).
@@ -64,6 +95,8 @@ This project is devided into 9 modules:
 <div align="center">
   <img src="photos/book_and_buy_offer.png" width="800"/>
 </div>
+
+
 
 ## Using-docker-compose
 
